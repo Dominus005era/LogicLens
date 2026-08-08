@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LogicLens AI — Multi-Persona Round-Table Discussion Dashboard</title>
+  <title>LogicLens AI — Deep Discussion & Reasoning Dashboard</title>
   <meta name="description" content="Impartial AI Reasoning & Virtual Multi-Persona Round-Table Discussion Engine powered by Google Gemma 4 AI.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -90,19 +90,16 @@
 
         <!-- Topic & Argument Input Card Container -->
         <div class="workspace-card" id="topic-input-container">
-          <div class="workspace-header">
-            <div class="workspace-title-box">
-              <h2>🗣️ Virtual Multi-Persona Round-Table Engine</h2>
-              <p>Enter any topic, prompt, or opinion to launch an organic 1-to-2 minute live round-table debate.</p>
+          <div class="workspace-header" style="justify-content:center; text-align:center;">
+            <div class="workspace-title-box" style="margin-bottom:1rem;">
+              <h2>🗣️ Deep Discussion & Reasoning Platform</h2>
+              <p>Enter any topic, prompt, or opinion to launch an in-depth 4-party round-table discussion.</p>
             </div>
 
-            <!-- Mode Switcher Tabs -->
-            <div class="mode-tabs">
-              <button class="mode-tab active" data-mode="roundtable" onclick="setMode('roundtable')">
-                <span>🏛️ Round-Table Debate</span>
-              </button>
-              <button class="mode-tab" data-mode="analyze" onclick="setMode('analyze')">
-                <span>📊 Transcript Analysis</span>
+            <!-- Two Primary Centered Mode Switcher Tabs -->
+            <div class="mode-tabs" style="margin: 0 auto;">
+              <button class="mode-tab active" data-mode="deep_discussion" onclick="setMode('deep_discussion')">
+                <span>🗣️ Deep Discussion</span>
               </button>
               <button class="mode-tab" data-mode="calm" onclick="setMode('calm')">
                 <span>🕊️ Calm Rewrite</span>
@@ -137,7 +134,7 @@ Example: Whether school and colleges need proper uniform or not"></textarea>
           <!-- Primary Action Submit Button -->
           <div class="action-bar">
             <button id="analyze-btn" class="btn btn-primary btn-large" onclick="triggerRoundTable()">
-              <span id="btn-text">✨ Generate Round-Table Discussion</span>
+              <span id="btn-text">✨ Launch Deep Discussion</span>
               <div class="spinner hidden" id="btn-spinner"></div>
             </button>
           </div>
@@ -169,7 +166,7 @@ Example: Whether school and colleges need proper uniform or not"></textarea>
             </div>
 
             <!-- Canvas Screen for 3D Isometric Round-Table Meeting -->
-            <div style="position:relative; width:100%; text-align:center; margin-bottom:1.5rem;">
+            <div style="position:relative; width:100%; text-align:center; margin-bottom:1.5rem;" id="canvas-stage-wrapper">
               <canvas id="roundtable-canvas" style="border-radius:var(--radius-lg); width:100%; max-width:980px; box-shadow:var(--shadow-glow); cursor:pointer;" onclick="handleCanvasClick(event)"></canvas>
             </div>
 
@@ -180,19 +177,85 @@ Example: Whether school and colleges need proper uniform or not"></textarea>
                 <span id="live-speaker-status" style="font-size:0.9rem; font-weight:600; color:var(--text-main);">Person A is introducing their core thesis...</span>
               </div>
 
-              <!-- Quick Persona Inspection Buttons -->
-              <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-                <button class="preset-btn" onclick="openPersonaDrawer('person_a')" style="border-color:var(--accent-indigo);">🧑‍💼 Person A (Economic)</button>
-                <button class="preset-btn" onclick="openPersonaDrawer('person_b')" style="border-color:var(--accent-rose);">👩‍🎨 Person B (Social)</button>
-                <button class="preset-btn" onclick="openPersonaDrawer('person_c')" style="border-color:var(--accent-emerald);">👨‍🔬 Person C (Data)</button>
-                <button class="preset-btn" onclick="openPersonaDrawer('person_d')" style="border-color:var(--accent-amber);">👩‍⚖️ Person D (Ethics)</button>
+              <!-- Action Bar Buttons -->
+              <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+                <!-- On-Demand View Toggle Button -->
+                <button class="btn btn-secondary" id="toggle-analysis-btn" onclick="toggleTranscriptAnalysisView()" style="border-color:var(--accent-indigo);">
+                  <span>📊 View Transcript Analysis</span>
+                </button>
                 
                 <button class="btn-seek-conclusion" onclick="openConclusionModal()" style="margin-left:0.5rem;">
-                  ✨ Seek Synthesis & Conclusion
+                  ✨ Seek Synthesis & Report
                 </button>
               </div>
             </div>
 
+          </div>
+
+          <!-- ================================================================
+               ON-DEMAND TOPIC TRANSCRIPT ANALYSIS WINDOW (TOGGLED)
+               ================================================================ -->
+          <div class="results-dashboard hidden" id="topic-transcript-analysis-container" style="margin-top:2.5rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-card); padding:1rem 1.5rem; border-radius:var(--radius-md); border:1px solid var(--border-glow);">
+              <h3>📊 Topic Transcript Analysis Metrics</h3>
+              <button class="btn btn-secondary" onclick="toggleTranscriptAnalysisView()">
+                <span>🗣️ Back to Round Table Stage</span>
+              </button>
+            </div>
+
+            <!-- Summary & Coach Banner -->
+            <div class="dashboard-section summary-card">
+              <div class="section-title">
+                <span class="icon">📝</span>
+                <h3>Reasoning Evaluation & Debate Coach Verdict</h3>
+              </div>
+              <p id="topic-summary-text" class="summary-body"></p>
+
+              <div class="coach-score-box">
+                <div class="score-circle-wrap">
+                  <svg class="score-ring-svg" viewBox="0 0 100 100">
+                    <circle class="ring-bg" cx="50" cy="50" r="42"></circle>
+                    <circle class="ring-fill" id="topic-score-ring" cx="50" cy="50" r="42" stroke-dasharray="264" stroke-dashoffset="264"></circle>
+                  </svg>
+                  <div class="score-number-display">
+                    <span id="topic-coach-score-num">0</span>
+                    <span class="score-max">/100</span>
+                  </div>
+                </div>
+
+                <div class="coach-details">
+                  <h4 id="topic-coach-verdict-title">Overall Reasoning Quality</h4>
+                  <ul id="topic-coach-tips-list" class="coach-tips"></ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Participants Evaluation Cards Grid -->
+            <div class="dashboard-section">
+              <div class="section-title">
+                <span class="icon">📊</span>
+                <h3>Participant Reasoning Scores & Badges</h3>
+              </div>
+              <div class="participants-grid" id="topic-participants-container"></div>
+            </div>
+
+            <!-- Tone Evolution Heat Map -->
+            <div class="dashboard-section">
+              <div class="section-title">
+                <span class="icon">🌡️</span>
+                <h3>Conversation Tone Evolution Heatmap</h3>
+              </div>
+              <div class="heatmap-container" id="topic-heatmap-container"></div>
+            </div>
+
+            <!-- Evidence Support Meter -->
+            <div class="dashboard-section">
+              <div class="section-title">
+                <span class="icon">🔍</span>
+                <h3>Evidence & Claims Verification Breakdown</h3>
+              </div>
+              <div class="evidence-list" id="topic-evidence-container"></div>
+            </div>
           </div>
         </div>
 
@@ -284,32 +347,55 @@ Example: Whether school and colleges need proper uniform or not"></textarea>
     </div>
   </div>
 
-  <!-- Attributed Conclusion Synthesis Modal -->
+  <!-- FORMAL EXECUTIVE CONCLUSION SYNTHESIS REPORT MODAL -->
   <div class="conclusion-modal-overlay hidden" id="conclusion-modal">
-    <div class="conclusion-modal-card">
+    <div class="conclusion-modal-card" style="max-width:850px;">
       <div class="modal-header">
         <div>
-          <h3>✨ Attributed Round-Table Conclusion</h3>
-          <p style="font-size:0.88rem; color:var(--text-muted);">Objective consensus mapping specific participant alignments and trade-offs.</p>
+          <h3>📑 Deep Reasoning Synthesis & Executive Report</h3>
+          <p style="font-size:0.88rem; color:var(--text-muted);">Formal objective consensus mapping participant behaviors and trade-offs.</p>
         </div>
         <button class="modal-close-btn" onclick="closeConclusionModal()">✕</button>
       </div>
 
-      <div style="padding:1.5rem 0; display:flex; flex-direction:column; gap:1.25rem;">
+      <div style="padding:1.5rem 0; display:flex; flex-direction:column; gap:1.5rem; max-height:75vh; overflow-y:auto;">
+        
+        <!-- Report Title & Score Badge -->
+        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-dark); padding:1.25rem; border-radius:var(--radius-md); border-left:4px solid var(--accent-indigo);">
+          <div>
+            <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--accent-indigo); font-weight:700;">Executive Analysis Report</span>
+            <h4 id="report-topic-title" style="font-size:1.15rem; margin-top:0.2rem;">Topic Analysis</h4>
+          </div>
+          <div style="text-align:right;">
+            <span style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase;">Discussion Score</span>
+            <div id="report-score-badge" style="font-family:var(--font-heading); font-size:1.5rem; font-weight:800; color:var(--accent-emerald);">88 / 100</div>
+          </div>
+        </div>
+
+        <!-- Synthesized Summary -->
         <div>
-          <strong style="font-size:0.95rem; color:var(--accent-indigo);">Synthesized Consensus Verdict:</strong>
-          <p id="conclusion-summary-text" style="font-size:1rem; margin-top:0.4rem; line-height:1.6;"></p>
+          <strong style="font-size:0.95rem; color:var(--accent-indigo);">1. Synthesized Consensus Verdict:</strong>
+          <p id="conclusion-summary-text" style="font-size:0.95rem; margin-top:0.4rem; line-height:1.6; color:var(--text-main);"></p>
         </div>
 
-        <div style="background:rgba(5, 150, 105, 0.08); border:1px solid rgba(5, 150, 105, 0.2); padding:1rem; border-radius:var(--radius-md);">
-          <strong style="color:var(--accent-emerald); font-size:0.9rem;">Participant Agreement Mappings:</strong>
-          <div id="conclusion-agreements-list" style="display:flex; flex-direction:column; gap:0.75rem; margin-top:0.5rem;"></div>
+        <!-- Persona Behavioral Profiles Grid -->
+        <div>
+          <strong style="font-size:0.95rem; color:var(--accent-violet);">2. Participant Behavioral Profiles & Cognitive Logic Ratings:</strong>
+          <div id="report-personas-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:1rem; margin-top:0.6rem;"></div>
         </div>
 
-        <div style="background:rgba(217, 119, 6, 0.08); border:1px solid rgba(217, 119, 6, 0.2); padding:1rem; border-radius:var(--radius-md);">
-          <strong style="color:var(--accent-amber); font-size:0.9rem;">Core Dilemma & Trade-Off:</strong>
-          <p id="conclusion-tradeoff-text" style="font-size:0.9rem; margin-top:0.2rem;"></p>
+        <!-- Attributed Common Ground Alignments -->
+        <div style="background:rgba(5, 150, 105, 0.08); border:1px solid rgba(5, 150, 105, 0.2); padding:1.1rem; border-radius:var(--radius-md);">
+          <strong style="color:var(--accent-emerald); font-size:0.92rem;">3. Attributed Common Ground Alignments:</strong>
+          <div id="conclusion-agreements-list" style="display:flex; flex-direction:column; gap:0.75rem; margin-top:0.6rem;"></div>
         </div>
+
+        <!-- Core Dilemma & Trade-Off -->
+        <div style="background:rgba(217, 119, 6, 0.08); border:1px solid rgba(217, 119, 6, 0.2); padding:1.1rem; border-radius:var(--radius-md);">
+          <strong style="color:var(--accent-amber); font-size:0.92rem;">4. Fundamental Dilemma & Strategic Trade-Off:</strong>
+          <p id="conclusion-tradeoff-text" style="font-size:0.92rem; margin-top:0.3rem; color:var(--text-main);"></p>
+        </div>
+
       </div>
     </div>
   </div>

@@ -431,7 +431,7 @@ Return JSON strictly formatted:
   }
 });
 
-// Endpoint: Round-Table Multi-Persona Discussion Simulation
+// Endpoint: Round-Table Multi-Persona Discussion Simulation & Full Transcript Analysis
 app.post('/api/simulate-roundtable', async (req, res) => {
   try {
     const { topic } = req.body;
@@ -441,7 +441,7 @@ app.post('/api/simulate-roundtable', async (req, res) => {
 
     const prompt = `You are LogicLens AI featuring Virtual Multi-Persona Round-Table Discussion Engine.
 
-Your task is to take the following topic/opinion and simulate a deep, realistic, organic 1-to-2 minute multi-persona discussion among 4 distinct AI Personas sitting around a virtual round table:
+Your task is to take the following topic/opinion and simulate a deep, realistic, organic 1-to-2 minute multi-persona discussion among 4 distinct AI Personas sitting around a virtual round table, AND generate a complete transcript analysis:
 
 Topic / Opinion: "${topic}"
 
@@ -453,17 +453,17 @@ The 4 Personas evaluate this topic from 4 distinct cognitive parameters:
 
 CRITICAL INSTRUCTIONS FOR ORGANIC CONVERSATION FLOW:
 1. DO NOT use a fixed sequential order (A->B->C->D). Make turns flow naturally! Person B should directly counter Person A, Person A can defend themselves, Person D can interrupt with an ethical concern, Person C can interject with data to settle a dispute between A and B!
-2. Generate between 8 to 12 dynamic dialogue turns total spanning a realistic 60-120 second conversation.
+2. Generate between 8 to 12 dynamic dialogue turns total.
 
 Return ONLY a valid, strict JSON object with EXACTLY this structure:
 
 {
   "topic": "${topic.replace(/"/g, '\\"')}",
   "personas": [
-    { "id": "person_a", "name": "Person A", "archetype": "Economic & Logistics", "avatar_color": "indigo" },
-    { "id": "person_b", "name": "Person B", "archetype": "Social & Freedom", "avatar_color": "rose" },
-    { "id": "person_c", "name": "Person C", "archetype": "Empirical Data", "avatar_color": "emerald" },
-    { "id": "person_d", "name": "Person D", "archetype": "Ethics & Psychology", "avatar_color": "amber" }
+    { "id": "person_a", "name": "Person A", "archetype": "Economic & Logistics", "avatar_color": "indigo", "tone": "Calm", "logic_rating": 8 },
+    { "id": "person_b", "name": "Person B", "archetype": "Social & Freedom", "avatar_color": "rose", "tone": "Passionate", "logic_rating": 8 },
+    { "id": "person_c", "name": "Person C", "archetype": "Empirical Data", "avatar_color": "emerald", "tone": "Calm", "logic_rating": 9 },
+    { "id": "person_d", "name": "Person D", "archetype": "Ethics & Psychology", "avatar_color": "amber", "tone": "Thoughtful", "logic_rating": 8 }
   ],
   "turns": [
     {
@@ -512,6 +512,66 @@ Return ONLY a valid, strict JSON object with EXACTLY this structure:
       "duration_ms": 8000
     }
   ],
+  "transcript_analysis": {
+    "summary": "Deep multi-parameter examination of the topic covering economic feasibility, individual rights, statistical research, and psychological well-being.",
+    "coach": {
+      "overall_score": 86,
+      "verdict": "High-quality reasoned debate with strong empirical backing and passionate philosophical counterpoints.",
+      "tips": [
+        "Reconcile economic standardization with student identity needs",
+        "Utilize randomized controlled trials for policy decisions"
+      ]
+    },
+    "participants": [
+      {
+        "name": "Person A (Economic)",
+        "logic_score": 8, "evidence_score": 7, "respect_score": 8, "clarity_score": 9, "consistency_score": 8, "persuasiveness_score": 8,
+        "fallacies": [],
+        "strengths": ["Focused on household economic relief and logistics"],
+        "weaknesses": ["Overlooked identity expression concerns"],
+        "badges": ["🧠 Rational Thinker", "🔍 Logistics Focus"]
+      },
+      {
+        "name": "Person B (Social & Freedom)",
+        "logic_score": 8, "evidence_score": 8, "respect_score": 8, "clarity_score": 9, "consistency_score": 8, "persuasiveness_score": 8,
+        "fallacies": [],
+        "strengths": ["Strong defense of personal autonomy and equity"],
+        "weaknesses": ["Underestimated peer pressure dynamics"],
+        "badges": ["🕊️ Autonomy Defender"]
+      },
+      {
+        "name": "Person C (Empirical Data)",
+        "logic_score": 9, "evidence_score": 10, "respect_score": 9, "clarity_score": 9, "consistency_score": 9, "persuasiveness_score": 9,
+        "fallacies": [],
+        "strengths": ["Cited empirical meta-analyses and statistical data"],
+        "weaknesses": ["Focused strictly on quantitative metrics"],
+        "badges": ["🔍 Evidence Hunter", "🧠 Data Master"]
+      },
+      {
+        "name": "Person D (Ethics & Psychology)",
+        "logic_score": 8, "evidence_score": 8, "respect_score": 9, "clarity_score": 8, "consistency_score": 8, "persuasiveness_score": 8,
+        "fallacies": [],
+        "strengths": ["Framed psychological belonging and bullying reduction"],
+        "weaknesses": ["Qualitative focus"],
+        "badges": ["🕊️ Respectful Debater"]
+      }
+    ],
+    "heat_map": [
+      { "speaker": "Person A", "message": "Uniforms eliminate socioeconomic clothing competition.", "tone": "Calm", "level": "Blue" },
+      { "speaker": "Person B", "message": "Mandates restrict personal autonomy and identity.", "tone": "Curious", "level": "Green" },
+      { "speaker": "Person C", "message": "Meta-analyses show zero academic test score correlation.", "tone": "Calm", "level": "Blue" },
+      { "speaker": "Person D", "message": "Shared attire increases belonging and reduces bullying.", "tone": "Calm", "level": "Blue" }
+    ],
+    "evidence_meter": [
+      { "claim": "Uniforms reduce household wardrobe costs.", "speaker": "Person A", "status": "Supported by facts", "reason": "Consistent with consumer expenditure surveys." },
+      { "claim": "No direct correlation to academic test scores.", "speaker": "Person C", "status": "Supported by facts", "reason": "Cites peer-reviewed educational meta-analyses." }
+    ],
+    "strongest_argument": { "speaker": "Person C", "quote": "Meta-analyses show zero statistical correlation between strict uniforms and test scores.", "reason": "Direct empirical evidence addressing policy claims." },
+    "weakest_argument": { "speaker": "Person A", "quote": "Self-expression happens through achievements, not daily brand flexing.", "reason": "Dismissive of personal aesthetic autonomy." },
+    "constructive_suggestions": [
+      { "speaker": "Person A", "original": "Self-expression happens through achievements, not brand flexing.", "suggested": "How can we balance economic equity with opportunities for personal expression?" }
+    ]
+  },
   "attributed_conclusion": {
     "summary": "Synthesized 3-4 sentence balanced overview combining all 4 perspectives into an objective resolution.",
     "agreement_mappings": [
@@ -529,7 +589,7 @@ Return ONLY a valid, strict JSON object with EXACTLY this structure:
   }
 }
 
-Generate between 8 to 12 organic turns in turns array. Respond with pure JSON only.`;
+Respond with pure JSON only.`;
 
     const result = await callGemma(prompt);
     res.json({ success: true, data: result });

@@ -1,12 +1,13 @@
 // LogicLens Dashboard & Canvas Sequential Turn Engine (dashboard.js)
 
-let currentMode = 'roundtable';
+let currentMode = 'deep_discussion';
 let roundTableData = null;
 let fallacyLibraryCache = [];
 let canvasStage = null;
 let activeTurnIndex = 0;
 let liveStreamTimer = null;
 let activeOpenDrawerPersonId = null;
+let isAnalysisViewActive = false;
 
 // Sample Topic Presets Catalog
 const TOPIC_PRESETS = {
@@ -115,12 +116,17 @@ function expandTopicInput() {
   document.getElementById('minimized-topic-bar').classList.add('hidden');
 }
 
-// Mode Selection
+// Mode Selection (Deep Discussion vs Calm Rewrite)
 function setMode(mode) {
   currentMode = mode;
   document.querySelectorAll('.mode-tab').forEach(tab => {
     tab.classList.toggle('active', tab.dataset.mode === mode);
   });
+
+  const btnText = document.getElementById('btn-text');
+  if (btnText) {
+    btnText.textContent = mode === 'calm' ? '🕊️ Launch Calm Rewrite Discussion' : '✨ Launch Deep Discussion';
+  }
 }
 
 // Trigger Round-Table Simulation
@@ -145,14 +151,17 @@ async function triggerRoundTable() {
   analyzeBtn.disabled = true;
 
   try {
+    const endpoint = currentMode === 'calm' ? '/api/rewrite-calm' : '/api/simulate-roundtable';
+    
+    // In calm mode, wrap request if needed or use simulate-roundtable with calm directive
     const res = await fetch('/api/simulate-roundtable', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ topic })
+      body: JSON.stringify({ topic, mode: currentMode })
     });
 
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Failed to simulate round-table discussion');
+    if (!res.ok) throw new Error(data.error || 'Failed to simulate discussion');
 
     roundTableData = data.data;
     
@@ -175,10 +184,13 @@ async function triggerRoundTable() {
     stageWorkspace.classList.remove('hidden');
     stageWorkspace.scrollIntoView({ behavior: 'smooth' });
 
+    // Populate Transcript Analysis Window Data
+    renderTopicTranscriptAnalysis(roundTableData.transcript_analysis);
+
     // Start Live 1-to-2 Minute Turn-by-Turn Discussion Stream
     startSequentialLiveStream(roundTableData.turns || []);
   } catch (err) {
-    showError(err.message || 'An error occurred during round-table simulation.');
+    showError(err.message || 'An error occurred during discussion simulation.');
   } finally {
     loadingIndicator.classList.add('hidden');
     analyzeBtn.disabled = false;
@@ -208,7 +220,7 @@ function startSequentialLiveStream(turns) {
         liveTag.style.color = 'var(--accent-emerald)';
         liveTag.textContent = '✅ DEBATE COMPLETED';
       }
-      document.getElementById('live-speaker-status').textContent = 'Discussion concluded across all 4 parameters. Click "Seek Synthesis & Conclusion" to view final consensus.';
+      document.getElementById('live-speaker-status').textContent = 'Discussion concluded across all 4 parameters. Click "Seek Synthesis & Report" to view final executive report.';
       return;
     }
 
@@ -241,12 +253,10 @@ function startSequentialLiveStream(turns) {
     // 4. Trigger Canvas Active Speaker & Speech Audio
     if (canvasStage) {
       canvasStage.setActiveSpeaker(speakerId, turn.headline_point, turn.spoken_text, () => {
-        // Voice speech finished — advance to next turn smoothly
         advanceTurn();
       });
     }
 
-    // Fallback timer if TTS speech isn't supported or fails
     const duration = turn.duration_ms || 8000;
     liveStreamTimer = setTimeout(advanceTurn, duration + 1000);
   };
@@ -254,7 +264,95 @@ function startSequentialLiveStream(turns) {
   runNextTurn();
 }
 
-// Canvas Click Event Handler (Audio Toggle + Persona Drawer Click)
+// On-Demand Transcript Analysis View Toggle
+function toggleTranscriptAnalysisView() {
+  const analysisContainer = document.getElementById('topic-transcript-analysis-container');
+  const toggleBtn = document.getElementById('toggle-analysis-btn');
+  if (!analysisContainer) return;
+
+  isAnalysisViewActive = !isAnalysisViewActive;
+  if (isAnalysisViewActive) {
+    analysisContainer.classList.remove('hidden');
+    if (toggleBtn) toggleBtn.innerHTML = '<span>🗣️ Back to Round Table Stage</span>';
+    analysisContainer.scrollIntoView({ behavior: 'smooth' });
+  } else {
+    analysisContainer.classList.add('hidden');
+    if (toggleBtn) toggleBtn.innerHTML = '<span>📊 View Transcript Analysis</span>';
+  }
+}
+
+// Render Topic Transcript Analysis Data
+function renderTopicTranscriptAnalysis(analysis) {
+  if (!analysis) return;
+
+  // Summary & Coach
+  document.getElementById('topic-summary-text').textContent = analysis.summary || '';
+  const coach = analysis.coach || { overall_score: 85, verdict: 'Good reasoning quality.', tips: [] };
+  document.getElementById('topic-coach-score-num').textContent = coach.overall_score;
+  document.getElementById('topic-coach-verdict-title').textContent = coach.verdict;
+  
+  // Score Ring Offset
+  const scoreRing = document.getElementById('topic-score-ring');
+  if (scoreRing) {
+    const circumference = 264;
+    const offset = circumference - (coach.overall_score / 100) * circumference;
+    scoreRing.style.strokeDashoffset = offset;
+  }
+
+  const tipsList = document.getElementById('topic-coach-tips-list');
+  if (tipsList) {
+    tipsList.innerHTML = (coach.tips || []).map(tip => `<li>💡 ${escapeHtml(tip)}</li>`).join('');
+  }
+
+  // Participants Grid
+  const partContainer = document.getElementById('topic-participants-container');
+  if (partContainer) {
+    partContainer.innerHTML = (analysis.participants || []).map(p => `
+      <div class="participant-card">
+        <div class="p-header">
+          <div>
+            <span class="p-name">${escapeHtml(p.name)}</span>
+          </div>
+          <span class="p-score-badge">${p.logic_score}/10 Logic</span>
+        </div>
+        <div class="badges-row">
+          ${(p.badges || []).map(b => `<span class="badge-tag">${escapeHtml(b)}</span>`).join('')}
+        </div>
+        <div class="p-metrics">
+          <div class="metric-line"><span>Evidence Support</span><strong>${p.evidence_score}/10</strong></div>
+          <div class="metric-line"><span>Clarity</span><strong>${p.clarity_score}/10</strong></div>
+          <div class="metric-line"><span>Respectfulness</span><strong>${p.respect_score}/10</strong></div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Heatmap
+  const heatContainer = document.getElementById('topic-heatmap-container');
+  if (heatContainer) {
+    heatContainer.innerHTML = (analysis.heat_map || []).map(h => `
+      <div class="heatmap-item level-${(h.level || 'Blue').toLowerCase()}">
+        <span class="speaker">${escapeHtml(h.speaker)}</span>
+        <span class="msg">"${escapeHtml(h.message)}"</span>
+        <span class="tone-tag">${escapeHtml(h.tone)}</span>
+      </div>
+    `).join('');
+  }
+
+  // Evidence Meter
+  const evContainer = document.getElementById('topic-evidence-container');
+  if (evContainer) {
+    evContainer.innerHTML = (analysis.evidence_meter || []).map(e => `
+      <div class="evidence-item">
+        <span class="ev-status ${e.status.includes('Supported') ? 'supported' : 'unsupported'}">${escapeHtml(e.status)}</span>
+        <strong style="color:var(--text-main); font-size:0.9rem;">"${escapeHtml(e.claim)}"</strong>
+        <span style="color:var(--text-muted); font-size:0.85rem;">— ${escapeHtml(e.speaker)} (${escapeHtml(e.reason)})</span>
+      </div>
+    `).join('');
+  }
+}
+
+// Canvas Click Handler
 function handleCanvasClick(evt) {
   if (!canvasStage) return;
   const rect = canvasStage.canvas.getBoundingClientRect();
@@ -262,26 +360,26 @@ function handleCanvasClick(evt) {
   const clickY = evt.clientY - rect.top;
   const w = canvasStage.canvas.width;
 
-  // Check top-right audio toggle button (x: w - 120, y: 15, width: 105, height: 30)
+  // Check audio toggle button
   if (clickX >= w - 125 && clickX <= w - 15 && clickY >= 10 && clickY <= 50) {
     const isEnabled = canvasStage.toggleAudio();
     alert(isEnabled ? '🔊 Voice Audio Enabled for Discussion!' : '🔇 Voice Audio Muted.');
     return;
   }
 
-  // Check proximity to 4 persona coordinates
+  // Check proximity to 4 personas
   Object.keys(canvasStage.personas).forEach(key => {
     const p = canvasStage.personas[key];
     const px = w * p.x;
     const py = canvasStage.canvas.height * p.y;
     const dist = Math.hypot(clickX - px, clickY - py);
-    if (dist < 60) {
+    if (dist < 65) {
       openPersonaDrawer(key);
     }
   });
 }
 
-// Open Persona Detail Slide Drawer (Updates Live during streaming!)
+// Open Persona Detail Slide Drawer
 function openPersonaDrawer(personaId) {
   activeOpenDrawerPersonId = personaId;
   const drawer = document.getElementById('persona-drawer');
@@ -324,16 +422,32 @@ function closePersonaDrawer() {
   document.getElementById('persona-drawer').classList.add('hidden');
 }
 
-// Open Attributed Conclusion Modal
+// Open Formal Executive Synthesis Conclusion Report Modal
 function openConclusionModal() {
   if (!roundTableData || !roundTableData.attributed_conclusion) {
-    alert('Please generate a round-table discussion first.');
+    alert('Please generate a discussion first.');
     return;
   }
 
   const conc = roundTableData.attributed_conclusion;
+  document.getElementById('report-topic-title').textContent = `"${roundTableData.topic}"`;
+  document.getElementById('report-score-badge').textContent = `${conc.discussion_quality_score || 88} / 100`;
   document.getElementById('conclusion-summary-text').textContent = conc.summary || '';
   
+  // Render Persona Behavioral Profiles Grid
+  const personasGrid = document.getElementById('report-personas-grid');
+  if (personasGrid && roundTableData.personas) {
+    personasGrid.innerHTML = roundTableData.personas.map(p => `
+      <div style="background:var(--bg-card); padding:0.85rem; border-radius:var(--radius-md); border:1px solid var(--border-subtle); border-top:3px solid ${p.avatar_color === 'indigo' ? '#4F46E5' : p.avatar_color === 'rose' ? '#E11D48' : p.avatar_color === 'emerald' ? '#059669' : '#D97706'};">
+        <strong style="color:var(--text-main); font-size:0.9rem;">${escapeHtml(p.name)}</strong>
+        <span style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:0.4rem;">${escapeHtml(p.archetype)}</span>
+        <div style="font-size:0.8rem; color:var(--text-muted);">Behavior Tone: <strong style="color:var(--text-main);">${escapeHtml(p.tone || 'Calm')}</strong></div>
+        <div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.2rem;">Logic Score: <strong style="color:var(--accent-emerald);">${p.logic_rating || 8}/10</strong></div>
+      </div>
+    `).join('');
+  }
+
+  // Agreement Mappings
   const mappingsContainer = document.getElementById('conclusion-agreements-list');
   const mappings = conc.agreement_mappings || [];
   
