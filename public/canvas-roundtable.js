@@ -225,7 +225,7 @@ class CanvasRoundTable {
     if (this.activeSpeakerId && this.personas[this.activeSpeakerId] && this.headlineText) {
       const activeP = this.personas[this.activeSpeakerId];
       const bubbleX = w * activeP.x;
-      const bubbleY = h * activeP.y - 95;
+      const bubbleY = h * activeP.y - 120;
       this.drawSpeechBubble(ctx, bubbleX, bubbleY, this.headlineText, activeP.color);
     }
 
@@ -241,72 +241,72 @@ class CanvasRoundTable {
 
     // Speaking Pulse Ring
     if (isSpeaking) {
-      const pulseSize = 48 + Math.sin(this.time * 2.5) * 4;
+      const pulseSize = 60 + Math.sin(this.time * 2.5) * 5;
       ctx.beginPath();
-      ctx.arc(x, y - 48, pulseSize, 0, Math.PI * 2);
+      ctx.arc(x, y - 58, pulseSize, 0, Math.PI * 2);
       ctx.fillStyle = color;
-      ctx.globalAlpha = 0.22;
+      ctx.globalAlpha = 0.25;
       ctx.fill();
       ctx.globalAlpha = 1.0;
     }
 
-    // Executive Chair Back
+    // Executive Chair Back (Enlarged)
     ctx.fillStyle = '#0F172A';
-    ctx.fillRect(x - 26, y - 75, 52, 60);
+    ctx.fillRect(x - 34, y - 92, 68, 75);
 
-    // Torso / Suit Jacket (Taller & Broader)
+    // Torso / Suit Jacket (Enlarged width = 64px, height = 60px)
     ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.moveTo(x - 24, y - 12);
-    ctx.lineTo(x - 20, y - 55);
-    ctx.lineTo(x + 20, y - 55);
-    ctx.lineTo(x + 24, y - 12);
+    ctx.moveTo(x - 30, y - 12);
+    ctx.lineTo(x - 25, y - 68);
+    ctx.lineTo(x + 25, y - 68);
+    ctx.lineTo(x + 30, y - 12);
     ctx.closePath();
     ctx.fill();
 
     // Shirt Collar V-Neck & Tie
     ctx.fillStyle = '#FFFFFF';
     ctx.beginPath();
-    ctx.moveTo(x - 8, y - 55);
-    ctx.lineTo(x, y - 38);
-    ctx.lineTo(x + 8, y - 55);
+    ctx.moveTo(x - 10, y - 68);
+    ctx.lineTo(x, y - 46);
+    ctx.lineTo(x + 10, y - 68);
     ctx.closePath();
     ctx.fill();
 
-    // Head (Bigger Radius = 16px)
-    const headTilt = isSpeaking ? Math.sin(this.time * 2) * 2 : 0;
+    // Head (Enlarged Head Radius = 20px)
+    const headTilt = isSpeaking ? Math.sin(this.time * 2) * 2.5 : 0;
     ctx.fillStyle = '#F3D2B8';
     ctx.beginPath();
-    ctx.arc(x + headTilt, y - 64, 16, 0, Math.PI * 2);
+    ctx.arc(x + headTilt, y - 80, 20, 0, Math.PI * 2);
     ctx.fill();
 
     // Hair Style
     ctx.fillStyle = '#1E293B';
     ctx.beginPath();
-    ctx.arc(x + headTilt, y - 68, 16, Math.PI * 0.9, Math.PI * 2.1);
+    ctx.arc(x + headTilt, y - 85, 20, Math.PI * 0.9, Math.PI * 2.1);
     ctx.fill();
 
-    // Animated Gesturing Hands (Slow, Smooth Gesture Engine: freq = 1.8)
-    const handGestureY = isSpeaking ? Math.sin(this.time * 1.8 + persona.gestureOffset) * 6 : 0;
-    const handGestureX = isSpeaking ? Math.cos(this.time * 1.8 + persona.gestureOffset) * 4 : 0;
+    // Animated Gesturing Hands (Enlarged Radius = 8px)
+    const handGestureY = isSpeaking ? Math.sin(this.time * 1.8 + persona.gestureOffset) * 8 : 0;
+    const handGestureX = isSpeaking ? Math.cos(this.time * 1.8 + persona.gestureOffset) * 5 : 0;
 
     ctx.fillStyle = '#F3D2B8';
     ctx.beginPath();
-    ctx.arc(x - 20 + handGestureX, y - 28 + handGestureY, 6, 0, Math.PI * 2); // Left hand
-    ctx.arc(x + 20 - handGestureX, y - 26 - handGestureY, 6, 0, Math.PI * 2); // Right hand
+    ctx.arc(x - 26 + handGestureX, y - 32 + handGestureY, 7.5, 0, Math.PI * 2); // Left hand
+    ctx.arc(x + 26 - handGestureX, y - 30 - handGestureY, 7.5, 0, Math.PI * 2); // Right hand
     ctx.fill();
 
     // Name Label Tag
     ctx.fillStyle = isSpeaking ? color : 'rgba(15, 23, 42, 0.9)';
-    ctx.fillRect(x - 65, y + 4, 130, 22);
+    ctx.fillRect(x - 72, y + 6, 144, 25);
     ctx.strokeStyle = color;
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(x - 65, y + 4, 130, 22);
+    ctx.lineWidth = 1.8;
+    ctx.strokeRect(x - 72, y + 6, 144, 25);
 
     ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 11px sans-serif';
+    ctx.font = 'bold 12px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(persona.name, x, y + 19);
+    ctx.fillText(persona.name, x, y + 23);
 
     ctx.restore();
   }
