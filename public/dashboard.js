@@ -101,6 +101,7 @@ function clearInput() {
   document.getElementById('roundtable-workspace').classList.add('hidden');
   document.getElementById('error-message').classList.add('hidden');
   if (liveStreamTimer) clearTimeout(liveStreamTimer);
+  if (canvasStage) canvasStage.stopSpeech();
 }
 
 // Topic Minimization Handlers
@@ -133,6 +134,7 @@ async function triggerRoundTable() {
   errorBanner.classList.add('hidden');
   stageWorkspace.classList.add('hidden');
   if (liveStreamTimer) clearTimeout(liveStreamTimer);
+  if (canvasStage) canvasStage.stopSpeech();
 
   if (!topic || topic.length < 5) {
     showError('Please enter a valid topic or opinion (at least 5 characters).');
@@ -189,71 +191,91 @@ function showError(msg) {
   errorBanner.classList.remove('hidden');
 }
 
-// Live 1-to-2 Minute Turn Sequencer Engine
+// Live 1-to-2 Minute Turn Sequencer Engine with TTS Synchronization
 function startSequentialLiveStream(turns) {
   if (!turns || turns.length === 0) return;
   activeTurnIndex = 0;
 
   const runNextTurn = () => {
     if (activeTurnIndex >= turns.length) {
-      // Stream completed
-      if (canvasStage) canvasStage.setActiveSpeaker(null, "");
+      // Stream completed — show Discussion Ended badge on table center
+      if (canvasStage) {
+        canvasStage.setDebateEnded(true);
+      }
       const liveTag = document.getElementById('live-indicator-tag');
       if (liveTag) {
         liveTag.style.background = 'rgba(5,150,105,0.15)';
         liveTag.style.color = 'var(--accent-emerald)';
         liveTag.textContent = '✅ DEBATE COMPLETED';
       }
-      document.getElementById('live-speaker-status').textContent = 'All 4 personas finished their debate. Click "Seek Synthesis & Conclusion" to view final consensus.';
+      document.getElementById('live-speaker-status').textContent = 'Discussion concluded across all 4 parameters. Click "Seek Synthesis & Conclusion" to view final consensus.';
       return;
     }
 
     const turn = turns[activeTurnIndex];
     const speakerId = turn.speaker_id;
 
-    // 1. Update Canvas Active Speaker & Speech Bubble
-    if (canvasStage) {
-      canvasStage.setActiveSpeaker(speakerId, turn.headline_point);
-    }
-
-    // 2. Append to Persona Live Logs
+    // 1. Update Persona Live Logs
     if (roundTableData.personaLogs[speakerId]) {
       roundTableData.personaLogs[speakerId].push(turn);
     }
 
-    // 3. If Persona Drawer is open for this speaker, UPDATE LIVE!
+    // 2. If Persona Drawer is open for this speaker, UPDATE LIVE!
     if (activeOpenDrawerPersonId === speakerId) {
       renderLivePersonaDrawerContent(speakerId);
     }
 
-    // 4. Update Status Banner
+    // 3. Update Status Banner
     const statusText = `Turn ${turn.turn_index} of ${turns.length}: ${turn.speaker_name} is speaking...`;
     document.getElementById('live-speaker-status').textContent = statusText;
 
-    activeTurnIndex++;
-    const duration = turn.duration_ms || 7500;
-    liveStreamTimer = setTimeout(runNextTurn, duration);
+    // Advance turn callback
+    let turnAdvanced = false;
+    const advanceTurn = () => {
+      if (turnAdvanced) return;
+      turnAdvanced = true;
+      activeTurnIndex++;
+      runNextTurn();
+    };
+
+    // 4. Trigger Canvas Active Speaker & Speech Audio
+    if (canvasStage) {
+      canvasStage.setActiveSpeaker(speakerId, turn.headline_point, turn.spoken_text, () => {
+        // Voice speech finished — advance to next turn smoothly
+        advanceTurn();
+      });
+    }
+
+    // Fallback timer if TTS speech isn't supported or fails
+    const duration = turn.duration_ms || 8000;
+    liveStreamTimer = setTimeout(advanceTurn, duration + 1000);
   };
 
   runNextTurn();
 }
 
-// Canvas Click Event Handler to Open Persona Drawer
+// Canvas Click Event Handler (Audio Toggle + Persona Drawer Click)
 function handleCanvasClick(evt) {
   if (!canvasStage) return;
   const rect = canvasStage.canvas.getBoundingClientRect();
   const clickX = evt.clientX - rect.left;
   const clickY = evt.clientY - rect.top;
   const w = canvasStage.canvas.width;
-  const h = canvasStage.canvas.height;
+
+  // Check top-right audio toggle button (x: w - 120, y: 15, width: 105, height: 30)
+  if (clickX >= w - 125 && clickX <= w - 15 && clickY >= 10 && clickY <= 50) {
+    const isEnabled = canvasStage.toggleAudio();
+    alert(isEnabled ? '🔊 Voice Audio Enabled for Discussion!' : '🔇 Voice Audio Muted.');
+    return;
+  }
 
   // Check proximity to 4 persona coordinates
   Object.keys(canvasStage.personas).forEach(key => {
     const p = canvasStage.personas[key];
     const px = w * p.x;
-    const py = h * p.y;
+    const py = canvasStage.canvas.height * p.y;
     const dist = Math.hypot(clickX - px, clickY - py);
-    if (dist < 50) {
+    if (dist < 60) {
       openPersonaDrawer(key);
     }
   });
@@ -289,7 +311,7 @@ function renderLivePersonaDrawerContent(personaId) {
     pointsList.innerHTML = '<li style="font-style:italic;">No points spoken yet in the live debate.</li>';
   } else {
     pointsList.innerHTML = logs.map(l => `
-      <li style="background:var(--bg-dark); padding:0.6rem; border-radius:var(--radius-sm); border-left:3px solid var(--accent-indigo);">
+      <li style="background:var(--bg-dark); padding:0.65rem; border-radius:var(--radius-sm); border-left:3px solid var(--accent-indigo);">
         <strong style="color:var(--text-main); display:block;">${escapeHtml(l.headline_point)}</strong>
         <span style="color:var(--text-muted); font-size:0.85rem;">"${escapeHtml(l.spoken_text)}"</span>
       </li>
