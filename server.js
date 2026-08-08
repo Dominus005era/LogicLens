@@ -539,9 +539,19 @@ Generate between 8 to 12 organic turns in turns array. Respond with pure JSON on
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`====================================================`);
-  console.log(`🧠 LogicLens AI Backend Server running on port ${PORT}`);
-  console.log(`🤖 Powered by Gemma Model: ${GEMMA_MODEL}`);
-  console.log(`====================================================`);
+// Serve index.html explicitly for root route
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html');
 });
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`====================================================`);
+    console.log(`🧠 LogicLens AI Backend Server running on port ${PORT}`);
+    console.log(`🤖 Powered by Gemma Model: ${GEMMA_MODEL}`);
+    console.log(`====================================================`);
+  });
+}
+
+module.exports = app;
+
