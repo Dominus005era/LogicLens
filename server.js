@@ -441,94 +441,95 @@ app.post('/api/simulate-roundtable', async (req, res) => {
 
     const prompt = `You are LogicLens AI featuring Virtual Multi-Persona Round-Table Discussion Engine.
 
-Your task is to take the following topic/opinion and simulate a deep, structured, multi-perspective discussion among 4 distinct AI Personas sitting around a virtual round table:
+Your task is to take the following topic/opinion and simulate a deep, realistic, organic 1-to-2 minute multi-persona discussion among 4 distinct AI Personas sitting around a virtual round table:
 
 Topic / Opinion: "${topic}"
 
-The 4 Personas must evaluate this topic from 4 distinct cognitive parameters:
-1. Person A (Archetype: Economic & Logistics Parameter) — Focuses on practical implementation, costs, resource allocation, and real-world feasibility.
-2. Person B (Archetype: Social & Freedom of Expression Parameter) — Focuses on individual autonomy, social equity, identity, and personal rights.
-3. Person C (Archetype: Empirical Data & Scientific Science Parameter) — Focuses on peer-reviewed research, statistical studies, and measurable outcomes.
-4. Person D (Archetype: Ethical & Psychological Well-being Parameter) — Focuses on mental health, community ethics, discipline, and human behavioral impact.
+The 4 Personas evaluate this topic from 4 distinct cognitive parameters:
+- Person A (Archetype: Economic & Logistics Parameter) — Practical execution, household budgets, logistics.
+- Person B (Archetype: Social & Freedom of Expression Parameter) — Autonomy, self-expression, rights, equity.
+- Person C (Archetype: Empirical Data & Scientific Parameter) — Peer-reviewed studies, statistics, quantitative data.
+- Person D (Archetype: Ethical & Psychological Parameter) — Mental health, community ethics, discipline, psychology.
+
+CRITICAL INSTRUCTIONS FOR ORGANIC CONVERSATION FLOW:
+1. DO NOT use a fixed sequential order (A->B->C->D). Make turns flow naturally! Person B should directly counter Person A, Person A can defend themselves, Person D can interrupt with an ethical concern, Person C can interject with data to settle a dispute between A and B!
+2. Generate between 8 to 12 dynamic dialogue turns total spanning a realistic 60-120 second conversation.
 
 Return ONLY a valid, strict JSON object with EXACTLY this structure:
 
 {
   "topic": "${topic.replace(/"/g, '\\"')}",
   "personas": [
+    { "id": "person_a", "name": "Person A", "archetype": "Economic & Logistics", "avatar_color": "indigo" },
+    { "id": "person_b", "name": "Person B", "archetype": "Social & Freedom", "avatar_color": "rose" },
+    { "id": "person_c", "name": "Person C", "archetype": "Empirical Data", "avatar_color": "emerald" },
+    { "id": "person_d", "name": "Person D", "archetype": "Ethics & Psychology", "avatar_color": "amber" }
+  ],
+  "turns": [
     {
-      "id": "person_a",
-      "name": "Person A",
-      "archetype": "Economic & Logistics",
-      "avatar_color": "indigo",
-      "headline_quote": "Concise 1-2 sentence core thesis headline quote put forward by Person A.",
-      "full_argument": "Detailed 3-4 sentence argument explaining Person A's perspective in depth.",
-      "key_points": [
-        "Key argument point 1",
-        "Key argument point 2"
-      ],
-      "evidence_cited": "Reference to real-world economic statistics or logistical data.",
-      "tone": "Calm",
-      "score": 8
+      "turn_index": 1,
+      "speaker_id": "person_a",
+      "speaker_name": "Person A",
+      "headline_point": "1. Uniforms Eliminate Socioeconomic Clothing Competitiveness",
+      "spoken_text": "Mandatory uniforms level the playing field by eliminating visible wealth disparities and reducing annual household costs.",
+      "target_response_to": null,
+      "duration_ms": 7500
     },
     {
-      "id": "person_b",
-      "name": "Person B",
-      "archetype": "Social & Freedom",
-      "avatar_color": "rose",
-      "headline_quote": "Concise 1-2 sentence core thesis headline quote put forward by Person B.",
-      "full_argument": "Detailed 3-4 sentence argument explaining Person B's perspective in depth.",
-      "key_points": [
-        "Key argument point 1",
-        "Key argument point 2"
-      ],
-      "evidence_cited": "Reference to social surveys or rights frameworks.",
-      "tone": "Curious",
-      "score": 8
+      "turn_index": 2,
+      "speaker_id": "person_b",
+      "speaker_name": "Person B",
+      "headline_point": "2. Direct Counter: Restricting Self-Expression & Autonomy",
+      "spoken_text": "While economic relief is valid, Person A ignores that forcing identical dress suppresses student identity and self-expression.",
+      "target_response_to": "person_a",
+      "duration_ms": 8000
     },
     {
-      "id": "person_c",
-      "name": "Person C",
-      "archetype": "Empirical Data",
-      "avatar_color": "emerald",
-      "headline_quote": "Concise 1-2 sentence core thesis headline quote put forward by Person C.",
-      "full_argument": "Detailed 3-4 sentence argument explaining Person C's perspective in depth.",
-      "key_points": [
-        "Key argument point 1",
-        "Key argument point 2"
-      ],
-      "evidence_cited": "Reference to empirical academic studies and statistics.",
-      "tone": "Calm",
-      "score": 9
+      "turn_index": 3,
+      "speaker_id": "person_a",
+      "speaker_name": "Person A",
+      "headline_point": "3. Rebuttal: Focus Over Fashion Trends",
+      "spoken_text": "Self-expression happens through achievements and arts, not daily brand flexing in classrooms.",
+      "target_response_to": "person_b",
+      "duration_ms": 7000
     },
     {
-      "id": "person_d",
-      "name": "Person D",
-      "archetype": "Ethics & Psychology",
-      "avatar_color": "amber",
-      "headline_quote": "Concise 1-2 sentence core thesis headline quote put forward by Person D.",
-      "full_argument": "Detailed 3-4 sentence argument explaining Person D's perspective in depth.",
-      "key_points": [
-        "Key argument point 1",
-        "Key argument point 2"
-      ],
-      "evidence_cited": "Reference to psychological research or ethical principles.",
-      "tone": "Calm",
-      "score": 8
+      "turn_index": 4,
+      "speaker_id": "person_c",
+      "speaker_name": "Person C",
+      "headline_point": "4. Interjecting Empirical Data on Academic Correlation",
+      "spoken_text": "Let's look at numbers. Meta-analyses show zero statistical correlation between strict uniforms and academic test scores.",
+      "target_response_to": "person_a",
+      "duration_ms": 8500
+    },
+    {
+      "turn_index": 5,
+      "speaker_id": "person_d",
+      "speaker_name": "Person D",
+      "headline_point": "5. Psychological Framing: Sense of Belonging",
+      "spoken_text": "However, psychological studies reveal that shared group attire increases a sense of belonging and reduces peer bullying.",
+      "target_response_to": "person_c",
+      "duration_ms": 8000
     }
   ],
-  "synthesis_conclusion": {
+  "attributed_conclusion": {
     "summary": "Synthesized 3-4 sentence balanced overview combining all 4 perspectives into an objective resolution.",
-    "consensus_points": [
-      "Common ground point shared across perspectives 1",
-      "Common ground point 2"
+    "agreement_mappings": [
+      {
+        "persons": ["Person A", "Person D"],
+        "common_point": "Both Person A and Person D agreed that baseline dress standards foster school focus, discipline, and financial equity for families."
+      },
+      {
+        "persons": ["Person B", "Person C"],
+        "common_point": "Both Person B and Person C emphasized that flexible dress codes achieve social harmony without violating individual autonomy or lacking empirical support."
+      }
     ],
-    "core_tradeoffs": "Summary of the fundamental trade-off between the perspectives.",
-    "discussion_quality_score": 86
+    "core_tradeoffs": "Summary of the fundamental trade-off between economic standardization and personal expression.",
+    "discussion_quality_score": 88
   }
 }
 
-Respond with pure JSON only.`;
+Generate between 8 to 12 organic turns in turns array. Respond with pure JSON only.`;
 
     const result = await callGemma(prompt);
     res.json({ success: true, data: result });

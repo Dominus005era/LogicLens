@@ -80,7 +80,7 @@
         <!-- Collapsible Minimized Topic Bar (Shown when discussion is active) -->
         <div class="collapsible-topic-bar hidden" id="minimized-topic-bar">
           <div class="minimized-topic-title">
-            <span>🗣️ Active Round-Table Topic:</span>
+            <span>🗣️ Active Topic:</span>
             <span id="minimized-topic-text">"Whether school and colleges need proper uniform or not"</span>
           </div>
           <button class="btn btn-secondary" style="padding:0.4rem 0.85rem; font-size:0.85rem;" onclick="expandTopicInput()">
@@ -93,7 +93,7 @@
           <div class="workspace-header">
             <div class="workspace-title-box">
               <h2>🗣️ Virtual Multi-Persona Round-Table Engine</h2>
-              <p>Enter any topic, prompt, or opinion to launch an in-depth 4-party round-table discussion.</p>
+              <p>Enter any topic, prompt, or opinion to launch an organic 1-to-2 minute live round-table debate.</p>
             </div>
 
             <!-- Mode Switcher Tabs -->
@@ -148,8 +148,8 @@ Example: Whether school and colleges need proper uniform or not"></textarea>
               <div class="pulse-circle"></div>
               <div class="pulse-circle-2"></div>
             </div>
-            <p class="loading-title">Gemma 4 AI is convening the Virtual Round Table...</p>
-            <p class="loading-subtitle">Simulating 4 distinct AI Personas (Economic, Social, Data, Ethical parameters)...</p>
+            <p class="loading-title">Gemma 4 AI is convening the Virtual Conference Room...</p>
+            <p class="loading-subtitle">Generating organic turns, counter-points, empirical references & psychological framing...</p>
           </div>
 
           <!-- Error Banner Container -->
@@ -157,79 +157,42 @@ Example: Whether school and colleges need proper uniform or not"></textarea>
         </div>
 
         <!-- ==================================================================
-             CENTERED ROUND-TABLE CONFERENCE STAGE WORKSPACE
+             PSEUDO-3D CANVAS ANIMATED ROUND-TABLE CONFERENCE STAGE
              ================================================================== -->
         <div class="roundtable-stage-container hidden" id="roundtable-workspace">
           <div class="roundtable-stage-card">
             
             <div class="roundtable-stage-header">
-              <span class="section-badge">Live Multi-Perspective Conference</span>
-              <h2 id="stage-topic-title">Round-Table Discussion Stage</h2>
-              <p>Click on any Persona (Person A, B, C, D) to slide open their detailed argument breakdown.</p>
+              <span class="section-badge">Live Pseudo-3D Animated Conference</span>
+              <h2 id="stage-topic-title">Round-Table Discussion Room</h2>
+              <p id="stage-turn-status">Live organic debate streaming... Click on Person A, B, C, D to open their live thoughts log.</p>
             </div>
 
-            <!-- Centered Circular Table Stage with 4 Personas -->
-            <div class="roundtable-center-wrapper">
-              
-              <!-- Centered Circular Table with Seek Conclusion Button -->
-              <div class="roundtable-circular-table">
-                <div class="table-center-hub">
-                  <span style="font-size:1.5rem; display:block; margin-bottom:0.4rem;">🏛️</span>
-                  <button class="btn-seek-conclusion" onclick="openConclusionModal()">
-                    ✨ Seek Synthesis & Conclusion
-                  </button>
-                </div>
-              </div>
-
-              <!-- PERSON A (Top Left: Economic & Logistics) -->
-              <div class="persona-station station-top-left station-person-a">
-                <div class="speech-bubble" id="bubble-person-a">
-                  "Uniforms reduce socioeconomic clothing competition and ease family budgets."
-                </div>
-                <div class="persona-avatar-card" onclick="openPersonaDrawer('person_a')">
-                  <div class="speaking-pulse"></div>
-                  <span class="persona-avatar-icon">🧑‍💼</span>
-                  <span class="persona-name-tag" id="tag-person-a">Person A (Economic)</span>
-                </div>
-              </div>
-
-              <!-- PERSON B (Top Right: Social & Freedom) -->
-              <div class="persona-station station-top-right station-person-b">
-                <div class="speech-bubble" id="bubble-person-b">
-                  "Mandatory dress codes suppress student individuality and self-expression."
-                </div>
-                <div class="persona-avatar-card" onclick="openPersonaDrawer('person_b')">
-                  <div class="speaking-pulse"></div>
-                  <span class="persona-avatar-icon">👩‍🎨</span>
-                  <span class="persona-name-tag" id="tag-person-b">Person B (Social)</span>
-                </div>
-              </div>
-
-              <!-- PERSON C (Bottom Left: Empirical Data) -->
-              <div class="persona-station station-bottom-left station-person-c">
-                <div class="speech-bubble" id="bubble-person-c">
-                  "Statistical meta-analyses show no direct correlation between uniforms and test scores."
-                </div>
-                <div class="persona-avatar-card" onclick="openPersonaDrawer('person_c')">
-                  <div class="speaking-pulse"></div>
-                  <span class="persona-avatar-icon">👨‍🔬</span>
-                  <span class="persona-name-tag" id="tag-person-c">Person C (Empirical Data)</span>
-                </div>
-              </div>
-
-              <!-- PERSON D (Bottom Right: Ethics & Psychology) -->
-              <div class="persona-station station-bottom-right station-person-d">
-                <div class="speech-bubble" id="bubble-person-d">
-                  "Shared identity fosters belonging and minimizes peer bullying dynamics."
-                </div>
-                <div class="persona-avatar-card" onclick="openPersonaDrawer('person_d')">
-                  <div class="speaking-pulse"></div>
-                  <span class="persona-avatar-icon">👩‍⚖️</span>
-                  <span class="persona-name-tag" id="tag-person-d">Person D (Ethics)</span>
-                </div>
-              </div>
-
+            <!-- Canvas Screen for 3D Isometric Round-Table Meeting -->
+            <div style="position:relative; width:100%; text-align:center; margin-bottom:1.5rem;">
+              <canvas id="roundtable-canvas" style="border-radius:var(--radius-lg); width:100%; max-width:980px; box-shadow:var(--shadow-glow); cursor:pointer;" onclick="handleCanvasClick(event)"></canvas>
             </div>
+
+            <!-- Live Discussion Feed & Action Hub -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; background:var(--bg-dark); padding:1rem 1.5rem; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+              <div style="display:flex; align-items:center; gap:0.75rem;">
+                <span class="badge-tag" id="live-indicator-tag" style="background:rgba(220,38,38,0.15); color:var(--accent-rose);">🔴 LIVE DEBATE STREAMING</span>
+                <span id="live-speaker-status" style="font-size:0.9rem; font-weight:600; color:var(--text-main);">Person A is introducing their core thesis...</span>
+              </div>
+
+              <!-- Quick Persona Inspection Buttons -->
+              <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                <button class="preset-btn" onclick="openPersonaDrawer('person_a')" style="border-color:var(--accent-indigo);">🧑‍💼 Person A (Economic)</button>
+                <button class="preset-btn" onclick="openPersonaDrawer('person_b')" style="border-color:var(--accent-rose);">👩‍🎨 Person B (Social)</button>
+                <button class="preset-btn" onclick="openPersonaDrawer('person_c')" style="border-color:var(--accent-emerald);">👨‍🔬 Person C (Data)</button>
+                <button class="preset-btn" onclick="openPersonaDrawer('person_d')" style="border-color:var(--accent-amber);">👩‍⚖️ Person D (Ethics)</button>
+                
+                <button class="btn-seek-conclusion" onclick="openConclusionModal()" style="margin-left:0.5rem;">
+                  ✨ Seek Synthesis & Conclusion
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -298,7 +261,7 @@ Example: Whether school and colleges need proper uniform or not"></textarea>
     </main>
   </div>
 
-  <!-- Persona Detail Slide-Over Drawer -->
+  <!-- Persona Detail Slide-Over Drawer (Live Updating) -->
   <div class="persona-slide-drawer hidden" id="persona-drawer">
     <div class="drawer-header">
       <div>
@@ -310,57 +273,48 @@ Example: Whether school and colleges need proper uniform or not"></textarea>
 
     <div style="display:flex; flex-direction:column; gap:1.25rem;">
       <div style="background:var(--bg-dark); padding:1rem; border-radius:var(--radius-md);">
-        <strong style="color:var(--accent-indigo); font-size:0.85rem; text-transform:uppercase;">Core Stance Quote:</strong>
-        <p id="drawer-persona-quote" style="font-size:0.95rem; font-style:italic; margin-top:0.3rem;"></p>
+        <strong style="color:var(--accent-indigo); font-size:0.85rem; text-transform:uppercase;">Latest Spoken Point:</strong>
+        <p id="drawer-persona-quote" style="font-size:0.95rem; font-style:italic; margin-top:0.3rem;">"Spoken point will appear here in real-time..."</p>
       </div>
 
       <div>
-        <strong style="font-size:0.9rem;">Full Analytical Argument:</strong>
-        <p id="drawer-persona-argument" style="font-size:0.92rem; color:var(--text-muted); margin-top:0.3rem; line-height:1.6;"></p>
-      </div>
-
-      <div>
-        <strong style="font-size:0.9rem;">Key Supporting Points:</strong>
-        <ul id="drawer-persona-points" style="padding-left:1.2rem; color:var(--text-muted); font-size:0.88rem; margin-top:0.3rem;"></ul>
-      </div>
-
-      <div style="background:var(--bg-dark); padding:0.85rem; border-radius:var(--radius-md);">
-        <strong style="font-size:0.82rem; color:var(--accent-emerald);">Evidence / Reference Cited:</strong>
-        <p id="drawer-persona-evidence" style="font-size:0.88rem; margin-top:0.2rem;"></p>
+        <strong style="font-size:0.9rem;">Live Thoughts & Points Spoken (Real-Time Feed):</strong>
+        <ul id="drawer-persona-points" style="padding-left:1.2rem; color:var(--text-muted); font-size:0.88rem; margin-top:0.4rem; display:flex; flex-direction:column; gap:0.6rem;"></ul>
       </div>
     </div>
   </div>
 
-  <!-- Conclusion Synthesis Modal -->
+  <!-- Attributed Conclusion Synthesis Modal -->
   <div class="conclusion-modal-overlay hidden" id="conclusion-modal">
     <div class="conclusion-modal-card">
       <div class="modal-header">
         <div>
-          <h3>✨ Synthesized Round-Table Conclusion</h3>
-          <p style="font-size:0.88rem; color:var(--text-muted);">Objective consensus combining all 4 cognitive parameters.</p>
+          <h3>✨ Attributed Round-Table Conclusion</h3>
+          <p style="font-size:0.88rem; color:var(--text-muted);">Objective consensus mapping specific participant alignments and trade-offs.</p>
         </div>
         <button class="modal-close-btn" onclick="closeConclusionModal()">✕</button>
       </div>
 
       <div style="padding:1.5rem 0; display:flex; flex-direction:column; gap:1.25rem;">
         <div>
-          <strong style="font-size:0.95rem; color:var(--accent-indigo);">Synthesized Consensus Summary:</strong>
+          <strong style="font-size:0.95rem; color:var(--accent-indigo);">Synthesized Consensus Verdict:</strong>
           <p id="conclusion-summary-text" style="font-size:1rem; margin-top:0.4rem; line-height:1.6;"></p>
         </div>
 
         <div style="background:rgba(5, 150, 105, 0.08); border:1px solid rgba(5, 150, 105, 0.2); padding:1rem; border-radius:var(--radius-md);">
-          <strong style="color:var(--accent-emerald); font-size:0.9rem;">Points of Common Ground:</strong>
-          <ul id="conclusion-consensus-list" style="padding-left:1.25rem; font-size:0.9rem; margin-top:0.3rem;"></ul>
+          <strong style="color:var(--accent-emerald); font-size:0.9rem;">Participant Agreement Mappings:</strong>
+          <div id="conclusion-agreements-list" style="display:flex; flex-direction:column; gap:0.75rem; margin-top:0.5rem;"></div>
         </div>
 
         <div style="background:rgba(217, 119, 6, 0.08); border:1px solid rgba(217, 119, 6, 0.2); padding:1rem; border-radius:var(--radius-md);">
-          <strong style="color:var(--accent-amber); font-size:0.9rem;">Fundamental Trade-off:</strong>
+          <strong style="color:var(--accent-amber); font-size:0.9rem;">Core Dilemma & Trade-Off:</strong>
           <p id="conclusion-tradeoff-text" style="font-size:0.9rem; margin-top:0.2rem;"></p>
         </div>
       </div>
     </div>
   </div>
 
+  <script src="canvas-roundtable.js"></script>
   <script src="dashboard.js"></script>
 </body>
 </html>

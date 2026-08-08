@@ -1,8 +1,12 @@
-// LogicLens Dashboard & Virtual Round-Table Conference Engine (dashboard.js)
+// LogicLens Dashboard & Canvas Sequential Turn Engine (dashboard.js)
 
 let currentMode = 'roundtable';
 let roundTableData = null;
 let fallacyLibraryCache = [];
+let canvasStage = null;
+let activeTurnIndex = 0;
+let liveStreamTimer = null;
+let activeOpenDrawerPersonId = null;
 
 // Sample Topic Presets Catalog
 const TOPIC_PRESETS = {
@@ -17,14 +21,17 @@ const TOPIC_PRESETS = {
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   fetchFallacyLibrary();
+
+  // Initialize Canvas 2D Pseudo-3D Stage
+  if (document.getElementById('roundtable-canvas')) {
+    canvasStage = new CanvasRoundTable('roundtable-canvas');
+  }
 });
 
 // Mobile Sidebar Toggle
 function toggleSidebar() {
   const sidebar = document.getElementById('sidebar-panel');
-  if (sidebar) {
-    sidebar.classList.toggle('open');
-  }
+  if (sidebar) sidebar.classList.toggle('open');
 }
 
 // Working Theme Switcher Sync
@@ -71,7 +78,6 @@ function switchSidebarTab(target) {
     activePanel.classList.remove('hidden');
   }
 
-  // Close mobile sidebar if open
   const sidebar = document.getElementById('sidebar-panel');
   if (sidebar) sidebar.classList.remove('open');
 
@@ -94,6 +100,7 @@ function clearInput() {
   document.getElementById('topic-input').value = '';
   document.getElementById('roundtable-workspace').classList.add('hidden');
   document.getElementById('error-message').classList.add('hidden');
+  if (liveStreamTimer) clearTimeout(liveStreamTimer);
 }
 
 // Topic Minimization Handlers
@@ -113,15 +120,6 @@ function setMode(mode) {
   document.querySelectorAll('.mode-tab').forEach(tab => {
     tab.classList.toggle('active', tab.dataset.mode === mode);
   });
-
-  const btnText = document.getElementById('btn-text');
-  if (mode === 'roundtable') {
-    btnText.textContent = '✨ Generate Round-Table Discussion';
-  } else if (mode === 'calm') {
-    btnText.textContent = '🕊️ Rewrite Calm Dialogue';
-  } else {
-    btnText.textContent = '📊 Full Transcript Analysis';
-  }
 }
 
 // Trigger Round-Table Simulation
@@ -134,6 +132,7 @@ async function triggerRoundTable() {
 
   errorBanner.classList.add('hidden');
   stageWorkspace.classList.add('hidden');
+  if (liveStreamTimer) clearTimeout(liveStreamTimer);
 
   if (!topic || topic.length < 5) {
     showError('Please enter a valid topic or opinion (at least 5 characters).');
@@ -154,12 +153,28 @@ async function triggerRoundTable() {
     if (!res.ok) throw new Error(data.error || 'Failed to simulate round-table discussion');
 
     roundTableData = data.data;
-    renderRoundTableStage(roundTableData);
+    
+    // Initialize persona live logs
+    roundTableData.personaLogs = {
+      person_a: [],
+      person_b: [],
+      person_c: [],
+      person_d: []
+    };
 
-    // Minimize topic input box & show round-table stage
+    if (canvasStage) {
+      canvasStage.setTopic(roundTableData.topic);
+    }
+
+    document.getElementById('minimized-topic-text').textContent = `"${roundTableData.topic}"`;
+    document.getElementById('stage-topic-title').textContent = roundTableData.topic;
+
     collapseTopicInput();
     stageWorkspace.classList.remove('hidden');
     stageWorkspace.scrollIntoView({ behavior: 'smooth' });
+
+    // Start Live 1-to-2 Minute Turn-by-Turn Discussion Stream
+    startSequentialLiveStream(roundTableData.turns || []);
   } catch (err) {
     showError(err.message || 'An error occurred during round-table simulation.');
   } finally {
@@ -174,66 +189,142 @@ function showError(msg) {
   errorBanner.classList.remove('hidden');
 }
 
-// Render Round-Table Stage
-function renderRoundTableStage(data) {
-  document.getElementById('minimized-topic-text').textContent = `"${data.topic}"`;
-  document.getElementById('stage-topic-title').textContent = data.topic;
+// Live 1-to-2 Minute Turn Sequencer Engine
+function startSequentialLiveStream(turns) {
+  if (!turns || turns.length === 0) return;
+  activeTurnIndex = 0;
 
-  const personas = data.personas || [];
-  
-  personas.forEach(p => {
-    const id = p.id;
-    if (id === 'person_a') {
-      document.getElementById('bubble-person-a').textContent = `"${p.headline_quote}"`;
-      document.getElementById('tag-person-a').textContent = `${p.name} (${p.archetype})`;
-    } else if (id === 'person_b') {
-      document.getElementById('bubble-person-b').textContent = `"${p.headline_quote}"`;
-      document.getElementById('tag-person-b').textContent = `${p.name} (${p.archetype})`;
-    } else if (id === 'person_c') {
-      document.getElementById('bubble-person-c').textContent = `"${p.headline_quote}"`;
-      document.getElementById('tag-person-c').textContent = `${p.name} (${p.archetype})`;
-    } else if (id === 'person_d') {
-      document.getElementById('bubble-person-d').textContent = `"${p.headline_quote}"`;
-      document.getElementById('tag-person-d').textContent = `${p.name} (${p.archetype})`;
+  const runNextTurn = () => {
+    if (activeTurnIndex >= turns.length) {
+      // Stream completed
+      if (canvasStage) canvasStage.setActiveSpeaker(null, "");
+      const liveTag = document.getElementById('live-indicator-tag');
+      if (liveTag) {
+        liveTag.style.background = 'rgba(5,150,105,0.15)';
+        liveTag.style.color = 'var(--accent-emerald)';
+        liveTag.textContent = '✅ DEBATE COMPLETED';
+      }
+      document.getElementById('live-speaker-status').textContent = 'All 4 personas finished their debate. Click "Seek Synthesis & Conclusion" to view final consensus.';
+      return;
+    }
+
+    const turn = turns[activeTurnIndex];
+    const speakerId = turn.speaker_id;
+
+    // 1. Update Canvas Active Speaker & Speech Bubble
+    if (canvasStage) {
+      canvasStage.setActiveSpeaker(speakerId, turn.headline_point);
+    }
+
+    // 2. Append to Persona Live Logs
+    if (roundTableData.personaLogs[speakerId]) {
+      roundTableData.personaLogs[speakerId].push(turn);
+    }
+
+    // 3. If Persona Drawer is open for this speaker, UPDATE LIVE!
+    if (activeOpenDrawerPersonId === speakerId) {
+      renderLivePersonaDrawerContent(speakerId);
+    }
+
+    // 4. Update Status Banner
+    const statusText = `Turn ${turn.turn_index} of ${turns.length}: ${turn.speaker_name} is speaking...`;
+    document.getElementById('live-speaker-status').textContent = statusText;
+
+    activeTurnIndex++;
+    const duration = turn.duration_ms || 7500;
+    liveStreamTimer = setTimeout(runNextTurn, duration);
+  };
+
+  runNextTurn();
+}
+
+// Canvas Click Event Handler to Open Persona Drawer
+function handleCanvasClick(evt) {
+  if (!canvasStage) return;
+  const rect = canvasStage.canvas.getBoundingClientRect();
+  const clickX = evt.clientX - rect.left;
+  const clickY = evt.clientY - rect.top;
+  const w = canvasStage.canvas.width;
+  const h = canvasStage.canvas.height;
+
+  // Check proximity to 4 persona coordinates
+  Object.keys(canvasStage.personas).forEach(key => {
+    const p = canvasStage.personas[key];
+    const px = w * p.x;
+    const py = h * p.y;
+    const dist = Math.hypot(clickX - px, clickY - py);
+    if (dist < 50) {
+      openPersonaDrawer(key);
     }
   });
 }
 
-// Open Persona Detail Slide Drawer
+// Open Persona Detail Slide Drawer (Updates Live during streaming!)
 function openPersonaDrawer(personaId) {
-  if (!roundTableData || !roundTableData.personas) return;
-  const persona = roundTableData.personas.find(p => p.id === personaId);
-  if (!persona) return;
+  activeOpenDrawerPersonId = personaId;
+  const drawer = document.getElementById('persona-drawer');
+  if (!drawer) return;
+
+  renderLivePersonaDrawerContent(personaId);
+  drawer.classList.remove('hidden');
+}
+
+function renderLivePersonaDrawerContent(personaId) {
+  if (!roundTableData) return;
+  const persona = (roundTableData.personas || []).find(p => p.id === personaId) || { name: personaId, archetype: 'Debater' };
+  const logs = (roundTableData.personaLogs && roundTableData.personaLogs[personaId]) ? roundTableData.personaLogs[personaId] : [];
 
   document.getElementById('drawer-persona-name').textContent = persona.name;
-  document.getElementById('drawer-persona-archetype').textContent = persona.archetype;
-  document.getElementById('drawer-persona-quote').textContent = `"${persona.headline_quote}"`;
-  document.getElementById('drawer-persona-argument').textContent = persona.full_argument;
+  document.getElementById('drawer-persona-archetype').textContent = persona.archetype || 'Perspective Parameter';
   
-  const pointsList = document.getElementById('drawer-persona-points');
-  pointsList.innerHTML = (persona.key_points || []).map(pt => `<li>${escapeHtml(pt)}</li>`).join('');
-  
-  document.getElementById('drawer-persona-evidence').textContent = persona.evidence_cited || 'General qualitative rationale.';
+  if (logs.length > 0) {
+    const latest = logs[logs.length - 1];
+    document.getElementById('drawer-persona-quote').textContent = `"${latest.spoken_text}"`;
+  } else {
+    document.getElementById('drawer-persona-quote').textContent = '"Awaiting speaker turn in live discussion..."';
+  }
 
-  document.getElementById('persona-drawer').classList.remove('hidden');
+  const pointsList = document.getElementById('drawer-persona-points');
+  if (logs.length === 0) {
+    pointsList.innerHTML = '<li style="font-style:italic;">No points spoken yet in the live debate.</li>';
+  } else {
+    pointsList.innerHTML = logs.map(l => `
+      <li style="background:var(--bg-dark); padding:0.6rem; border-radius:var(--radius-sm); border-left:3px solid var(--accent-indigo);">
+        <strong style="color:var(--text-main); display:block;">${escapeHtml(l.headline_point)}</strong>
+        <span style="color:var(--text-muted); font-size:0.85rem;">"${escapeHtml(l.spoken_text)}"</span>
+      </li>
+    `).join('');
+  }
 }
 
 function closePersonaDrawer() {
+  activeOpenDrawerPersonId = null;
   document.getElementById('persona-drawer').classList.add('hidden');
 }
 
-// Open Conclusion Synthesis Modal
+// Open Attributed Conclusion Modal
 function openConclusionModal() {
-  if (!roundTableData || !roundTableData.synthesis_conclusion) {
+  if (!roundTableData || !roundTableData.attributed_conclusion) {
     alert('Please generate a round-table discussion first.');
     return;
   }
 
-  const conc = roundTableData.synthesis_conclusion;
+  const conc = roundTableData.attributed_conclusion;
   document.getElementById('conclusion-summary-text').textContent = conc.summary || '';
   
-  const consensusList = document.getElementById('conclusion-consensus-list');
-  consensusList.innerHTML = (conc.consensus_points || []).map(pt => `<li>${escapeHtml(pt)}</li>`).join('');
+  const mappingsContainer = document.getElementById('conclusion-agreements-list');
+  const mappings = conc.agreement_mappings || [];
+  
+  if (mappings.length === 0) {
+    mappingsContainer.innerHTML = '<p style="font-style:italic; font-size:0.9rem;">Consensus synthesized across all 4 parameters.</p>';
+  } else {
+    mappingsContainer.innerHTML = mappings.map(m => `
+      <div style="background:var(--bg-card); padding:0.75rem 1rem; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+        <strong style="color:var(--accent-emerald); font-size:0.88rem;">🤝 Alignment (${(m.persons || []).join(' & ')}):</strong>
+        <p style="font-size:0.88rem; color:var(--text-main); margin-top:0.2rem;">${escapeHtml(m.common_point)}</p>
+      </div>
+    `).join('');
+  }
 
   document.getElementById('conclusion-tradeoff-text').textContent = conc.core_tradeoffs || '';
 
