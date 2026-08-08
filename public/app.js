@@ -1,12 +1,29 @@
-// LogicLens Landing Page Script (app.js)
-
-let fallacyLibraryCache = [];
-
 // Initialize Theme & UI
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   fetchFallacyLibrary();
 });
+
+// Mobile Navigation Drawer Toggle
+function toggleMobileNav() {
+  const links = document.getElementById('landing-nav-links');
+  if (links) {
+    if (links.style.display === 'flex') {
+      links.style.display = '';
+    } else {
+      links.style.display = 'flex';
+      links.style.flexDirection = 'column';
+      links.style.position = 'absolute';
+      links.style.top = '70px';
+      links.style.left = '0';
+      links.style.right = '0';
+      links.style.background = 'var(--bg-card)';
+      links.style.padding = '1.5rem';
+      links.style.borderBottom = '1px solid var(--border-subtle)';
+      links.style.boxShadow = '0 10px 25px rgba(0,0,0,0.15)';
+    }
+  }
+}
 
 // Working Theme Switcher Logic (Default: Light Theme)
 function initTheme() {

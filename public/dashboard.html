@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LogicLens AI — Reasoning Analyzer Dashboard</title>
-  <meta name="description" content="Impartial AI Reasoning Analyzer Dashboard powered by Google Gemma 4 AI.">
+  <title>LogicLens AI — Multi-Persona Round-Table Discussion Dashboard</title>
+  <meta name="description" content="Impartial AI Reasoning & Virtual Multi-Persona Round-Table Discussion Engine powered by Google Gemma 4 AI.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -15,15 +15,20 @@
   <!-- Top Navbar -->
   <nav class="navbar">
     <div class="nav-container">
-      <a href="index.html" class="brand-logo">
-        <div class="logo-icon-wrap">
-          <img src="logo.png" alt="LogicLens Logo" class="brand-logo-img">
-        </div>
-        <div class="brand-text">
-          <span class="brand-name">LogicLens<span class="brand-accent">.AI</span></span>
-          <span class="brand-tagline">Platform Dashboard</span>
-        </div>
-      </a>
+      <div style="display:flex; align-items:center; gap:0.75rem;">
+        <!-- Mobile Menu Toggle Button -->
+        <button class="mobile-menu-toggle" id="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+        
+        <a href="index.html" class="brand-logo">
+          <div class="logo-icon-wrap">
+            <img src="logo.png" alt="LogicLens Logo" class="brand-logo-img">
+          </div>
+          <div class="brand-text">
+            <span class="brand-name">LogicLens<span class="brand-accent">.AI</span></span>
+            <span class="brand-tagline">Platform Dashboard</span>
+          </div>
+        </a>
+      </div>
 
       <div class="nav-links">
         <a href="index.html">← Back to Marketing Home</a>
@@ -41,7 +46,7 @@
   <div class="dashboard-layout">
     
     <!-- Sidebar Slide Panel -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar-panel">
       <nav class="sidebar-nav">
         <div class="sidebar-link active" data-target="dashboard" onclick="switchSidebarTab('dashboard')">
           <span class="sidebar-icon">📊</span>
@@ -71,73 +76,68 @@
       
       <!-- 1. DASHBOARD VIEW (ACTIVE BY DEFAULT) -->
       <div id="dashboard-view" class="view-panel">
-        <div class="workspace-card">
+
+        <!-- Collapsible Minimized Topic Bar (Shown when discussion is active) -->
+        <div class="collapsible-topic-bar hidden" id="minimized-topic-bar">
+          <div class="minimized-topic-title">
+            <span>🗣️ Active Round-Table Topic:</span>
+            <span id="minimized-topic-text">"Whether school and colleges need proper uniform or not"</span>
+          </div>
+          <button class="btn btn-secondary" style="padding:0.4rem 0.85rem; font-size:0.85rem;" onclick="expandTopicInput()">
+            <span>✏️ New / Edit Topic</span>
+          </button>
+        </div>
+
+        <!-- Topic & Argument Input Card Container -->
+        <div class="workspace-card" id="topic-input-container">
           <div class="workspace-header">
             <div class="workspace-title-box">
-              <h2>🧠 Reasoning Analyzer Platform</h2>
-              <p>Paste a conversation transcript or choose a quick preset example below to analyze.</p>
+              <h2>🗣️ Virtual Multi-Persona Round-Table Engine</h2>
+              <p>Enter any topic, prompt, or opinion to launch an in-depth 4-party round-table discussion.</p>
             </div>
 
             <!-- Mode Switcher Tabs -->
             <div class="mode-tabs">
-              <button class="mode-tab active" data-mode="analyze" onclick="setMode('analyze')">
-                <span>📊 Full Analysis</span>
+              <button class="mode-tab active" data-mode="roundtable" onclick="setMode('roundtable')">
+                <span>🏛️ Round-Table Debate</span>
+              </button>
+              <button class="mode-tab" data-mode="analyze" onclick="setMode('analyze')">
+                <span>📊 Transcript Analysis</span>
               </button>
               <button class="mode-tab" data-mode="calm" onclick="setMode('calm')">
                 <span>🕊️ Calm Rewrite</span>
-              </button>
-              <button class="mode-tab" data-mode="persona" onclick="setMode('persona')">
-                <span>🎭 Persona Mode</span>
               </button>
             </div>
           </div>
 
           <!-- Presets Selector -->
           <div class="presets-container" id="presets-section">
-            <span class="presets-label">⚡ Quick Presets:</span>
+            <span class="presets-label">⚡ Sample Topics:</span>
             <div class="presets-buttons">
-              <button class="preset-btn" onclick="loadPreset('ev')">🚗 EVs vs Gas</button>
-              <button class="preset-btn" onclick="loadPreset('ai')">🤖 AI & Jobs</button>
-              <button class="preset-btn" onclick="loadPreset('remote')">🏠 Remote Work</button>
-              <button class="preset-btn" onclick="loadPreset('mars')">🚀 Mars vs Moon</button>
-              <button class="preset-btn" onclick="loadPreset('social')">📱 Social Media</button>
+              <button class="preset-btn" onclick="loadTopicPreset('uniforms')">👔 School Uniform Mandate</button>
+              <button class="preset-btn" onclick="loadTopicPreset('ai_creativity')">🎨 AI & Human Creativity</button>
+              <button class="preset-btn" onclick="loadTopicPreset('remote_work')">🏠 Remote Work vs Office</button>
+              <button class="preset-btn" onclick="loadTopicPreset('mars_colony')">🚀 Mars Colony Funding</button>
+              <button class="preset-btn" onclick="loadTopicPreset('social_media')">📱 Social Media Restrictions</button>
             </div>
           </div>
 
-          <!-- Persona Selector Dropdown -->
-          <div class="persona-selector-row hidden" id="persona-select-container">
-            <label for="persona-select">Choose Historical / Character Perspective:</label>
-            <select id="persona-select" class="custom-select">
-              <option value="Aristotle">🏛️ Aristotle — Classical Logic & Syllogism</option>
-              <option value="Socrates">📜 Socrates — Socratic Questioning & Elenchus</option>
-              <option value="Sherlock Holmes">🔍 Sherlock Holmes — Deductive Reasoning</option>
-              <option value="Elon Musk">🚀 Elon Musk — First Principles Engineering</option>
-              <option value="Iron Man (Tony Stark)">🦾 Iron Man (Tony Stark) — Witty Tech Genius</option>
-              <option value="Senior Trial Lawyer">⚖️ Senior Trial Lawyer — Cross Examination & Evidence</option>
-              <option value="Data Scientist">📊 Data Scientist — Empirical Probability & Statistics</option>
-            </select>
-          </div>
-
-          <!-- Input Text Area Area -->
+          <!-- Input Text Area -->
           <div class="input-area-wrap">
-            <textarea id="debate-input" class="custom-textarea" placeholder="Paste argument conversation here...
+            <textarea id="topic-input" class="custom-textarea" placeholder="Enter a topic or controversial opinion here...
 
-Example:
-Person A: Electric cars are useless because charging stations don't exist.
-Person B: That's false. Thousands of charging stations exist today.
-Person A: Whatever. Batteries explode anyway.
-Person B: Statistics show EV fires are actually less common than gasoline vehicle fires."></textarea>
+Example: Whether school and colleges need proper uniform or not"></textarea>
             
             <div class="input-footer">
-              <span class="input-hint">Tip: Format as "Speaker: Statement" for optimal speaker detection.</span>
-              <button class="btn-clear" onclick="clearInput()">Clear Text</button>
+              <span class="input-hint">Tip: Enter any question, debate prompt, or opinion statement.</span>
+              <button class="btn-clear" onclick="clearInput()">Clear Input</button>
             </div>
           </div>
 
           <!-- Primary Action Submit Button -->
           <div class="action-bar">
-            <button id="analyze-btn" class="btn btn-primary btn-large" onclick="triggerAnalysis()">
-              <span id="btn-text">✨ Analyze Reasoning Quality</span>
+            <button id="analyze-btn" class="btn btn-primary btn-large" onclick="triggerRoundTable()">
+              <span id="btn-text">✨ Generate Round-Table Discussion</span>
               <div class="spinner hidden" id="btn-spinner"></div>
             </button>
           </div>
@@ -148,128 +148,91 @@ Person B: Statistics show EV fires are actually less common than gasoline vehicl
               <div class="pulse-circle"></div>
               <div class="pulse-circle-2"></div>
             </div>
-            <p class="loading-title">Gemma 4 AI is analyzing reasoning structure...</p>
-            <p class="loading-subtitle">Evaluating logic, scanning 20+ fallacies, calculating evidence ratios & tone heatmaps.</p>
+            <p class="loading-title">Gemma 4 AI is convening the Virtual Round Table...</p>
+            <p class="loading-subtitle">Simulating 4 distinct AI Personas (Economic, Social, Data, Ethical parameters)...</p>
           </div>
 
           <!-- Error Banner Container -->
           <div class="error-banner hidden" id="error-message"></div>
+        </div>
 
-          <!-- Results Dashboard -->
-          <div class="results-dashboard hidden" id="results-dashboard">
+        <!-- ==================================================================
+             CENTERED ROUND-TABLE CONFERENCE STAGE WORKSPACE
+             ================================================================== -->
+        <div class="roundtable-stage-container hidden" id="roundtable-workspace">
+          <div class="roundtable-stage-card">
             
-            <!-- Summary & Coach Banner -->
-            <div class="dashboard-section summary-card">
-              <div class="section-title">
-                <span class="icon">📝</span>
-                <h3>Conversation Summary & Debate Coach Verdict</h3>
-              </div>
-              <p id="summary-text" class="summary-body"></p>
+            <div class="roundtable-stage-header">
+              <span class="section-badge">Live Multi-Perspective Conference</span>
+              <h2 id="stage-topic-title">Round-Table Discussion Stage</h2>
+              <p>Click on any Persona (Person A, B, C, D) to slide open their detailed argument breakdown.</p>
+            </div>
 
-              <div class="coach-score-box">
-                <div class="score-circle-wrap">
-                  <svg class="score-ring-svg" viewBox="0 0 100 100">
-                    <circle class="ring-bg" cx="50" cy="50" r="42"></circle>
-                    <circle class="ring-fill" id="score-ring" cx="50" cy="50" r="42" stroke-dasharray="264" stroke-dashoffset="264"></circle>
-                  </svg>
-                  <div class="score-number-display">
-                    <span id="coach-score-num">0</span>
-                    <span class="score-max">/100</span>
-                  </div>
-                </div>
-
-                <div class="coach-details">
-                  <h4 id="coach-verdict-title">Overall Reasoning Quality</h4>
-                  <ul id="coach-tips-list" class="coach-tips"></ul>
+            <!-- Centered Circular Table Stage with 4 Personas -->
+            <div class="roundtable-center-wrapper">
+              
+              <!-- Centered Circular Table with Seek Conclusion Button -->
+              <div class="roundtable-circular-table">
+                <div class="table-center-hub">
+                  <span style="font-size:1.5rem; display:block; margin-bottom:0.4rem;">🏛️</span>
+                  <button class="btn-seek-conclusion" onclick="openConclusionModal()">
+                    ✨ Seek Synthesis & Conclusion
+                  </button>
                 </div>
               </div>
-            </div>
 
-            <!-- Participants Evaluation Cards Grid -->
-            <div class="dashboard-section">
-              <div class="section-title">
-                <span class="icon">📊</span>
-                <h3>Participant Reasoning Scores & Badges</h3>
-              </div>
-              <div class="participants-grid" id="participants-container"></div>
-            </div>
-
-            <!-- Tone Evolution Heat Map -->
-            <div class="dashboard-section">
-              <div class="section-title">
-                <span class="icon">🌡️</span>
-                <h3>Conversation Tone Evolution Heatmap</h3>
-              </div>
-              <div class="heatmap-container" id="heatmap-container"></div>
-            </div>
-
-            <!-- Evidence Support Meter -->
-            <div class="dashboard-section">
-              <div class="section-title">
-                <span class="icon">🔍</span>
-                <h3>Evidence & Claims Verification Breakdown</h3>
-              </div>
-              <div class="evidence-list" id="evidence-container"></div>
-            </div>
-
-            <!-- Strongest vs Weakest Highlights -->
-            <div class="dashboard-section highlight-grid">
-              <div class="highlight-card strongest-card">
-                <div class="card-badge badge-green">★ Strongest Argument</div>
-                <p class="highlight-quote" id="strongest-quote"></p>
-                <span class="highlight-speaker" id="strongest-speaker"></span>
-                <p class="highlight-reason" id="strongest-reason"></p>
+              <!-- PERSON A (Top Left: Economic & Logistics) -->
+              <div class="persona-station station-top-left station-person-a">
+                <div class="speech-bubble" id="bubble-person-a">
+                  "Uniforms reduce socioeconomic clothing competition and ease family budgets."
+                </div>
+                <div class="persona-avatar-card" onclick="openPersonaDrawer('person_a')">
+                  <div class="speaking-pulse"></div>
+                  <span class="persona-avatar-icon">🧑‍💼</span>
+                  <span class="persona-name-tag" id="tag-person-a">Person A (Economic)</span>
+                </div>
               </div>
 
-              <div class="highlight-card weakest-card">
-                <div class="card-badge badge-red">⚠️ Weakest Argument</div>
-                <p class="highlight-quote" id="weakest-quote"></p>
-                <span class="highlight-speaker" id="weakest-speaker"></span>
-                <p class="highlight-reason" id="weakest-reason"></p>
+              <!-- PERSON B (Top Right: Social & Freedom) -->
+              <div class="persona-station station-top-right station-person-b">
+                <div class="speech-bubble" id="bubble-person-b">
+                  "Mandatory dress codes suppress student individuality and self-expression."
+                </div>
+                <div class="persona-avatar-card" onclick="openPersonaDrawer('person_b')">
+                  <div class="speaking-pulse"></div>
+                  <span class="persona-avatar-icon">👩‍🎨</span>
+                  <span class="persona-name-tag" id="tag-person-b">Person B (Social)</span>
+                </div>
               </div>
-            </div>
 
-            <!-- Constructive Rephrasing Suggestions -->
-            <div class="dashboard-section">
-              <div class="section-title">
-                <span class="icon">💡</span>
-                <h3>Constructive Alternatives ("Instead of X, Try Y")</h3>
+              <!-- PERSON C (Bottom Left: Empirical Data) -->
+              <div class="persona-station station-bottom-left station-person-c">
+                <div class="speech-bubble" id="bubble-person-c">
+                  "Statistical meta-analyses show no direct correlation between uniforms and test scores."
+                </div>
+                <div class="persona-avatar-card" onclick="openPersonaDrawer('person_c')">
+                  <div class="speaking-pulse"></div>
+                  <span class="persona-avatar-icon">👨‍🔬</span>
+                  <span class="persona-name-tag" id="tag-person-c">Person C (Empirical Data)</span>
+                </div>
               </div>
-              <div class="suggestions-list" id="suggestions-container"></div>
-            </div>
 
-            <!-- Calm Rewrite Results (Shown if Calm Mode) -->
-            <div class="dashboard-section hidden" id="calm-results-card">
-              <div class="section-title">
-                <span class="icon">🕊️</span>
-                <h3>Calm & Constructive Dialogue Rewrite</h3>
+              <!-- PERSON D (Bottom Right: Ethics & Psychology) -->
+              <div class="persona-station station-bottom-right station-person-d">
+                <div class="speech-bubble" id="bubble-person-d">
+                  "Shared identity fosters belonging and minimizes peer bullying dynamics."
+                </div>
+                <div class="persona-avatar-card" onclick="openPersonaDrawer('person_d')">
+                  <div class="speaking-pulse"></div>
+                  <span class="persona-avatar-icon">👩‍⚖️</span>
+                  <span class="persona-name-tag" id="tag-person-d">Person D (Ethics)</span>
+                </div>
               </div>
-              <div class="calm-dialogue-list" id="calm-dialogue-container"></div>
-              <div class="takeaway-box" id="calm-takeaway"></div>
-            </div>
 
-            <!-- Persona Analysis Results (Shown if Persona Mode) -->
-            <div class="dashboard-section hidden" id="persona-results-card">
-              <div class="section-title">
-                <span class="icon">🎭</span>
-                <h3 id="persona-title">Persona Commentary</h3>
-              </div>
-              <div class="persona-verdict-box" id="persona-verdict-text"></div>
-              <div class="persona-critiques-box">
-                <h4>Key Analytical Observations:</h4>
-                <ul id="persona-critiques-list"></ul>
-              </div>
             </div>
-
-            <!-- Share & Export Bar -->
-            <div class="export-bar">
-              <button class="btn btn-secondary" onclick="copyExecutiveSummary()">
-                <span>📋 Copy Summary Report</span>
-              </button>
-            </div>
-
           </div>
         </div>
+
       </div>
 
       <!-- 2. LIBRARY VIEW -->
@@ -333,6 +296,69 @@ Person B: Statistics show EV fires are actually less common than gasoline vehicl
       </div>
 
     </main>
+  </div>
+
+  <!-- Persona Detail Slide-Over Drawer -->
+  <div class="persona-slide-drawer hidden" id="persona-drawer">
+    <div class="drawer-header">
+      <div>
+        <h3 id="drawer-persona-name">Person A</h3>
+        <span id="drawer-persona-archetype" class="badge-tag">Economic & Logistics Parameter</span>
+      </div>
+      <button class="drawer-close-btn" onclick="closePersonaDrawer()">✕</button>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:1.25rem;">
+      <div style="background:var(--bg-dark); padding:1rem; border-radius:var(--radius-md);">
+        <strong style="color:var(--accent-indigo); font-size:0.85rem; text-transform:uppercase;">Core Stance Quote:</strong>
+        <p id="drawer-persona-quote" style="font-size:0.95rem; font-style:italic; margin-top:0.3rem;"></p>
+      </div>
+
+      <div>
+        <strong style="font-size:0.9rem;">Full Analytical Argument:</strong>
+        <p id="drawer-persona-argument" style="font-size:0.92rem; color:var(--text-muted); margin-top:0.3rem; line-height:1.6;"></p>
+      </div>
+
+      <div>
+        <strong style="font-size:0.9rem;">Key Supporting Points:</strong>
+        <ul id="drawer-persona-points" style="padding-left:1.2rem; color:var(--text-muted); font-size:0.88rem; margin-top:0.3rem;"></ul>
+      </div>
+
+      <div style="background:var(--bg-dark); padding:0.85rem; border-radius:var(--radius-md);">
+        <strong style="font-size:0.82rem; color:var(--accent-emerald);">Evidence / Reference Cited:</strong>
+        <p id="drawer-persona-evidence" style="font-size:0.88rem; margin-top:0.2rem;"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Conclusion Synthesis Modal -->
+  <div class="conclusion-modal-overlay hidden" id="conclusion-modal">
+    <div class="conclusion-modal-card">
+      <div class="modal-header">
+        <div>
+          <h3>✨ Synthesized Round-Table Conclusion</h3>
+          <p style="font-size:0.88rem; color:var(--text-muted);">Objective consensus combining all 4 cognitive parameters.</p>
+        </div>
+        <button class="modal-close-btn" onclick="closeConclusionModal()">✕</button>
+      </div>
+
+      <div style="padding:1.5rem 0; display:flex; flex-direction:column; gap:1.25rem;">
+        <div>
+          <strong style="font-size:0.95rem; color:var(--accent-indigo);">Synthesized Consensus Summary:</strong>
+          <p id="conclusion-summary-text" style="font-size:1rem; margin-top:0.4rem; line-height:1.6;"></p>
+        </div>
+
+        <div style="background:rgba(5, 150, 105, 0.08); border:1px solid rgba(5, 150, 105, 0.2); padding:1rem; border-radius:var(--radius-md);">
+          <strong style="color:var(--accent-emerald); font-size:0.9rem;">Points of Common Ground:</strong>
+          <ul id="conclusion-consensus-list" style="padding-left:1.25rem; font-size:0.9rem; margin-top:0.3rem;"></ul>
+        </div>
+
+        <div style="background:rgba(217, 119, 6, 0.08); border:1px solid rgba(217, 119, 6, 0.2); padding:1rem; border-radius:var(--radius-md);">
+          <strong style="color:var(--accent-amber); font-size:0.9rem;">Fundamental Trade-off:</strong>
+          <p id="conclusion-tradeoff-text" style="font-size:0.9rem; margin-top:0.2rem;"></p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="dashboard.js"></script>

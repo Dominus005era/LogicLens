@@ -15,17 +15,20 @@
   <!-- Navigation Bar -->
   <nav class="navbar">
     <div class="nav-container">
-      <a href="#" class="brand-logo">
-        <div class="logo-icon-wrap">
-          <img src="logo.png" alt="LogicLens Logo" class="brand-logo-img">
-        </div>
-        <div class="brand-text">
-          <span class="brand-name">LogicLens<span class="brand-accent">.AI</span></span>
-          <span class="brand-tagline">Reasoning Analyzer</span>
-        </div>
-      </a>
+      <div style="display:flex; align-items:center; gap:0.75rem;">
+        <button class="mobile-menu-toggle" id="mobile-menu-btn" onclick="toggleMobileNav()">☰</button>
+        <a href="#" class="brand-logo">
+          <div class="logo-icon-wrap">
+            <img src="logo.png" alt="LogicLens Logo" class="brand-logo-img">
+          </div>
+          <div class="brand-text">
+            <span class="brand-name">LogicLens<span class="brand-accent">.AI</span></span>
+            <span class="brand-tagline">Reasoning Analyzer</span>
+          </div>
+        </a>
+      </div>
 
-      <div class="nav-links">
+      <div class="nav-links" id="landing-nav-links">
         <a href="#features">Capabilities</a>
         <a href="#how-it-works">How It Works</a>
         <a href="#fallacies-preview" onclick="openFallacyModal()">Fallacy Library</a>

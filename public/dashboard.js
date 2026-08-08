@@ -1,34 +1,16 @@
-// LogicLens Dashboard Script (dashboard.js)
+// LogicLens Dashboard & Virtual Round-Table Conference Engine (dashboard.js)
 
-let currentMode = 'analyze';
+let currentMode = 'roundtable';
+let roundTableData = null;
 let fallacyLibraryCache = [];
 
-// Preset Catalog
-const PRESETS = {
-  ev: `Person A: Electric cars are useless because charging stations don't exist.
-Person B: That's false. Thousands of charging stations exist today.
-Person A: Whatever. Batteries explode anyway.
-Person B: Statistics show EV fires are actually less common than gasoline vehicle fires.`,
-
-  ai: `Developer A: Generative AI is going to destroy all software engineering jobs within two years!
-Developer B: That's an extreme claim. AI tools currently assist with boilerplate code, but high-level system architecture and problem solving still require human reasoning.
-Developer A: You're just coping because you don't want to admit you'll be unemployed.
-Developer B: I'm relying on historical data regarding technology adoption rather than fear.`,
-
-  remote: `Manager: Remote work makes employees lazy and completely destroys company culture.
-Employee: Studies from Stanford show remote workers are 13% more productive and report higher job satisfaction.
-Manager: Well, true dedicated employees want to be in the office every day.
-Employee: Productivity metrics and retention rates are more reliable indicators of dedication than physical presence.`,
-
-  mars: `Advocate: We must colonize Mars immediately to ensure the survival of human consciousness.
-Skeptic: Fixing Earth's climate issues should take 100% priority before spending trillions on a dead planet.
-Advocate: You obviously don't care about human extinction risks.
-Skeptic: I care deeply about extinction, which is why preserving our existing biosphere is mathematically the highest leverage priority.`,
-
-  social: `User A: Social media is pure cancer that ruins teenager mental health.
-User B: While heavy usage correlates with anxiety, social media also enables global communities and educational access.
-User A: My nephew spends 8 hours on TikTok and got bad grades, so it's all bad.
-User B: That's a single anecdotal example; randomized controlled trials suggest screen time quality and sleep hygiene matter more than app existence.`
+// Sample Topic Presets Catalog
+const TOPIC_PRESETS = {
+  uniforms: "Whether school and colleges need proper uniform or not",
+  ai_creativity: "Is Generative AI a threat or an enhancement to human artistic creativity?",
+  remote_work: "Should companies mandate 5-day in-office work or offer full remote flexibility?",
+  mars_colony: "Should governments prioritize funding a Mars colony or Earth climate preservation?",
+  social_media: "Should social media usage for teenagers under 16 be legally restricted?"
 };
 
 // Initialize Dashboard
@@ -37,7 +19,15 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchFallacyLibrary();
 });
 
-// Theme Switcher Sync
+// Mobile Sidebar Toggle
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar-panel');
+  if (sidebar) {
+    sidebar.classList.toggle('open');
+  }
+}
+
+// Working Theme Switcher Sync
 function initTheme() {
   const savedTheme = localStorage.getItem('logiclens_theme') || 'light';
   applyTheme(savedTheme);
@@ -66,7 +56,7 @@ function applyTheme(theme) {
   localStorage.setItem('logiclens_theme', theme);
 }
 
-// Sidebar Navigation
+// Sidebar Navigation Tabs
 function switchSidebarTab(target) {
   document.querySelectorAll('.sidebar-link').forEach(link => {
     link.classList.toggle('active', link.dataset.target === target);
@@ -81,25 +71,40 @@ function switchSidebarTab(target) {
     activePanel.classList.remove('hidden');
   }
 
+  // Close mobile sidebar if open
+  const sidebar = document.getElementById('sidebar-panel');
+  if (sidebar) sidebar.classList.remove('open');
+
   if (target === 'library') {
     renderDashFallacies(fallacyLibraryCache);
   }
 }
 
-// Preset Loader
-function loadPreset(key) {
-  const input = document.getElementById('debate-input');
-  if (PRESETS[key]) {
-    input.value = PRESETS[key];
+// Load Topic Preset
+function loadTopicPreset(key) {
+  const input = document.getElementById('topic-input');
+  if (TOPIC_PRESETS[key]) {
+    input.value = TOPIC_PRESETS[key];
     input.focus();
   }
 }
 
-// Clear Text
+// Clear Input
 function clearInput() {
-  document.getElementById('debate-input').value = '';
-  document.getElementById('results-dashboard').classList.add('hidden');
+  document.getElementById('topic-input').value = '';
+  document.getElementById('roundtable-workspace').classList.add('hidden');
   document.getElementById('error-message').classList.add('hidden');
+}
+
+// Topic Minimization Handlers
+function collapseTopicInput() {
+  document.getElementById('topic-input-container').classList.add('hidden');
+  document.getElementById('minimized-topic-bar').classList.remove('hidden');
+}
+
+function expandTopicInput() {
+  document.getElementById('topic-input-container').classList.remove('hidden');
+  document.getElementById('minimized-topic-bar').classList.add('hidden');
 }
 
 // Mode Selection
@@ -109,34 +114,29 @@ function setMode(mode) {
     tab.classList.toggle('active', tab.dataset.mode === mode);
   });
 
-  const personaContainer = document.getElementById('persona-select-container');
   const btnText = document.getElementById('btn-text');
-
-  if (mode === 'persona') {
-    personaContainer.classList.remove('hidden');
-    btnText.textContent = '🎭 Evaluate with Persona';
+  if (mode === 'roundtable') {
+    btnText.textContent = '✨ Generate Round-Table Discussion';
   } else if (mode === 'calm') {
-    personaContainer.classList.add('hidden');
     btnText.textContent = '🕊️ Rewrite Calm Dialogue';
   } else {
-    personaContainer.classList.add('hidden');
-    btnText.textContent = '✨ Analyze Reasoning Quality';
+    btnText.textContent = '📊 Full Transcript Analysis';
   }
 }
 
-// Trigger Gemma AI Analysis
-async function triggerAnalysis() {
-  const debateText = document.getElementById('debate-input').value.trim();
+// Trigger Round-Table Simulation
+async function triggerRoundTable() {
+  const topic = document.getElementById('topic-input').value.trim();
   const errorBanner = document.getElementById('error-message');
   const loadingIndicator = document.getElementById('loading-indicator');
-  const resultsDashboard = document.getElementById('results-dashboard');
+  const stageWorkspace = document.getElementById('roundtable-workspace');
   const analyzeBtn = document.getElementById('analyze-btn');
 
   errorBanner.classList.add('hidden');
-  resultsDashboard.classList.add('hidden');
+  stageWorkspace.classList.add('hidden');
 
-  if (!debateText || debateText.length < 10) {
-    showError('Please enter a valid argument conversation transcript (at least 10 characters).');
+  if (!topic || topic.length < 5) {
+    showError('Please enter a valid topic or opinion (at least 5 characters).');
     return;
   }
 
@@ -144,40 +144,24 @@ async function triggerAnalysis() {
   analyzeBtn.disabled = true;
 
   try {
-    if (currentMode === 'analyze') {
-      const res = await fetch('/api/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ debateText })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to analyze debate');
-      renderAnalysisResults(data.data);
-    } else if (currentMode === 'calm') {
-      const res = await fetch('/api/rewrite-calm', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ debateText })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to rewrite calm debate');
-      renderCalmRewriteResults(data.data);
-    } else if (currentMode === 'persona') {
-      const persona = document.getElementById('persona-select').value;
-      const res = await fetch('/api/persona-mode', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ debateText, persona })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to run persona evaluation');
-      renderPersonaResults(data.data);
-    }
+    const res = await fetch('/api/simulate-roundtable', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ topic })
+    });
 
-    resultsDashboard.classList.remove('hidden');
-    resultsDashboard.scrollIntoView({ behavior: 'smooth' });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to simulate round-table discussion');
+
+    roundTableData = data.data;
+    renderRoundTableStage(roundTableData);
+
+    // Minimize topic input box & show round-table stage
+    collapseTopicInput();
+    stageWorkspace.classList.remove('hidden');
+    stageWorkspace.scrollIntoView({ behavior: 'smooth' });
   } catch (err) {
-    showError(err.message || 'An error occurred during analysis.');
+    showError(err.message || 'An error occurred during round-table simulation.');
   } finally {
     loadingIndicator.classList.add('hidden');
     analyzeBtn.disabled = false;
@@ -190,171 +174,77 @@ function showError(msg) {
   errorBanner.classList.remove('hidden');
 }
 
-// Render Standard Analysis Results
-function renderAnalysisResults(data) {
-  document.getElementById('calm-results-card').classList.add('hidden');
-  document.getElementById('persona-results-card').classList.add('hidden');
+// Render Round-Table Stage
+function renderRoundTableStage(data) {
+  document.getElementById('minimized-topic-text').textContent = `"${data.topic}"`;
+  document.getElementById('stage-topic-title').textContent = data.topic;
 
-  // Summary & Coach Score
-  document.getElementById('summary-text').textContent = data.summary || 'Summary unavailable.';
+  const personas = data.personas || [];
   
-  const score = data.coach?.overall_score || 75;
-  document.getElementById('coach-score-num').textContent = score;
-  
-  const ring = document.getElementById('score-ring');
-  const circumference = 264;
-  const offset = circumference - (score / 100) * circumference;
-  ring.style.strokeDashoffset = offset;
-
-  document.getElementById('coach-verdict-title').textContent = data.coach?.verdict || 'Reasoning Evaluation';
-  const tipsList = document.getElementById('coach-tips-list');
-  tipsList.innerHTML = (data.coach?.tips || []).map(tip => `<li>${escapeHtml(tip)}</li>`).join('');
-
-  // Participants Grid
-  const pContainer = document.getElementById('participants-container');
-  pContainer.innerHTML = '';
-
-  (data.participants || []).forEach(p => {
-    const card = document.createElement('div');
-    card.className = 'participant-card';
-
-    const badgesHtml = (p.badges || []).map(b => `<span class="badge-tag">${escapeHtml(b)}</span>`).join('');
-    
-    const fallaciesHtml = (p.fallacies && p.fallacies.length > 0) ? `
-      <div class="participant-fallacies">
-        <h5>❌ Fallacies Detected (${p.fallacies.length})</h5>
-        ${p.fallacies.map(f => `
-          <div class="fallacy-item">
-            <span class="fallacy-name">${escapeHtml(f.name)}:</span> ${escapeHtml(f.reason)}
-            <span class="fallacy-quote">"${escapeHtml(f.quote)}"</span>
-          </div>
-        `).join('')}
-      </div>
-    ` : '<div class="participant-fallacies" style="background:rgba(5,150,105,0.08);border-color:rgba(5,150,105,0.2);"><h5 style="color:var(--accent-emerald);">✅ Zero Fallacies Detected</h5></div>';
-
-    card.innerHTML = `
-      <div class="participant-header">
-        <span class="participant-name">${escapeHtml(p.name)}</span>
-      </div>
-      <div class="participant-badges">${badgesHtml}</div>
-      <div class="scores-metrics">
-        ${renderMetricBar('Logic', p.logic_score)}
-        ${renderMetricBar('Evidence', p.evidence_score)}
-        ${renderMetricBar('Respect', p.respect_score)}
-        ${renderMetricBar('Clarity', p.clarity_score)}
-        ${renderMetricBar('Consistency', p.consistency_score)}
-        ${renderMetricBar('Persuasion', p.persuasiveness_score)}
-      </div>
-      ${fallaciesHtml}
-    `;
-    pContainer.appendChild(card);
-
-    setTimeout(() => {
-      card.querySelectorAll('.metric-bar-fill').forEach(bar => {
-        bar.style.width = bar.dataset.val + '%';
-      });
-    }, 100);
+  personas.forEach(p => {
+    const id = p.id;
+    if (id === 'person_a') {
+      document.getElementById('bubble-person-a').textContent = `"${p.headline_quote}"`;
+      document.getElementById('tag-person-a').textContent = `${p.name} (${p.archetype})`;
+    } else if (id === 'person_b') {
+      document.getElementById('bubble-person-b').textContent = `"${p.headline_quote}"`;
+      document.getElementById('tag-person-b').textContent = `${p.name} (${p.archetype})`;
+    } else if (id === 'person_c') {
+      document.getElementById('bubble-person-c').textContent = `"${p.headline_quote}"`;
+      document.getElementById('tag-person-c').textContent = `${p.name} (${p.archetype})`;
+    } else if (id === 'person_d') {
+      document.getElementById('bubble-person-d').textContent = `"${p.headline_quote}"`;
+      document.getElementById('tag-person-d').textContent = `${p.name} (${p.archetype})`;
+    }
   });
-
-  // Heat Map
-  const heatContainer = document.getElementById('heatmap-container');
-  heatContainer.innerHTML = (data.heat_map || []).map(h => {
-    let colorClass = 'heat-blue';
-    const lvl = (h.level || h.tone || '').toLowerCase();
-    if (lvl.includes('yellow') || lvl.includes('defensive')) colorClass = 'heat-yellow';
-    else if (lvl.includes('orange') || lvl.includes('aggressive')) colorClass = 'heat-orange';
-    else if (lvl.includes('red') || lvl.includes('hostile')) colorClass = 'heat-red';
-    else if (lvl.includes('green') || lvl.includes('curious')) colorClass = 'heat-green';
-
-    return `
-      <div class="heat-msg">
-        <span class="heat-badge ${colorClass}">${escapeHtml(h.tone || 'Calm')}</span>
-        <div class="heat-content">
-          <span class="heat-speaker">${escapeHtml(h.speaker)}</span>
-          <p class="heat-text">"${escapeHtml(h.message)}"</p>
-        </div>
-      </div>
-    `;
-  }).join('');
-
-  // Evidence Meter
-  const evidenceContainer = document.getElementById('evidence-container');
-  evidenceContainer.innerHTML = (data.evidence_meter || []).map(e => {
-    let badgeClass = 'badge-green';
-    if ((e.level || e.status || '').toLowerCase().includes('yellow') || (e.status || '').includes('Assertion')) badgeClass = 'badge-yellow';
-    if ((e.level || e.status || '').toLowerCase().includes('red') || (e.status || '').includes('Contradicted')) badgeClass = 'badge-red';
-
-    return `
-      <div class="evidence-card">
-        <div>
-          <p class="evidence-claim">"${escapeHtml(e.claim)}"</p>
-          <span class="evidence-speaker">${escapeHtml(e.speaker)} — ${escapeHtml(e.reason || '')}</span>
-        </div>
-        <span class="evidence-status ${badgeClass}">${escapeHtml(e.status)}</span>
-      </div>
-    `;
-  }).join('');
-
-  // Strongest vs Weakest
-  document.getElementById('strongest-quote').textContent = data.strongest_argument?.quote ? `"${data.strongest_argument.quote}"` : '';
-  document.getElementById('strongest-speaker').textContent = data.strongest_argument?.speaker ? `— ${data.strongest_argument.speaker}` : '';
-  document.getElementById('strongest-reason').textContent = data.strongest_argument?.reason || '';
-
-  document.getElementById('weakest-quote').textContent = data.weakest_argument?.quote ? `"${data.weakest_argument.quote}"` : '';
-  document.getElementById('weakest-speaker').textContent = data.weakest_argument?.speaker ? `— ${data.weakest_argument.speaker}` : '';
-  document.getElementById('weakest-reason').textContent = data.weakest_argument?.reason || '';
-
-  // Suggestions
-  const suggContainer = document.getElementById('suggestions-container');
-  suggContainer.innerHTML = (data.constructive_suggestions || []).map(s => `
-    <div class="suggestion-card">
-      <div class="sugg-orig">❌ Original (${escapeHtml(s.speaker)}): "${escapeHtml(s.original)}"</div>
-      <div class="sugg-new">💡 Try Constructive Alternative: "${escapeHtml(s.suggested)}"</div>
-    </div>
-  `).join('');
 }
 
-function renderMetricBar(label, val) {
-  const num = val || 5;
-  const pct = (num / 10) * 100;
-  return `
-    <div class="metric-row">
-      <span class="metric-label">${label}</span>
-      <div class="metric-bar-bg">
-        <div class="metric-bar-fill" data-val="${pct}"></div>
-      </div>
-      <span class="metric-val">${num}/10</span>
-    </div>
-  `;
+// Open Persona Detail Slide Drawer
+function openPersonaDrawer(personaId) {
+  if (!roundTableData || !roundTableData.personas) return;
+  const persona = roundTableData.personas.find(p => p.id === personaId);
+  if (!persona) return;
+
+  document.getElementById('drawer-persona-name').textContent = persona.name;
+  document.getElementById('drawer-persona-archetype').textContent = persona.archetype;
+  document.getElementById('drawer-persona-quote').textContent = `"${persona.headline_quote}"`;
+  document.getElementById('drawer-persona-argument').textContent = persona.full_argument;
+  
+  const pointsList = document.getElementById('drawer-persona-points');
+  pointsList.innerHTML = (persona.key_points || []).map(pt => `<li>${escapeHtml(pt)}</li>`).join('');
+  
+  document.getElementById('drawer-persona-evidence').textContent = persona.evidence_cited || 'General qualitative rationale.';
+
+  document.getElementById('persona-drawer').classList.remove('hidden');
 }
 
-function renderCalmRewriteResults(data) {
-  const calmCard = document.getElementById('calm-results-card');
-  calmCard.classList.remove('hidden');
-
-  const dialogueContainer = document.getElementById('calm-dialogue-container');
-  dialogueContainer.innerHTML = (data.rewritten_conversation || []).map(item => `
-    <div class="suggestion-card" style="margin-bottom:1rem;">
-      <div class="sugg-orig">Original (${escapeHtml(item.speaker)}): "${escapeHtml(item.original)}"</div>
-      <div class="sugg-new">🕊️ Calm Version: "${escapeHtml(item.calm_version)}"</div>
-    </div>
-  `).join('');
-
-  document.getElementById('calm-takeaway').innerHTML = `<strong>💡 Key Constructive Takeaway:</strong> ${escapeHtml(data.key_takeaway || '')}`;
+function closePersonaDrawer() {
+  document.getElementById('persona-drawer').classList.add('hidden');
 }
 
-function renderPersonaResults(data) {
-  const personaCard = document.getElementById('persona-results-card');
-  personaCard.classList.remove('hidden');
+// Open Conclusion Synthesis Modal
+function openConclusionModal() {
+  if (!roundTableData || !roundTableData.synthesis_conclusion) {
+    alert('Please generate a round-table discussion first.');
+    return;
+  }
 
-  document.getElementById('persona-title').textContent = `🎭 Perspectives from ${data.persona}`;
-  document.getElementById('persona-verdict-text').textContent = data.persona_verdict || '';
+  const conc = roundTableData.synthesis_conclusion;
+  document.getElementById('conclusion-summary-text').textContent = conc.summary || '';
+  
+  const consensusList = document.getElementById('conclusion-consensus-list');
+  consensusList.innerHTML = (conc.consensus_points || []).map(pt => `<li>${escapeHtml(pt)}</li>`).join('');
 
-  const critiquesList = document.getElementById('persona-critiques-list');
-  critiquesList.innerHTML = (data.key_critiques || []).map(c => `<li>${escapeHtml(c)}</li>`).join('');
+  document.getElementById('conclusion-tradeoff-text').textContent = conc.core_tradeoffs || '';
+
+  document.getElementById('conclusion-modal').classList.remove('hidden');
 }
 
-// Fallacy Library in Dashboard Tab
+function closeConclusionModal() {
+  document.getElementById('conclusion-modal').classList.add('hidden');
+}
+
+// Fallacy Library Fetching
 async function fetchFallacyLibrary() {
   try {
     const res = await fetch('/api/fallacies');
@@ -388,16 +278,6 @@ function filterDashFallacies() {
     f.definition.toLowerCase().includes(query)
   );
   renderDashFallacies(filtered);
-}
-
-function copyExecutiveSummary() {
-  const summary = document.getElementById('summary-text').textContent;
-  const score = document.getElementById('coach-score-num').textContent;
-  const textToCopy = `🧠 LogicLens AI Reasoning Analysis Summary\n\nOverall Debate Quality Score: ${score}/100\n\nSummary:\n${summary}\n\nEvaluated by LogicLens AI (Powered by Google Gemma 4 AI)`;
-  
-  navigator.clipboard.writeText(textToCopy).then(() => {
-    alert('📋 Executive summary report copied to clipboard!');
-  });
 }
 
 function escapeHtml(str) {

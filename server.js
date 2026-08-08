@@ -431,6 +431,113 @@ Return JSON strictly formatted:
   }
 });
 
+// Endpoint: Round-Table Multi-Persona Discussion Simulation
+app.post('/api/simulate-roundtable', async (req, res) => {
+  try {
+    const { topic } = req.body;
+    if (!topic || topic.trim().length < 5) {
+      return res.status(400).json({ error: 'Please enter a valid topic or opinion for the round-table discussion.' });
+    }
+
+    const prompt = `You are LogicLens AI featuring Virtual Multi-Persona Round-Table Discussion Engine.
+
+Your task is to take the following topic/opinion and simulate a deep, structured, multi-perspective discussion among 4 distinct AI Personas sitting around a virtual round table:
+
+Topic / Opinion: "${topic}"
+
+The 4 Personas must evaluate this topic from 4 distinct cognitive parameters:
+1. Person A (Archetype: Economic & Logistics Parameter) — Focuses on practical implementation, costs, resource allocation, and real-world feasibility.
+2. Person B (Archetype: Social & Freedom of Expression Parameter) — Focuses on individual autonomy, social equity, identity, and personal rights.
+3. Person C (Archetype: Empirical Data & Scientific Science Parameter) — Focuses on peer-reviewed research, statistical studies, and measurable outcomes.
+4. Person D (Archetype: Ethical & Psychological Well-being Parameter) — Focuses on mental health, community ethics, discipline, and human behavioral impact.
+
+Return ONLY a valid, strict JSON object with EXACTLY this structure:
+
+{
+  "topic": "${topic.replace(/"/g, '\\"')}",
+  "personas": [
+    {
+      "id": "person_a",
+      "name": "Person A",
+      "archetype": "Economic & Logistics",
+      "avatar_color": "indigo",
+      "headline_quote": "Concise 1-2 sentence core thesis headline quote put forward by Person A.",
+      "full_argument": "Detailed 3-4 sentence argument explaining Person A's perspective in depth.",
+      "key_points": [
+        "Key argument point 1",
+        "Key argument point 2"
+      ],
+      "evidence_cited": "Reference to real-world economic statistics or logistical data.",
+      "tone": "Calm",
+      "score": 8
+    },
+    {
+      "id": "person_b",
+      "name": "Person B",
+      "archetype": "Social & Freedom",
+      "avatar_color": "rose",
+      "headline_quote": "Concise 1-2 sentence core thesis headline quote put forward by Person B.",
+      "full_argument": "Detailed 3-4 sentence argument explaining Person B's perspective in depth.",
+      "key_points": [
+        "Key argument point 1",
+        "Key argument point 2"
+      ],
+      "evidence_cited": "Reference to social surveys or rights frameworks.",
+      "tone": "Curious",
+      "score": 8
+    },
+    {
+      "id": "person_c",
+      "name": "Person C",
+      "archetype": "Empirical Data",
+      "avatar_color": "emerald",
+      "headline_quote": "Concise 1-2 sentence core thesis headline quote put forward by Person C.",
+      "full_argument": "Detailed 3-4 sentence argument explaining Person C's perspective in depth.",
+      "key_points": [
+        "Key argument point 1",
+        "Key argument point 2"
+      ],
+      "evidence_cited": "Reference to empirical academic studies and statistics.",
+      "tone": "Calm",
+      "score": 9
+    },
+    {
+      "id": "person_d",
+      "name": "Person D",
+      "archetype": "Ethics & Psychology",
+      "avatar_color": "amber",
+      "headline_quote": "Concise 1-2 sentence core thesis headline quote put forward by Person D.",
+      "full_argument": "Detailed 3-4 sentence argument explaining Person D's perspective in depth.",
+      "key_points": [
+        "Key argument point 1",
+        "Key argument point 2"
+      ],
+      "evidence_cited": "Reference to psychological research or ethical principles.",
+      "tone": "Calm",
+      "score": 8
+    }
+  ],
+  "synthesis_conclusion": {
+    "summary": "Synthesized 3-4 sentence balanced overview combining all 4 perspectives into an objective resolution.",
+    "consensus_points": [
+      "Common ground point shared across perspectives 1",
+      "Common ground point 2"
+    ],
+    "core_tradeoffs": "Summary of the fundamental trade-off between the perspectives.",
+    "discussion_quality_score": 86
+  }
+}
+
+Respond with pure JSON only.`;
+
+    const result = await callGemma(prompt);
+    res.json({ success: true, data: result });
+  } catch (err) {
+    console.error('Error simulating roundtable:', err);
+    res.status(500).json({ error: err.message || 'Failed to simulate round-table discussion' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`====================================================`);
   console.log(`🧠 LogicLens AI Backend Server running on port ${PORT}`);
