@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LogicLens AI — AI Reasoning Analyzer & Debate Quality Evaluator</title>
-  <meta name="description" content="LogicLens AI evaluates how arguments are made, not who is right. Detect fallacies, score evidence, track tone heatmaps, and rewrite debates constructively. Powered by Gemma AI.">
+  <title>LogicLens AI — AI Reasoning Analyzer & Debate Evaluator</title>
+  <meta name="description" content="LogicLens AI evaluates how arguments are made, not who is right. Detect fallacies, score evidence, track tone heatmaps, and rewrite debates constructively. Powered by Gemma 4 AI.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -27,15 +27,24 @@
       </a>
 
       <div class="nav-links">
-        <a href="#features">Features</a>
+        <a href="#features">Capabilities</a>
+        <a href="#how-it-works">How It Works</a>
         <a href="#fallacies-preview" onclick="openFallacyModal()">Fallacy Library</a>
-        <a href="#presets-section">Preset Debates</a>
-        <a href="#workspace" class="nav-cta-btn">Analyze Debate</a>
+        <a href="#usecases">Use Cases</a>
+        <a href="#faq">FAQ</a>
+
+        <!-- Working Theme Switcher Button -->
+        <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="toggleTheme()">
+          <span id="theme-btn-icon">🌙</span>
+          <span id="theme-btn-text">Dark Mode</span>
+        </button>
+
+        <a href="dashboard.html" class="nav-cta-btn">Launch Dashboard</a>
       </div>
     </div>
   </nav>
 
-  <!-- Hero Section (Marketing First) -->
+  <!-- Hero Section -->
   <header class="hero-section">
     <div class="hero-glow-1"></div>
     <div class="hero-glow-2"></div>
@@ -56,8 +65,8 @@
       </p>
 
       <div class="hero-actions">
-        <a href="#workspace" class="btn btn-primary btn-hero">
-          <span>🧠 Analyze a Debate Now</span>
+        <a href="dashboard.html" class="btn btn-primary btn-hero">
+          <span>🧠 Open Reasoning Dashboard</span>
           <div class="btn-shine"></div>
         </a>
         <button class="btn btn-secondary" onclick="openFallacyModal()">
@@ -73,7 +82,7 @@
             <span class="dot dot-yellow"></span>
             <span class="dot dot-green"></span>
           </div>
-          <span class="visual-title">Live Analysis Preview — EV Infrastructure Argument</span>
+          <span class="visual-title">Live Preview — EV Infrastructure Argument</span>
           <span class="gemma-pill">Gemma 4 Evaluated</span>
         </div>
 
@@ -97,7 +106,7 @@
               <span class="stat-value text-yellow">🔵 Calm ➔ 🟡 Defensive</span>
             </div>
             <div class="stat-pill">
-              <span class="stat-label">Coach Score</span>
+              <span class="stat-label">Coach Rating</span>
               <span class="stat-value text-purple">84 / 100</span>
             </div>
           </div>
@@ -106,7 +115,50 @@
     </div>
   </header>
 
-  <!-- Feature Highlights Grid -->
+  <!-- Interactive Before & After Argument Transformation Showcase -->
+  <section class="demo-showcase-section">
+    <div class="section-header">
+      <span class="section-badge">Visual Transformation</span>
+      <h2>Raw Debate Text vs <span class="gradient-text">LogicLens Output</span></h2>
+      <p>See how chaotic online commentary turns into structured, objective reasoning metrics.</p>
+    </div>
+
+    <div class="demo-card-grid">
+      <div class="demo-column">
+        <div class="demo-col-header">
+          <span>💬 Raw Online Argument Input</span>
+        </div>
+        <div class="demo-raw-text">
+          Person A: Electric cars are useless because charging stations don't exist.<br>
+          Person B: That's false. Thousands of charging stations exist today.<br>
+          Person A: Whatever. Batteries explode anyway.<br>
+          Person B: Statistics show EV fires are actually less common than gasoline vehicle fires.
+        </div>
+      </div>
+
+      <div class="demo-column">
+        <div class="demo-col-header">
+          <span>🧠 LogicLens Structured Evaluation</span>
+        </div>
+        <div class="demo-analyzed-results">
+          <div class="demo-result-pill" style="border-left: 4px solid var(--accent-emerald);">
+            <strong>Score:</strong> Logic 8/10 | Evidence 9/10 | Respect 6/10
+          </div>
+          <div class="demo-result-pill" style="border-left: 4px solid var(--accent-rose);">
+            <strong>Fallacy Flag:</strong> ❌ <i>Moving Goalposts</i> (Person A shifted from infrastructure to safety).
+          </div>
+          <div class="demo-result-pill" style="border-left: 4px solid var(--accent-amber);">
+            <strong>Tone Heatmap:</strong> Message 3 escalated to 🟡 Defensive tone.
+          </div>
+          <div class="demo-result-pill" style="border-left: 4px solid var(--accent-indigo);">
+            <strong>Constructive Alternative:</strong> "Are there large-scale studies comparing EV and gasoline vehicle fires?"
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 Analytical Pillars Section -->
   <section class="features-section" id="features">
     <div class="section-header">
       <span class="section-badge">Platform Capabilities</span>
@@ -145,7 +197,36 @@
     </div>
   </section>
 
-  <!-- Interactive Fallacy Preview Banner -->
+  <!-- 3-Step Workflow -->
+  <section class="workflow-section" id="how-it-works">
+    <div class="section-header">
+      <span class="section-badge">Simple 3-Step Process</span>
+      <h2>How LogicLens <span class="gradient-text">Analyzes Arguments</span></h2>
+      <p>Transform raw argument text into structured educational insights in seconds.</p>
+    </div>
+
+    <div class="workflow-grid">
+      <div class="step-card">
+        <div class="step-number">01</div>
+        <h3>Paste Debate Transcript</h3>
+        <p>Copy any text conversation from Reddit, X, WhatsApp, or YouTube into the LogicLens analyzer workspace.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">02</div>
+        <h3>Gemma 4 AI Evaluation</h3>
+        <p>Our backend engine runs structured reasoning analysis to evaluate logic, evidence ratio, and fallacies.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">03</div>
+        <h3>Get Insights & Actionable Feedback</h3>
+        <p>Receive your Debate Coach score (0-100), participant score cards, tone heatmaps, and constructive suggestions.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Fallacies Preview Banner -->
   <section class="fallacies-preview-section" id="fallacies-preview">
     <div class="fallacies-banner">
       <div class="fallacies-content">
@@ -168,209 +249,98 @@
     </div>
   </section>
 
-  <!-- Main Reasoning Workspace Container -->
-  <section class="workspace-section" id="workspace">
-    <div class="workspace-card">
-      <div class="workspace-header">
-        <div class="workspace-title-box">
-          <h2>🧠 Reasoning Analyzer Platform</h2>
-          <p>Paste a conversation transcript or choose a preset example below to analyze.</p>
-        </div>
+  <!-- Use Case Spotlight -->
+  <section class="usecases-section" id="usecases">
+    <div class="section-header">
+      <span class="section-badge">Built For Purpose</span>
+      <h2>Who Uses <span class="gradient-text">LogicLens AI?</span></h2>
+    </div>
 
-        <!-- Mode Switcher Tabs -->
-        <div class="mode-tabs">
-          <button class="mode-tab active" data-mode="analyze" onclick="setMode('analyze')">
-            <span>📊 Full Analysis</span>
-          </button>
-          <button class="mode-tab" data-mode="calm" onclick="setMode('calm')">
-            <span>🕊️ Calm Rewrite</span>
-          </button>
-          <button class="mode-tab" data-mode="persona" onclick="setMode('persona')">
-            <span>🎭 Persona Mode</span>
-          </button>
-        </div>
+    <div class="usecase-grid">
+      <div class="usecase-card">
+        <span>🎓</span>
+        <h4>Students & Debaters</h4>
+        <p>Practice competitive debate preparation, improve argumentation structure, and spot fallacies instantly.</p>
       </div>
 
-      <!-- Presets Selector -->
-      <div class="presets-container" id="presets-section">
-        <span class="presets-label">⚡ Quick Presets:</span>
-        <div class="presets-buttons">
-          <button class="preset-btn" onclick="loadPreset('ev')">🚗 EVs vs Gas</button>
-          <button class="preset-btn" onclick="loadPreset('ai')">🤖 AI & Jobs</button>
-          <button class="preset-btn" onclick="loadPreset('remote')">🏠 Remote Work</button>
-          <button class="preset-btn" onclick="loadPreset('mars')">🚀 Mars vs Moon</button>
-          <button class="preset-btn" onclick="loadPreset('social')">📱 Social Media</button>
-        </div>
+      <div class="usecase-card">
+        <span>👥</span>
+        <h4>Community Managers</h4>
+        <p>De-escalate comment section flame wars and facilitate constructive online discussions.</p>
       </div>
 
-      <!-- Persona Dropdown (Visible when persona tab active or as optional overlay) -->
-      <div class="persona-selector-row hidden" id="persona-select-container">
-        <label for="persona-select">Choose Historical / Character Perspective:</label>
-        <select id="persona-select" class="custom-select">
-          <option value="Aristotle">🏛️ Aristotle — Classical Logic & Syllogism</option>
-          <option value="Socrates">📜 Socrates — Socratic Questioning & Elenchus</option>
-          <option value="Sherlock Holmes">🔍 Sherlock Holmes — Deductive Reasoning</option>
-          <option value="Elon Musk">🚀 Elon Musk — First Principles Engineering</option>
-          <option value="Iron Man (Tony Stark)">🦾 Iron Man (Tony Stark) — Witty Tech Genius</option>
-          <option value="Senior Trial Lawyer">⚖️ Senior Trial Lawyer — Cross Examination & Evidence</option>
-          <option value="Data Scientist">📊 Data Scientist — Empirical Probability & Statistics</option>
-        </select>
+      <div class="usecase-card">
+        <span>📚</span>
+        <h4>Educators & Researchers</h4>
+        <p>Teach critical thinking and logical reasoning with real-world conversational examples.</p>
       </div>
 
-      <!-- Input Text Area -->
-      <div class="input-area-wrap">
-        <textarea id="debate-input" class="custom-textarea" placeholder="Paste argument conversation here...
-
-Example:
-Person A: Electric cars are useless because charging stations don't exist.
-Person B: That's false. Thousands of charging stations exist today.
-Person A: Whatever. Batteries explode anyway.
-Person B: Statistics show EV fires are actually less common than gasoline vehicle fires."></textarea>
-        
-        <div class="input-footer">
-          <span class="input-hint">Tip: Format as "Speaker: Statement" for optimal speaker detection.</span>
-          <button class="btn-clear" onclick="clearInput()">Clear Text</button>
-        </div>
+      <div class="usecase-card">
+        <span>✍️</span>
+        <h4>Content Creators</h4>
+        <p>Analyze public debates, podcasts, and interviews to generate insightful commentary content.</p>
       </div>
+    </div>
+  </section>
 
-      <!-- Primary Action Submit Button -->
-      <div class="action-bar">
-        <button id="analyze-btn" class="btn btn-primary btn-large" onclick="triggerAnalysis()">
-          <span id="btn-text">✨ Analyze Reasoning Quality</span>
-          <div class="spinner hidden" id="btn-spinner"></div>
+  <!-- FAQ Section -->
+  <section class="faq-section" id="faq">
+    <div class="section-header">
+      <span class="section-badge">Got Questions?</span>
+      <h2>Frequently Asked <span class="gradient-text">Questions</span></h2>
+    </div>
+
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Does LogicLens decide who is right or wrong?</span>
+          <span class="faq-icon">+</span>
         </button>
+        <div class="faq-answer hidden">
+          No! LogicLens is an <strong>AI Reasoning Analyzer</strong>, not an argument judge. It evaluates <em>how</em> arguments are constructed (logic, evidence, respect, clarity) rather than declaring whether a conclusion is factually true.
+        </div>
       </div>
 
-      <!-- Loading Progress Overlay -->
-      <div class="loading-state hidden" id="loading-indicator">
-        <div class="pulse-loader">
-          <div class="pulse-circle"></div>
-          <div class="pulse-circle-2"></div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>What AI model powers LogicLens?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer hidden">
+          LogicLens is powered by Google's state-of-the-art <strong>Gemma 4 model (`gemma-4-26b-a4b-it`)</strong>, running via a secure backend Node.js server.
         </div>
-        <p class="loading-title">Gemma 4 AI is analyzing reasoning structure...</p>
-        <p class="loading-subtitle">Evaluating logic, scanning 20+ fallacies, calculating evidence ratios & tone heatmaps.</p>
       </div>
 
-      <!-- Error Banner Container -->
-      <div class="error-banner hidden" id="error-message"></div>
-
-      <!-- Results Dashboard -->
-      <div class="results-dashboard hidden" id="results-dashboard">
-        
-        <!-- Summary & Coach Banner -->
-        <div class="dashboard-section summary-card">
-          <div class="section-title">
-            <span class="icon">📝</span>
-            <h3>Conversation Summary & Debate Coach Verdict</h3>
-          </div>
-          <p id="summary-text" class="summary-body"></p>
-
-          <div class="coach-score-box">
-            <div class="score-circle-wrap">
-              <svg class="score-ring-svg" viewBox="0 0 100 100">
-                <circle class="ring-bg" cx="50" cy="50" r="42"></circle>
-                <circle class="ring-fill" id="score-ring" cx="50" cy="50" r="42" stroke-dasharray="264" stroke-dashoffset="264"></circle>
-              </svg>
-              <div class="score-number-display">
-                <span id="coach-score-num">0</span>
-                <span class="score-max">/100</span>
-              </div>
-            </div>
-
-            <div class="coach-details">
-              <h4 id="coach-verdict-title">Overall Reasoning Quality</h4>
-              <ul id="coach-tips-list" class="coach-tips"></ul>
-            </div>
-          </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Can I analyze conversations from social media?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer hidden">
+          Yes! You can paste any text transcript from Reddit, X, WhatsApp, YouTube comments, or forum discussions directly into the analyzer workspace.
         </div>
-
-        <!-- Participants Evaluation Cards Grid -->
-        <div class="dashboard-section">
-          <div class="section-title">
-            <span class="icon">📊</span>
-            <h3>Participant Reasoning Scores & Badges</h3>
-          </div>
-          <div class="participants-grid" id="participants-container"></div>
-        </div>
-
-        <!-- Tone Evolution Heat Map -->
-        <div class="dashboard-section">
-          <div class="section-title">
-            <span class="icon">🌡️</span>
-            <h3>Conversation Tone Evolution Heatmap</h3>
-          </div>
-          <div class="heatmap-container" id="heatmap-container"></div>
-        </div>
-
-        <!-- Evidence Support Meter -->
-        <div class="dashboard-section">
-          <div class="section-title">
-            <span class="icon">🔍</span>
-            <h3>Evidence & Claims Verification Breakdown</h3>
-          </div>
-          <div class="evidence-list" id="evidence-container"></div>
-        </div>
-
-        <!-- Strongest vs Weakest Highlights -->
-        <div class="dashboard-section highlight-grid">
-          <div class="highlight-card strongest-card">
-            <div class="card-badge badge-green">★ Strongest Argument</div>
-            <p class="highlight-quote" id="strongest-quote"></p>
-            <span class="highlight-speaker" id="strongest-speaker"></span>
-            <p class="highlight-reason" id="strongest-reason"></p>
-          </div>
-
-          <div class="highlight-card weakest-card">
-            <div class="card-badge badge-red">⚠️ Weakest Argument</div>
-            <p class="highlight-quote" id="weakest-quote"></p>
-            <span class="highlight-speaker" id="weakest-speaker"></span>
-            <p class="highlight-reason" id="weakest-reason"></p>
-          </div>
-        </div>
-
-        <!-- Constructive Rephrasing Suggestions -->
-        <div class="dashboard-section">
-          <div class="section-title">
-            <span class="icon">💡</span>
-            <h3>Constructive Alternatives ("Instead of X, Try Y")</h3>
-          </div>
-          <div class="suggestions-list" id="suggestions-container"></div>
-        </div>
-
-        <!-- Calm Rewrite Results (Shown if Calm Mode) -->
-        <div class="dashboard-section hidden" id="calm-results-card">
-          <div class="section-title">
-            <span class="icon">🕊️</span>
-            <h3>Calm & Constructive Dialogue Rewrite</h3>
-          </div>
-          <div class="calm-dialogue-list" id="calm-dialogue-container"></div>
-          <div class="takeaway-box" id="calm-takeaway"></div>
-        </div>
-
-        <!-- Persona Analysis Results (Shown if Persona Mode) -->
-        <div class="dashboard-section hidden" id="persona-results-card">
-          <div class="section-title">
-            <span class="icon">🎭</span>
-            <h3 id="persona-title">Persona Commentary</h3>
-          </div>
-          <div class="persona-verdict-box" id="persona-verdict-text"></div>
-          <div class="persona-critiques-box">
-            <h4>Key Analytical Observations:</h4>
-            <ul id="persona-critiques-list"></ul>
-          </div>
-        </div>
-
-        <!-- Share & Export Bar -->
-        <div class="export-bar">
-          <button class="btn btn-secondary" onclick="copyExecutiveSummary()">
-            <span>📋 Copy Summary Report</span>
-          </button>
-          <button class="btn btn-secondary" onclick="shareCard()">
-            <span>📤 Share Reasoning Card</span>
-          </button>
-        </div>
-
       </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>What is Calm & Constructive Rewrite?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer hidden">
+          Calm Rewrite takes hostile or emotional arguments and rephrases them as if both participants were speaking with mutual respect, clarity, and truth seeking.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bottom CTA Banner -->
+  <section class="cta-banner-section">
+    <div class="cta-banner-card">
+      <h2>Ready to Analyze Your First Argument?</h2>
+      <p>Experience impartial AI reasoning evaluation, fallacy detection, and tone heatmaps in seconds.</p>
+      <a href="dashboard.html" class="btn btn-secondary" style="background:#FFF; color:#4F46E5; font-weight:700;">
+        <span>🚀 Open Dashboard Workplace</span>
+      </a>
     </div>
   </section>
 
@@ -405,7 +375,7 @@ Person B: Statistics show EV fires are actually less common than gasoline vehicl
       
       <div class="footer-links">
         <a href="https://github.com/Dominus005era/LogicLens.git" target="_blank" rel="noopener">GitHub Repository</a>
-        <a href="#workspace">Analyzer</a>
+        <a href="dashboard.html">Dashboard</a>
         <a href="#" onclick="openFallacyModal()">Fallacies Library</a>
       </div>
     </div>

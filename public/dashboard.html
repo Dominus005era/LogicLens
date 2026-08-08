@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LogicLens AI — Reasoning Analyzer Dashboard</title>
+  <meta name="description" content="Impartial AI Reasoning Analyzer Dashboard powered by Google Gemma 4 AI.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="brand-logo">
+        <div class="logo-icon-wrap">
+          <span class="logo-icon">🧠</span>
+          <div class="logo-pulse"></div>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">LogicLens<span class="brand-accent">.AI</span></span>
+          <span class="brand-tagline">Platform Dashboard</span>
+        </div>
+      </a>
+
+      <div class="nav-links">
+        <a href="index.html">← Back to Marketing Home</a>
+
+        <!-- Working Theme Switcher Button -->
+        <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="toggleTheme()">
+          <span id="theme-btn-icon">🌙</span>
+          <span id="theme-btn-text">Dark Mode</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Dashboard Layout with Sidebar Panel -->
+  <div class="dashboard-layout">
+    
+    <!-- Sidebar Slide Panel -->
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <div class="sidebar-link active" data-target="dashboard" onclick="switchSidebarTab('dashboard')">
+          <span class="sidebar-icon">📊</span>
+          <span>Dashboard</span>
+        </div>
+        <div class="sidebar-link" data-target="library" onclick="switchSidebarTab('library')">
+          <span class="sidebar-icon">📚</span>
+          <span>Fallacy Library</span>
+        </div>
+        <div class="sidebar-link" data-target="analytics" onclick="switchSidebarTab('analytics')">
+          <span class="sidebar-icon">📈</span>
+          <span>Analytics</span>
+        </div>
+        <div class="sidebar-link" data-target="insights" onclick="switchSidebarTab('insights')">
+          <span class="sidebar-icon">💡</span>
+          <span>Insights</span>
+        </div>
+        <div class="sidebar-link" data-target="settings" onclick="switchSidebarTab('settings')">
+          <span class="sidebar-icon">⚙️</span>
+          <span>Settings</span>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Main Workspace Area -->
+    <main class="dashboard-main">
+      
+      <!-- 1. DASHBOARD VIEW (ACTIVE BY DEFAULT) -->
+      <div id="dashboard-view" class="view-panel">
+        <div class="workspace-card">
+          <div class="workspace-header">
+            <div class="workspace-title-box">
+              <h2>🧠 Reasoning Analyzer Platform</h2>
+              <p>Paste a conversation transcript or choose a quick preset example below to analyze.</p>
+            </div>
+
+            <!-- Mode Switcher Tabs -->
+            <div class="mode-tabs">
+              <button class="mode-tab active" data-mode="analyze" onclick="setMode('analyze')">
+                <span>📊 Full Analysis</span>
+              </button>
+              <button class="mode-tab" data-mode="calm" onclick="setMode('calm')">
+                <span>🕊️ Calm Rewrite</span>
+              </button>
+              <button class="mode-tab" data-mode="persona" onclick="setMode('persona')">
+                <span>🎭 Persona Mode</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Presets Selector -->
+          <div class="presets-container" id="presets-section">
+            <span class="presets-label">⚡ Quick Presets:</span>
+            <div class="presets-buttons">
+              <button class="preset-btn" onclick="loadPreset('ev')">🚗 EVs vs Gas</button>
+              <button class="preset-btn" onclick="loadPreset('ai')">🤖 AI & Jobs</button>
+              <button class="preset-btn" onclick="loadPreset('remote')">🏠 Remote Work</button>
+              <button class="preset-btn" onclick="loadPreset('mars')">🚀 Mars vs Moon</button>
+              <button class="preset-btn" onclick="loadPreset('social')">📱 Social Media</button>
+            </div>
+          </div>
+
+          <!-- Persona Selector Dropdown -->
+          <div class="persona-selector-row hidden" id="persona-select-container">
+            <label for="persona-select">Choose Historical / Character Perspective:</label>
+            <select id="persona-select" class="custom-select">
+              <option value="Aristotle">🏛️ Aristotle — Classical Logic & Syllogism</option>
+              <option value="Socrates">📜 Socrates — Socratic Questioning & Elenchus</option>
+              <option value="Sherlock Holmes">🔍 Sherlock Holmes — Deductive Reasoning</option>
+              <option value="Elon Musk">🚀 Elon Musk — First Principles Engineering</option>
+              <option value="Iron Man (Tony Stark)">🦾 Iron Man (Tony Stark) — Witty Tech Genius</option>
+              <option value="Senior Trial Lawyer">⚖️ Senior Trial Lawyer — Cross Examination & Evidence</option>
+              <option value="Data Scientist">📊 Data Scientist — Empirical Probability & Statistics</option>
+            </select>
+          </div>
+
+          <!-- Input Text Area Area -->
+          <div class="input-area-wrap">
+            <textarea id="debate-input" class="custom-textarea" placeholder="Paste argument conversation here...
+
+Example:
+Person A: Electric cars are useless because charging stations don't exist.
+Person B: That's false. Thousands of charging stations exist today.
+Person A: Whatever. Batteries explode anyway.
+Person B: Statistics show EV fires are actually less common than gasoline vehicle fires."></textarea>
+            
+            <div class="input-footer">
+              <span class="input-hint">Tip: Format as "Speaker: Statement" for optimal speaker detection.</span>
+              <button class="btn-clear" onclick="clearInput()">Clear Text</button>
+            </div>
+          </div>
+
+          <!-- Primary Action Submit Button -->
+          <div class="action-bar">
+            <button id="analyze-btn" class="btn btn-primary btn-large" onclick="triggerAnalysis()">
+              <span id="btn-text">✨ Analyze Reasoning Quality</span>
+              <div class="spinner hidden" id="btn-spinner"></div>
+            </button>
+          </div>
+
+          <!-- Loading Progress Overlay -->
+          <div class="loading-state hidden" id="loading-indicator">
+            <div class="pulse-loader">
+              <div class="pulse-circle"></div>
+              <div class="pulse-circle-2"></div>
+            </div>
+            <p class="loading-title">Gemma 4 AI is analyzing reasoning structure...</p>
+            <p class="loading-subtitle">Evaluating logic, scanning 20+ fallacies, calculating evidence ratios & tone heatmaps.</p>
+          </div>
+
+          <!-- Error Banner Container -->
+          <div class="error-banner hidden" id="error-message"></div>
+
+          <!-- Results Dashboard -->
+          <div class="results-dashboard hidden" id="results-dashboard">
+            
+            <!-- Summary & Coach Banner -->
+            <div class="dashboard-section summary-card">
+              <div class="section-title">
+                <span class="icon">📝</span>
+                <h3>Conversation Summary & Debate Coach Verdict</h3>
+              </div>
+              <p id="summary-text" class="summary-body"></p>
+
+              <div class="coach-score-box">
+                <div class="score-circle-wrap">
+                  <svg class="score-ring-svg" viewBox="0 0 100 100">
+                    <circle class="ring-bg" cx="50" cy="50" r="42"></circle>
+                    <circle class="ring-fill" id="score-ring" cx="50" cy="50" r="42" stroke-dasharray="264" stroke-dashoffset="264"></circle>
+                  </svg>
+                  <div class="score-number-display">
+                    <span id="coach-score-num">0</span>
+                    <span class="score-max">/100</span>
+                  </div>
+                </div>
+
+                <div class="coach-details">
+                  <h4 id="coach-verdict-title">Overall Reasoning Quality</h4>
+                  <ul id="coach-tips-list" class="coach-tips"></ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Participants Evaluation Cards Grid -->
+            <div class="dashboard-section">
+              <div class="section-title">
+                <span class="icon">📊</span>
+                <h3>Participant Reasoning Scores & Badges</h3>
+              </div>
+              <div class="participants-grid" id="participants-container"></div>
+            </div>
+
+            <!-- Tone Evolution Heat Map -->
+            <div class="dashboard-section">
+              <div class="section-title">
+                <span class="icon">🌡️</span>
+                <h3>Conversation Tone Evolution Heatmap</h3>
+              </div>
+              <div class="heatmap-container" id="heatmap-container"></div>
+            </div>
+
+            <!-- Evidence Support Meter -->
+            <div class="dashboard-section">
+              <div class="section-title">
+                <span class="icon">🔍</span>
+                <h3>Evidence & Claims Verification Breakdown</h3>
+              </div>
+              <div class="evidence-list" id="evidence-container"></div>
+            </div>
+
+            <!-- Strongest vs Weakest Highlights -->
+            <div class="dashboard-section highlight-grid">
+              <div class="highlight-card strongest-card">
+                <div class="card-badge badge-green">★ Strongest Argument</div>
+                <p class="highlight-quote" id="strongest-quote"></p>
+                <span class="highlight-speaker" id="strongest-speaker"></span>
+                <p class="highlight-reason" id="strongest-reason"></p>
+              </div>
+
+              <div class="highlight-card weakest-card">
+                <div class="card-badge badge-red">⚠️ Weakest Argument</div>
+                <p class="highlight-quote" id="weakest-quote"></p>
+                <span class="highlight-speaker" id="weakest-speaker"></span>
+                <p class="highlight-reason" id="weakest-reason"></p>
+              </div>
+            </div>
+
+            <!-- Constructive Rephrasing Suggestions -->
+            <div class="dashboard-section">
+              <div class="section-title">
+                <span class="icon">💡</span>
+                <h3>Constructive Alternatives ("Instead of X, Try Y")</h3>
+              </div>
+              <div class="suggestions-list" id="suggestions-container"></div>
+            </div>
+
+            <!-- Calm Rewrite Results (Shown if Calm Mode) -->
+            <div class="dashboard-section hidden" id="calm-results-card">
+              <div class="section-title">
+                <span class="icon">🕊️</span>
+                <h3>Calm & Constructive Dialogue Rewrite</h3>
+              </div>
+              <div class="calm-dialogue-list" id="calm-dialogue-container"></div>
+              <div class="takeaway-box" id="calm-takeaway"></div>
+            </div>
+
+            <!-- Persona Analysis Results (Shown if Persona Mode) -->
+            <div class="dashboard-section hidden" id="persona-results-card">
+              <div class="section-title">
+                <span class="icon">🎭</span>
+                <h3 id="persona-title">Persona Commentary</h3>
+              </div>
+              <div class="persona-verdict-box" id="persona-verdict-text"></div>
+              <div class="persona-critiques-box">
+                <h4>Key Analytical Observations:</h4>
+                <ul id="persona-critiques-list"></ul>
+              </div>
+            </div>
+
+            <!-- Share & Export Bar -->
+            <div class="export-bar">
+              <button class="btn btn-secondary" onclick="copyExecutiveSummary()">
+                <span>📋 Copy Summary Report</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. LIBRARY VIEW -->
+      <div id="library-view" class="view-panel hidden">
+        <div class="workspace-card">
+          <h2>📚 Fallacy Reference Library</h2>
+          <p style="margin-bottom:1.5rem; color:var(--text-muted);">Explore 20+ logical fallacies scanned by Gemma 4 AI.</p>
+
+          <input type="text" id="dash-fallacy-search" class="custom-input" placeholder="Search fallacy by name or category..." oninput="filterDashFallacies()" style="margin-bottom:1.5rem;">
+
+          <div class="modal-body" id="dash-fallacy-grid">
+            <!-- Dynamically rendered -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. ANALYTICS VIEW PLACEHOLDER -->
+      <div id="analytics-view" class="view-panel hidden">
+        <div class="workspace-card" style="text-align:center; padding:4rem 2rem;">
+          <div style="font-size:3rem; margin-bottom:1rem;">📈</div>
+          <h2>Debate Analytics Module</h2>
+          <p style="color:var(--text-muted); max-width:500px; margin:0 auto 1.5rem;">Advanced long-term argument metrics, recurring fallacy frequency tracking, and cohort debate trends will be enabled in future updates.</p>
+          <button class="btn btn-secondary" onclick="switchSidebarTab('dashboard')">← Return to Dashboard</button>
+        </div>
+      </div>
+
+      <!-- 4. INSIGHTS VIEW PLACEHOLDER -->
+      <div id="insights-view" class="view-panel hidden">
+        <div class="workspace-card" style="text-align:center; padding:4rem 2rem;">
+          <div style="font-size:3rem; margin-bottom:1rem;">💡</div>
+          <h2>Debate Insights & Coaching Reports</h2>
+          <p style="color:var(--text-muted); max-width:500px; margin:0 auto 1.5rem;">AI historical argument pattern analysis and personalized communication recommendations will be enabled in future updates.</p>
+          <button class="btn btn-secondary" onclick="switchSidebarTab('dashboard')">← Return to Dashboard</button>
+        </div>
+      </div>
+
+      <!-- 5. SETTINGS VIEW PLACEHOLDER -->
+      <div id="settings-view" class="view-panel hidden">
+        <div class="workspace-card">
+          <h2>⚙️ Dashboard Settings</h2>
+          <p style="color:var(--text-muted); margin-bottom:2rem;">Manage your preferences and theme options.</p>
+
+          <div style="display:flex; flex-direction:column; gap:1.5rem; max-width:500px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-dark); padding:1rem; border-radius:var(--radius-md);">
+              <div>
+                <strong>Active AI Model</strong>
+                <p style="font-size:0.85rem; color:var(--text-muted);">Google Gemma 4 (gemma-4-26b-a4b-it)</p>
+              </div>
+              <span class="badge-tag">Connected</span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-dark); padding:1rem; border-radius:var(--radius-md);">
+              <div>
+                <strong>Interface Color Theme</strong>
+                <p style="font-size:0.85rem; color:var(--text-muted);">Toggle between Light and Dark mode</p>
+              </div>
+              <button class="theme-toggle-btn" onclick="toggleTheme()">Switch Theme</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>
