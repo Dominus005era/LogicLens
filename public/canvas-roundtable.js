@@ -16,12 +16,12 @@ class CanvasRoundTable {
     this.currentUtterance = null;
     this.isDebateEnded = false;
 
-    // Persona Layout Specifications (Adjusted Y-coordinates to avoid collision with top TV screen)
+    // Persona Layout Specifications (Positioned with generous wall clearance for center presentation screen)
     this.personas = {
-      person_a: { name: 'Person A (Economic)', archetype: 'Economic', x: 0.22, y: 0.38, color: '#4F46E5', voicePitch: 1.0, voiceRate: 0.95, gestureOffset: 0 },
-      person_b: { name: 'Person B (Social)', archetype: 'Social', x: 0.78, y: 0.38, color: '#E11D48', voicePitch: 1.25, voiceRate: 0.95, gestureOffset: 1.5 },
-      person_c: { name: 'Person C (Empirical)', archetype: 'Empirical Data', x: 0.24, y: 0.78, color: '#059669', voicePitch: 0.85, voiceRate: 0.95, gestureOffset: 3.0 },
-      person_d: { name: 'Person D (Ethics)', archetype: 'Ethics', x: 0.76, y: 0.78, color: '#D97706', voicePitch: 1.1, voiceRate: 0.9, gestureOffset: 4.5 }
+      person_a: { name: 'Person A (Economic)', archetype: 'Economic', x: 0.17, y: 0.42, color: '#4F46E5', voicePitch: 1.0, voiceRate: 0.95, gestureOffset: 0 },
+      person_b: { name: 'Person B (Social)', archetype: 'Social', x: 0.83, y: 0.42, color: '#E11D48', voicePitch: 1.25, voiceRate: 0.95, gestureOffset: 1.5 },
+      person_c: { name: 'Person C (Empirical)', archetype: 'Empirical Data', x: 0.20, y: 0.78, color: '#059669', voicePitch: 0.85, voiceRate: 0.95, gestureOffset: 3.0 },
+      person_d: { name: 'Person D (Ethics)', archetype: 'Ethics', x: 0.80, y: 0.78, color: '#D97706', voicePitch: 1.1, voiceRate: 0.9, gestureOffset: 4.5 }
     };
 
     this.initResizing();
@@ -172,15 +172,15 @@ class CanvasRoundTable {
     ctx.fillStyle = wallGrad;
     ctx.fillRect(0, 0, w, h * 0.45);
 
-    // 2. High Wall-Mounted Presentation TV Screen (Expanded 72% Width for Full Topic Display)
-    const tvW = w * 0.72;
+    // 2. Center Presentation TV Screen (Placed in Middle Wall Space Between Person A & B with Zero Overlap)
+    const tvW = w * 0.46;
     const tvH = h * 0.22;
     const tvX = (w - tvW) / 2;
     const tvY = h * 0.015;
 
     // Outer Screen Bezel Glow
     ctx.shadowColor = '#4F46E5';
-    ctx.shadowBlur = 12;
+    ctx.shadowBlur = 10;
 
     ctx.fillStyle = isDark ? '#030712' : '#0F172A';
     if (ctx.roundRect) {
@@ -206,11 +206,11 @@ class CanvasRoundTable {
 
     // Full Topic Text Renderer (Multi-Line Word Wrapping without Truncation)
     ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 13.5px sans-serif';
+    ctx.font = 'bold 12px sans-serif';
     
     const fullTopic = this.topicText ? `"${this.topicText}"` : '"Round-Table Discussion Room"';
     const words = fullTopic.split(' ');
-    const maxLineW = tvW - 32;
+    const maxLineW = tvW - 24;
     let line = '';
     const lines = [];
 
@@ -227,8 +227,8 @@ class CanvasRoundTable {
     lines.push(line.trim());
 
     // Center multi-line topic text vertically in screen
-    const startY = lines.length > 1 ? tvY + 36 : tvY + 44;
-    const lineHeight = 17;
+    const startY = lines.length > 2 ? tvY + 32 : lines.length > 1 ? tvY + 36 : tvY + 44;
+    const lineHeight = 16;
     lines.forEach((l, idx) => {
       ctx.fillText(l, w * 0.5, startY + (idx * lineHeight));
     });
@@ -403,19 +403,30 @@ class CanvasRoundTable {
     ctx.restore();
   }
 
-  // Floating Speech Card
+  // Floating Speech Card (Positioned with Smart Boundary Constraints to Avoid TV Screen Overlap)
   drawSpeechBubble(ctx, x, y, text, accentColor) {
     ctx.save();
 
-    const maxW = 240;
-    const padding = 12;
+    const maxW = 230;
+    const padding = 10;
     ctx.font = 'bold 11px sans-serif';
+    const w = this.width;
     
     const lines = this.wrapText(ctx, text, maxW - padding * 2);
     const bubbleH = lines.length * 16 + padding * 2;
     const bubbleW = maxW;
-    const bx = x - bubbleW / 2;
-    const by = y - bubbleH;
+    
+    // Smart X-offset to prevent overlapping center TV screen (x = 0.27w to 0.73w)
+    let bx = x - bubbleW / 2;
+    if (x < w * 0.40) {
+      // Left speaker (Person A): Shift bubble toward left edge
+      bx = Math.max(15, x - bubbleW * 0.65);
+    } else if (x > w * 0.60) {
+      // Right speaker (Person B): Shift bubble toward right edge
+      bx = Math.min(w - bubbleW - 15, x - bubbleW * 0.35);
+    }
+
+    const by = Math.max(10, y - bubbleH);
 
     // Speech Card Background
     ctx.fillStyle = '#0F172A';
@@ -428,10 +439,11 @@ class CanvasRoundTable {
     ctx.stroke();
 
     // Pointer Tail
+    const tailX = Math.max(bx + 20, Math.min(bx + bubbleW - 20, x));
     ctx.beginPath();
-    ctx.moveTo(x - 8, by + bubbleH);
-    ctx.lineTo(x, by + bubbleH + 9);
-    ctx.lineTo(x + 8, by + bubbleH);
+    ctx.moveTo(tailX - 8, by + bubbleH);
+    ctx.lineTo(tailX, by + bubbleH + 9);
+    ctx.lineTo(tailX + 8, by + bubbleH);
     ctx.fillStyle = '#0F172A';
     ctx.fill();
 
@@ -439,7 +451,7 @@ class CanvasRoundTable {
     ctx.fillStyle = '#F8FAFC';
     ctx.textAlign = 'center';
     lines.forEach((line, i) => {
-      ctx.fillText(line, x, by + padding + 13 + i * 16);
+      ctx.fillText(line, bx + bubbleW / 2, by + padding + 13 + i * 16);
     });
 
     ctx.restore();
