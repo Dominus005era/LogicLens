@@ -75,12 +75,32 @@ class CanvasRoundTable {
 
   stopSpeech() {
     this.isStopped = true;
+    this.isPaused = false;
     if (this.speechFallbackTimer) {
       clearTimeout(this.speechFallbackTimer);
       this.speechFallbackTimer = null;
     }
     if (this.synth && this.synth.speaking) {
       this.synth.cancel();
+    }
+  }
+
+  pauseSpeech() {
+    this.isPaused = true;
+    if (this.speechFallbackTimer) {
+      clearTimeout(this.speechFallbackTimer);
+      this.speechFallbackTimer = null;
+    }
+    if (this.synth && this.synth.speaking) {
+      this.synth.pause();
+    }
+  }
+
+  resumeSpeech() {
+    this.isPaused = false;
+    this.isStopped = false;
+    if (this.synth && this.synth.paused) {
+      this.synth.resume();
     }
   }
 

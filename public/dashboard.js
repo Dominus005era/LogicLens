@@ -416,18 +416,73 @@ function applyTheme(theme) {
 
 let currentActiveTab = 'dashboard';
 let currentStreamSessionId = 0;
+let isDiscussionPaused = false;
+
+// Toggle Pause / Resume Discussion Engine
+function togglePauseResumeDiscussion() {
+  const btn = document.getElementById('pause-resume-btn');
+  
+  isDiscussionPaused = !isDiscussionPaused;
+
+  if (isDiscussionPaused) {
+    if (canvasStage) canvasStage.pauseSpeech();
+    if (window.speechSynthesis && window.speechSynthesis.speaking) {
+      window.speechSynthesis.pause();
+    }
+    if (btn) {
+      btn.innerHTML = '<span>▶️ Resume Discussion</span>';
+      btn.style.borderColor = 'var(--accent-emerald)';
+      btn.style.color = 'var(--accent-emerald)';
+      btn.style.background = 'rgba(5, 150, 105, 0.15)';
+    }
+
+    const currentTurn = (roundTableData && roundTableData.turns) ? roundTableData.turns[activeTurnIndex] : null;
+    const speakerName = currentTurn ? currentTurn.speaker_name : 'Discussion';
+    document.getElementById('live-speaker-status').textContent = `⏸️ Discussion paused at Turn ${activeTurnIndex + 1}: ${speakerName}. Click "Resume" to continue.`;
+  } else {
+    if (canvasStage) canvasStage.resumeSpeech();
+    if (window.speechSynthesis && window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+    }
+    if (btn) {
+      btn.innerHTML = '<span>⏸️ Pause Discussion</span>';
+      btn.style.borderColor = 'var(--accent-amber)';
+      btn.style.color = 'var(--text-main)';
+      btn.style.background = 'transparent';
+    }
+
+    // Resume turn stream from active turn
+    if (roundTableData && roundTableData.turns) {
+      startSequentialLiveStream(roundTableData.turns, true);
+    }
+  }
+}
 
 // Sidebar Navigation Tabs (Stops TTS speech audio & turn progression immediately on tab switch!)
 function switchSidebarTab(target) {
   currentActiveTab = target;
-  currentStreamSessionId++; // Invalidate any running background stream session!
+
+  if (target !== 'dashboard') {
+    // Auto-pause active discussion when navigating away
+    if (!isDiscussionPaused && roundTableData && roundTableData.turns && activeTurnIndex < roundTableData.turns.length) {
+      isDiscussionPaused = true;
+      const btn = document.getElementById('pause-resume-btn');
+      if (btn) {
+        btn.innerHTML = '<span>▶️ Resume Discussion</span>';
+        btn.style.borderColor = 'var(--accent-emerald)';
+        btn.style.color = 'var(--accent-emerald)';
+        btn.style.background = 'rgba(5, 150, 105, 0.15)';
+      }
+    }
+    currentStreamSessionId++; // Invalidate background stream session
+    if (canvasStage) canvasStage.pauseSpeech();
+    if (window.speechSynthesis) window.speechSynthesis.pause();
+  }
 
   if (liveStreamTimer) {
     clearTimeout(liveStreamTimer);
     liveStreamTimer = null;
   }
-  if (canvasStage) canvasStage.stopSpeech();
-  if (window.speechSynthesis) window.speechSynthesis.cancel();
 
   document.querySelectorAll('.sidebar-link').forEach(link => {
     link.classList.toggle('active', link.dataset.target === target);
@@ -598,14 +653,26 @@ function showError(msg) {
 }
 
 // Live Turn Sequencer Engine (Organic Human Event-Driven Pacing)
-function startSequentialLiveStream(turns) {
+function startSequentialLiveStream(turns, isResuming = false) {
   if (!turns || turns.length === 0) return;
-  activeTurnIndex = 0;
+  
+  if (!isResuming) {
+    activeTurnIndex = 0;
+    isDiscussionPaused = false;
+    const btn = document.getElementById('pause-resume-btn');
+    if (btn) {
+      btn.innerHTML = '<span>⏸️ Pause Discussion</span>';
+      btn.style.borderColor = 'var(--accent-amber)';
+      btn.style.color = 'var(--text-main)';
+      btn.style.background = 'transparent';
+    }
+  }
+
   const sessionInstanceId = ++currentStreamSessionId;
 
   const runNextTurn = () => {
-    // Abort turn execution if user switched tabs or session was invalidated!
-    if (sessionInstanceId !== currentStreamSessionId || currentActiveTab !== 'dashboard') {
+    // Abort turn execution if user paused, switched tabs, or session was invalidated!
+    if (isDiscussionPaused || sessionInstanceId !== currentStreamSessionId || currentActiveTab !== 'dashboard') {
       return;
     }
 

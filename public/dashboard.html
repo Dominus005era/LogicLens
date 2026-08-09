@@ -183,6 +183,11 @@ Example: Whether school and colleges need proper uniform or not"></textarea>
 
               <!-- Action Bar Buttons -->
               <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+                <!-- Pause / Resume Discussion Button -->
+                <button class="btn btn-secondary" id="pause-resume-btn" onclick="togglePauseResumeDiscussion()" style="border-color:var(--accent-amber);">
+                  <span>⏸️ Pause Discussion</span>
+                </button>
+
                 <!-- On-Demand View Toggle Button -->
                 <button class="btn btn-secondary" id="toggle-analysis-btn" onclick="toggleTranscriptAnalysisView()" style="border-color:var(--accent-indigo);">
                   <span>📊 View Transcript Analysis</span>
