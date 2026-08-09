@@ -291,12 +291,13 @@ function renderTopicTranscriptAnalysis(analysis) {
   document.getElementById('topic-coach-score-num').textContent = coach.overall_score;
   document.getElementById('topic-coach-verdict-title').textContent = coach.verdict;
   
-  // Score Ring Offset
+  // Score Ring Offset & Gradient
   const scoreRing = document.getElementById('topic-score-ring');
   if (scoreRing) {
     const circumference = 264;
     const offset = circumference - (coach.overall_score / 100) * circumference;
     scoreRing.style.strokeDashoffset = offset;
+    scoreRing.style.stroke = coach.overall_score >= 80 ? 'url(#ringGradientEmerald)' : 'url(#ringGradientIndigo)';
   }
 
   const tipsList = document.getElementById('topic-coach-tips-list');
@@ -304,27 +305,63 @@ function renderTopicTranscriptAnalysis(analysis) {
     tipsList.innerHTML = (coach.tips || []).map(tip => `<li>💡 ${escapeHtml(tip)}</li>`).join('');
   }
 
+  // Color Mapping for Personas
+  const colorMap = {
+    'Person A': { color: '#4F46E5', bg: 'rgba(79, 70, 229, 0.12)' },
+    'Person B': { color: '#E11D48', bg: 'rgba(225, 29, 72, 0.12)' },
+    'Person C': { color: '#059669', bg: 'rgba(5, 150, 105, 0.12)' },
+    'Person D': { color: '#D97706', bg: 'rgba(217, 119, 6, 0.12)' }
+  };
+
   // Participants Grid
   const partContainer = document.getElementById('topic-participants-container');
   if (partContainer) {
-    partContainer.innerHTML = (analysis.participants || []).map(p => `
-      <div class="participant-card">
-        <div class="p-header">
-          <div>
-            <span class="p-name">${escapeHtml(p.name)}</span>
+    partContainer.innerHTML = (analysis.participants || []).map(p => {
+      let key = 'Person A';
+      if (p.name.includes('B')) key = 'Person B';
+      if (p.name.includes('C')) key = 'Person C';
+      if (p.name.includes('D')) key = 'Person D';
+      const theme = colorMap[key] || { color: '#4F46E5', bg: 'rgba(79, 70, 229, 0.12)' };
+
+      return `
+        <div class="participant-card" style="border-top-color: ${theme.color};">
+          <div class="p-header">
+            <div>
+              <span class="p-name" style="color: ${theme.color};">${escapeHtml(p.name)}</span>
+            </div>
+            <span class="p-score-badge" style="background: ${theme.bg}; color: ${theme.color};">${p.logic_score}/10 Logic</span>
           </div>
-          <span class="p-score-badge">${p.logic_score}/10 Logic</span>
+          <div class="badges-row">
+            ${(p.badges || []).map(b => `<span class="badge-tag" style="background: ${theme.bg}; color: ${theme.color};">${escapeHtml(b)}</span>`).join('')}
+          </div>
+          <div class="p-metrics">
+            <div class="metric-line">
+              <span>Evidence Support</span>
+              <strong>${p.evidence_score}/10</strong>
+            </div>
+            <div style="width:100%; height:6px; background:var(--border-subtle); border-radius:3px; overflow:hidden;">
+              <div style="width:${(p.evidence_score * 10)}%; height:100%; background:${theme.color}; border-radius:3px;"></div>
+            </div>
+
+            <div class="metric-line" style="margin-top:0.4rem;">
+              <span>Clarity</span>
+              <strong>${p.clarity_score}/10</strong>
+            </div>
+            <div style="width:100%; height:6px; background:var(--border-subtle); border-radius:3px; overflow:hidden;">
+              <div style="width:${(p.clarity_score * 10)}%; height:100%; background:${theme.color}; border-radius:3px;"></div>
+            </div>
+
+            <div class="metric-line" style="margin-top:0.4rem;">
+              <span>Respectfulness</span>
+              <strong>${p.respect_score}/10</strong>
+            </div>
+            <div style="width:100%; height:6px; background:var(--border-subtle); border-radius:3px; overflow:hidden;">
+              <div style="width:${(p.respect_score * 10)}%; height:100%; background:${theme.color}; border-radius:3px;"></div>
+            </div>
+          </div>
         </div>
-        <div class="badges-row">
-          ${(p.badges || []).map(b => `<span class="badge-tag">${escapeHtml(b)}</span>`).join('')}
-        </div>
-        <div class="p-metrics">
-          <div class="metric-line"><span>Evidence Support</span><strong>${p.evidence_score}/10</strong></div>
-          <div class="metric-line"><span>Clarity</span><strong>${p.clarity_score}/10</strong></div>
-          <div class="metric-line"><span>Respectfulness</span><strong>${p.respect_score}/10</strong></div>
-        </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   // Heatmap
