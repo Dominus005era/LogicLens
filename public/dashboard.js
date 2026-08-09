@@ -27,6 +27,82 @@ const TOPIC_PRESETS = {
   social_media: "Should social media usage for teenagers under 16 be legally restricted?"
 };
 
+// // Default Seed Debates for Library, Analytics & Insights (Full 8-10 turns across all 4 personas!)
+const DEFAULT_SEED_DEBATES = [
+  {
+    id: "seed-1",
+    topic: "Whether school and colleges need proper uniform or not",
+    mode: "deep_discussion",
+    date: "Aug 8, 2026",
+    coverImage: COVER_IMAGES[0],
+    personas: [
+      { id: "person_a", name: "Person A", archetype: "Economic & Logistics", avatar_color: "indigo", tone: "Calm", logic_rating: 8 },
+      { id: "person_b", name: "Person B", archetype: "Social & Freedom", avatar_color: "rose", tone: "Passionate", logic_rating: 8 },
+      { id: "person_c", name: "Person C", archetype: "Empirical Data", avatar_color: "emerald", tone: "Calm", logic_rating: 9 },
+      { id: "person_d", name: "Person D", archetype: "Ethics & Psychology", avatar_color: "amber", tone: "Thoughtful", logic_rating: 8 }
+    ],
+    turns: [
+      { turn_index: 1, speaker_id: "person_a", speaker_name: "Person A", headline_point: "1. Socioeconomic Equality & Household Savings", spoken_text: "Mandatory uniforms level the playing field by eliminating visible wealth disparities and reducing annual household wardrobe costs.", duration_ms: 7500 },
+      { turn_index: 2, speaker_id: "person_b", speaker_name: "Person B", headline_point: "2. Direct Counter: Suppression of Personal Autonomy", spoken_text: "While economic relief is valid, Person A ignores that forcing identical dress suppresses student identity, comfort, and self-expression.", duration_ms: 8000 },
+      { turn_index: 3, speaker_id: "person_a", speaker_name: "Person A", headline_point: "3. Rebuttal: Academic Focus Over Fashion Trends", spoken_text: "Self-expression happens through achievements, arts, and sports, not daily brand flexing in educational classrooms.", duration_ms: 7500 },
+      { turn_index: 4, speaker_id: "person_c", speaker_name: "Person C", headline_point: "4. Empirical Data on Academic Test Scores", spoken_text: "Let's examine data. Comprehensive meta-analyses show zero statistical correlation between strict uniform mandates and academic test scores.", duration_ms: 8500 },
+      { turn_index: 5, speaker_id: "person_d", speaker_name: "Person D", headline_point: "5. Psychological Sense of Belonging & Anti-Bullying", spoken_text: "However, psychological studies reveal that shared group attire increases a sense of belonging and significantly reduces peer bullying.", duration_ms: 8000 },
+      { turn_index: 6, speaker_id: "person_b", speaker_name: "Person B", headline_point: "6. Flexible Dress Codes as Balanced Alternative", spoken_text: "Flexible dress codes with clear modesty guidelines achieve social harmony without forcing uniform rigidity.", duration_ms: 7500 },
+      { turn_index: 7, speaker_id: "person_c", speaker_name: "Person C", headline_point: "7. Quantitative Surveys on Student Wellbeing", spoken_text: "Survey data across 120 schools indicates 88% higher student comfort ratings when flexible dress codes replace rigid uniforms.", duration_ms: 8000 },
+      { turn_index: 8, speaker_id: "person_d", speaker_name: "Person D", headline_point: "8. Ethical Resolution: Subsidized Inclusive Policies", spoken_text: "Ethically, a subsidized, flexible dress code offers the ideal balance between discipline and personal dignity.", duration_ms: 7500 }
+    ],
+    attributed_conclusion: {
+      summary: "The discussion reveals that while uniforms offer logistical simplicity and community cohesion, they lack a proven empirical link to academic test scores and pose risks to individual expression.",
+      agreement_mappings: [
+        { persons: ["Person A", "Person D"], common_point: "Both agreed that baseline dress standards foster school focus, discipline, and financial equity for families." },
+        { persons: ["Person B", "Person C"], common_point: "Both emphasized that flexible dress codes achieve social harmony without violating individual autonomy." }
+      ],
+      core_tradeoffs: "Fundamental tension between economic standardization and personal freedom of expression.",
+      discussion_quality_score: 88
+    },
+    transcript_analysis: {
+      summary: "Deep multi-parameter evaluation covering household economic relief, personal expression rights, empirical data, and psychological well-being.",
+      coach: { overall_score: 88, verdict: "High-quality reasoned debate with balanced empirical and ethical arguments.", tips: ["Bridge logistical simplicity with creative expression avenues"] },
+      participants: [
+        { name: "Person A (Economic)", logic_score: 8, evidence_score: 8, respect_score: 9, clarity_score: 9, badges: ["🧠 Rational Thinker", "🔍 Logistics Focus"] },
+        { name: "Person B (Social & Freedom)", logic_score: 8, evidence_score: 8, respect_score: 8, clarity_score: 9, badges: ["🕊️ Autonomy Defender"] },
+        { name: "Person C (Empirical Data)", logic_score: 9, evidence_score: 10, respect_score: 9, clarity_score: 9, badges: ["🔍 Evidence Hunter", "🧠 Data Master"] },
+        { name: "Person D (Ethics & Psychology)", logic_score: 8, evidence_score: 8, respect_score: 9, clarity_score: 8, badges: ["🕊️ Respectful Debater"] }
+      ],
+      heat_map: [
+        { speaker: "Person A", message: "Uniforms eliminate socioeconomic clothing competition.", tone: "Calm", level: "Blue" },
+        { speaker: "Person B", message: "Mandates restrict personal autonomy and identity.", tone: "Curious", level: "Green" },
+        { speaker: "Person C", message: "Meta-analyses show zero correlation to test scores.", tone: "Calm", level: "Blue" },
+        { speaker: "Person D", message: "Shared attire increases belonging and reduces bullying.", tone: "Calm", level: "Blue" }
+      ],
+      evidence_meter: [
+        { claim: "Uniforms reduce household wardrobe costs.", speaker: "Person A", status: "Supported by facts", reason: "Consistent with consumer expenditure surveys." },
+        { claim: "No direct correlation to test scores.", speaker: "Person C", status: "Supported by facts", reason: "Cites peer-reviewed educational meta-analyses." }
+      ]
+    }
+  },
+  {
+    id: "seed-2",
+    topic: "Is Generative AI a threat or an enhancement to human artistic creativity?",
+    mode: "deep_discussion",
+    date: "Aug 8, 2026",
+    coverImage: COVER_IMAGES[1],
+    personas: [
+      { id: "person_a", name: "Person A", archetype: "Economic & Logistics", avatar_color: "indigo", tone: "Calm", logic_rating: 8 },
+      { id: "person_b", name: "Person B", archetype: "Social & Freedom", avatar_color: "rose", tone: "Passionate", logic_rating: 9 },
+      { id: "person_c", name: "Person C", archetype: "Empirical Data", avatar_color: "emerald", tone: "Calm", logic_rating: 9 },
+      { id: "person_d", name: "Person D", archetype: "Ethics & Psychology", avatar_color: "amber", tone: "Thoughtful", logic_rating: 8 }
+    ],
+    turns: [
+      { turn_index: 1, speaker_id: "person_a", speaker_name: "Person A", headline_point: "1. Democratizing Production & Prototype Speed", spoken_text: "AI lowers technical barriers to entry, enabling independent creators to prototype and produce high-end media at fraction of traditional costs.", duration_ms: 8000 },
+      { turn_index: 2, speaker_id: "person_b", speaker_name: "Person B", headline_point: "2. Counter: Devaluation of Human Craftsmanship", spoken_text: "Generative AI floods markets with automated content trained on uncompensated artist labor, devaluing lifelong human artistic mastery.", duration_ms: 8500 },
+      { turn_index: 3, speaker_id: "person_a", speaker_name: "Person A", headline_point: "3. Rapid Iteration for Independent Creators", spoken_text: "Solo game devs and writers can now build worlds that previously required multimillion-dollar studio budgets.", duration_ms: 7500 },
+      { turn_index: 4, speaker_id: "person_c", speaker_name: "Person C", headline_point: "4. Empirical Data on Freelance Artist Income", spoken_text: "Market tracking shows a 38% decline in entry-level commercial illustration rates since commercial image model deployment.", duration_ms: 8000 },
+      { turn_index: 5, speaker_id: "person_d", speaker_name: "Person D", headline_point: "5. Psychological Meaning & Human Emotion", spoken_text: "Art is human emotional expression. Algorithmic outputs lack lived experience, risking a cultural meaning crisis.", duration_ms: 8000 },
+      { turn_index: 6, speaker_id: "person_b", speaker_name: "Person B", headline_point: "6. Mandatory Opt-in & Training Royalties", spoken_text: "Artists must have opt-in consent rights and recurring revenue sharing when their works train foundational models.", duration_ms: 8000 },
+      { turn_index: 7, speaker_id: "person_c", speaker_name: "Person C", headline_point: "7. Productivity Surveys on Hybrid AI-Human Workflows", spoken_text: "Studies show hybrid creators who use AI as a assistant reach 3x higher output while maintaining creative direction.", duration_ms: 8500 },
+      { turn_index: 8, speaker_id: "person_d", speaker_name: "Person D", headline_point: "8. Ethical Resolution: Watermarking & Craft Value", spoken_text: "The future requires provenance watermarking so authentic human art remains a prized, high-value premium tier.", duration_ms: 8000 }
+    ],
     attributed_conclusion: {
       summary: "AI democratizes commercial production and rapid prototyping, but risks devaluing specialized human craftsmanship and intellectual property rights.",
       agreement_mappings: [
@@ -262,12 +338,10 @@ function saveDebateToStorage(debateData) {
   
   const existingIdx = stored.findIndex(d => d.topic.toLowerCase() === debateData.topic.toLowerCase());
   
-  const settings = getSavedSettings();
   const newEntry = {
     id: `debate-${Date.now()}`,
     topic: debateData.topic,
     mode: currentMode,
-    durationMinutes: debateData.durationMinutes || settings.discussionDurationMinutes || 1,
     date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
     coverImage: COVER_IMAGES[stored.length % COVER_IMAGES.length],
     personas: debateData.personas || [],
@@ -329,12 +403,11 @@ function applyTheme(theme) {
   localStorage.setItem('logiclens_theme', theme);
 }
 
-let isDiscussionPaused = false;
-
-// Sidebar Navigation Tabs (Pauses live discussion & TTS speech audio immediately on tab switch!)
+// Sidebar Navigation Tabs (Stops TTS speech audio immediately on tab switch!)
 function switchSidebarTab(target) {
-  if (target !== 'dashboard') {
-    pauseDiscussion();
+  if (canvasStage) canvasStage.stopSpeech();
+  if (window.speechSynthesis && window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
   }
 
   document.querySelectorAll('.sidebar-link').forEach(link => {
@@ -362,56 +435,6 @@ function switchSidebarTab(target) {
   } else if (target === 'insights') {
     renderInsightsView();
   }
-}
-
-// Discussion Pause / Resume Control Engine
-function toggleDiscussionPause() {
-  if (isDiscussionPaused) {
-    resumeDiscussion();
-  } else {
-    pauseDiscussion();
-  }
-}
-
-function pauseDiscussion() {
-  isDiscussionPaused = true;
-  if (canvasStage) canvasStage.stopSpeech();
-  if (window.speechSynthesis && window.speechSynthesis.speaking) {
-    window.speechSynthesis.cancel();
-  }
-
-  const pauseBtn = document.getElementById('pause-resume-btn');
-  if (pauseBtn) pauseBtn.innerHTML = '<span>▶️ Resume</span>';
-
-  const liveTag = document.getElementById('live-indicator-tag');
-  if (liveTag) {
-    liveTag.style.background = 'rgba(217,119,6,0.15)';
-    liveTag.style.color = 'var(--accent-amber)';
-    liveTag.textContent = '⏸️ PAUSED';
-  }
-
-  const statusEl = document.getElementById('live-speaker-status');
-  if (statusEl && activeTurnIndex < (roundTableData?.turns?.length || 0)) {
-    statusEl.textContent = `Discussion paused at Turn ${activeTurnIndex + 1}. Click ▶️ Resume to continue playback.`;
-  }
-}
-
-function resumeDiscussion() {
-  if (!roundTableData || !roundTableData.turns) return;
-  isDiscussionPaused = false;
-
-  const pauseBtn = document.getElementById('pause-resume-btn');
-  if (pauseBtn) pauseBtn.innerHTML = '<span>⏸️ Pause</span>';
-
-  const liveTag = document.getElementById('live-indicator-tag');
-  if (liveTag) {
-    liveTag.style.background = 'rgba(220,38,38,0.15)';
-    liveTag.style.color = 'var(--accent-rose)';
-    liveTag.textContent = '🔴 LIVE DEBATE STREAMING';
-  }
-
-  // Resume turn-by-turn playback from current active turn index
-  runSequentialTurn();
 }
 
 // Delete Debate Card Helper
@@ -555,93 +578,62 @@ function showError(msg) {
   errorBanner.classList.remove('hidden');
 }
 
-let activeTurnsList = [];
-let activeStreamSessionId = 0;
-
-// Live Turn Sequencer Engine (Deterministic Session Guard & Sequential Flow)
+// Live Turn Sequencer Engine (Organic Human Event-Driven Pacing)
 function startSequentialLiveStream(turns) {
   if (!turns || turns.length === 0) return;
-  
-  // Invalidate any previous stream loop immediately
-  activeStreamSessionId++;
-  if (canvasStage) canvasStage.stopSpeech();
-  if (window.speechSynthesis) window.speechSynthesis.cancel();
-
-  activeTurnsList = turns;
   activeTurnIndex = 0;
-  isDiscussionPaused = false;
 
-  const pauseBtn = document.getElementById('pause-resume-btn');
-  if (pauseBtn) pauseBtn.innerHTML = '<span>⏸️ Pause</span>';
+  const runNextTurn = () => {
+    if (activeTurnIndex >= turns.length) {
+      document.getElementById('live-speaker-status').textContent = 'Discussion wrapping up... personas synthesizing common ground.';
+      
+      // Graceful 2.5-second ambient room pause after the final speaker finishes
+      setTimeout(() => {
+        if (canvasStage) {
+          canvasStage.setDebateEnded(true);
+        }
+        const liveTag = document.getElementById('live-indicator-tag');
+        if (liveTag) {
+          liveTag.style.background = 'rgba(5,150,105,0.15)';
+          liveTag.style.color = 'var(--accent-emerald)';
+          liveTag.textContent = '✅ DEBATE COMPLETED';
+        }
+        document.getElementById('live-speaker-status').textContent = 'Discussion concluded across all 4 parameters. Click "Seek Synthesis & Report" to view final executive report.';
+      }, 2500);
+      return;
+    }
 
-  const liveTag = document.getElementById('live-indicator-tag');
-  if (liveTag) {
-    liveTag.style.background = 'rgba(220,38,38,0.15)';
-    liveTag.style.color = 'var(--accent-rose)';
-    liveTag.textContent = '🔴 LIVE DEBATE STREAMING';
-  }
+    const turn = turns[activeTurnIndex];
+    const speakerId = turn.speaker_id;
 
-  runSequentialTurn();
-}
-
-function runSequentialTurn() {
-  const currentSessionId = activeStreamSessionId;
-
-  if (isDiscussionPaused || currentSessionId !== activeStreamSessionId || !activeTurnsList || activeTurnsList.length === 0) {
-    return;
-  }
-
-  if (activeTurnIndex >= activeTurnsList.length) {
-    document.getElementById('live-speaker-status').textContent = 'Discussion wrapping up... personas synthesizing common ground.';
-    
-    setTimeout(() => {
-      if (isDiscussionPaused || currentSessionId !== activeStreamSessionId) return;
-      if (canvasStage) {
-        canvasStage.setDebateEnded(true);
-      }
-      const liveTag = document.getElementById('live-indicator-tag');
-      if (liveTag) {
-        liveTag.style.background = 'rgba(5,150,105,0.15)';
-        liveTag.style.color = 'var(--accent-emerald)';
-        liveTag.textContent = '✅ DEBATE COMPLETED';
-      }
-      document.getElementById('live-speaker-status').textContent = 'Discussion concluded across all 4 parameters. Click "Seek Synthesis & Report" to view final executive report.';
-    }, 2000);
-    return;
-  }
-
-  const turn = activeTurnsList[activeTurnIndex];
-  const speakerId = turn.speaker_id;
-
-  if (roundTableData && roundTableData.personaLogs && roundTableData.personaLogs[speakerId]) {
-    // Avoid duplicate log push on resume
-    const lastLogged = roundTableData.personaLogs[speakerId][roundTableData.personaLogs[speakerId].length - 1];
-    if (!lastLogged || lastLogged.turn_index !== turn.turn_index) {
+    if (roundTableData.personaLogs && roundTableData.personaLogs[speakerId]) {
       roundTableData.personaLogs[speakerId].push(turn);
     }
-  }
 
-  if (activeOpenDrawerPersonId === speakerId) {
-    renderLivePersonaDrawerContent(speakerId);
-  }
+    if (activeOpenDrawerPersonId === speakerId) {
+      renderLivePersonaDrawerContent(speakerId);
+    }
 
-  const transitionLabel = turn.transition_type === 'organic_interjection' ? '⚡ interjecting...' : turn.transition_type === 'direct_counter' ? '💬 responding...' : 'speaking...';
-  const statusText = `Turn ${turn.turn_index} of ${activeTurnsList.length}: ${turn.speaker_name} is ${transitionLabel}`;
-  document.getElementById('live-speaker-status').textContent = statusText;
+    const transitionLabel = turn.transition_type === 'organic_interjection' ? '⚡ interjecting...' : turn.transition_type === 'direct_counter' ? '💬 responding...' : 'speaking...';
+    const statusText = `Turn ${turn.turn_index} of ${turns.length}: ${turn.speaker_name} is ${transitionLabel}`;
+    document.getElementById('live-speaker-status').textContent = statusText;
 
-  let turnAdvanced = false;
-  const advanceTurn = () => {
-    if (turnAdvanced || isDiscussionPaused || currentSessionId !== activeStreamSessionId) return;
-    turnAdvanced = true;
-    activeTurnIndex++;
-    runSequentialTurn();
+    let turnAdvanced = false;
+    const advanceTurn = () => {
+      if (turnAdvanced) return;
+      turnAdvanced = true;
+      activeTurnIndex++;
+      runNextTurn();
+    };
+
+    if (canvasStage) {
+      canvasStage.setActiveSpeaker(speakerId, turn.headline_point, turn.spoken_text, advanceTurn);
+    } else {
+      setTimeout(advanceTurn, 8000);
+    }
   };
 
-  if (canvasStage) {
-    canvasStage.setActiveSpeaker(speakerId, turn.headline_point, turn.spoken_text, advanceTurn);
-  } else {
-    setTimeout(advanceTurn, 7500);
-  }
+  runNextTurn();
 }
 
 // On-Demand Transcript Analysis View Toggle
@@ -680,7 +672,6 @@ function renderLibraryView() {
         <button class="card-delete-btn" onclick="deleteDebateCard(event, '${d.id}')" title="Delete debate">🗑️</button>
         <img src="${d.coverImage || COVER_IMAGES[0]}" alt="Cover" class="debate-card-img" />
         <span class="debate-card-mode-badge">${d.mode === 'calm' ? '🕊️ Calm Rewrite' : '🗣️ Deep Discussion'}</span>
-        <span class="debate-card-duration-badge">⏱️ ${d.durationMinutes || 1} Min</span>
       </div>
       <div class="debate-card-body">
         <h4 class="debate-card-title">${escapeHtml(d.topic)}</h4>
@@ -707,7 +698,6 @@ function filterLibraryCards() {
         <button class="card-delete-btn" onclick="deleteDebateCard(event, '${d.id}')" title="Delete debate">🗑️</button>
         <img src="${d.coverImage || COVER_IMAGES[0]}" alt="Cover" class="debate-card-img" />
         <span class="debate-card-mode-badge">${d.mode === 'calm' ? '🕊️ Calm Rewrite' : '🗣️ Deep Discussion'}</span>
-        <span class="debate-card-duration-badge">⏱️ ${d.durationMinutes || 1} Min</span>
       </div>
       <div class="debate-card-body">
         <h4 class="debate-card-title">${escapeHtml(d.topic)}</h4>
@@ -725,16 +715,10 @@ function loadSavedDebateIntoRoundTable(debateId) {
   const debate = debates.find(d => d.id === debateId);
   if (!debate) return;
 
-  // Invalidate any previous running session immediately
-  activeStreamSessionId++;
-  if (canvasStage) canvasStage.stopSpeech();
-  if (window.speechSynthesis) window.speechSynthesis.cancel();
-
   roundTableData = debate;
   roundTableData.personaLogs = { person_a: [], person_b: [], person_c: [], person_d: [] };
 
   switchSidebarTab('dashboard');
-  isDiscussionPaused = false;
   
   document.getElementById('topic-input').value = debate.topic;
   document.getElementById('minimized-topic-text').textContent = `"${debate.topic}"`;
@@ -746,7 +730,6 @@ function loadSavedDebateIntoRoundTable(debateId) {
 
   if (canvasStage) {
     canvasStage.setTopic(debate.topic);
-    canvasStage.updatePersonas(debate.personas);
   }
 
   renderTopicTranscriptAnalysis(debate.transcript_analysis);
@@ -774,7 +757,6 @@ function renderReportsView() {
           <button class="card-delete-btn" onclick="deleteDebateCard(event, '${d.id}')" title="Delete report">🗑️</button>
           <img src="${d.coverImage || COVER_IMAGES[0]}" alt="Cover" class="debate-card-img" />
           <span class="debate-card-mode-badge" style="background:rgba(79,70,229,0.9);">📄 ${score}/100 Score</span>
-          <span class="debate-card-duration-badge">⏱️ ${d.durationMinutes || 1} Min</span>
         </div>
         <div class="debate-card-body">
           <h4 class="debate-card-title">${escapeHtml(d.topic)}</h4>
@@ -905,11 +887,6 @@ function renderAnalyticsView() {
   const grid = document.getElementById('analytics-grid-container');
   if (!grid) return;
 
-  if (debates.length === 0) {
-    grid.innerHTML = '<p style="color:var(--text-muted); font-style:italic; grid-column:1/-1;">No analytics available yet. Generate a debate from the Dashboard tab!</p>';
-    return;
-  }
-
   grid.innerHTML = debates.map(d => {
     const score = d.attributed_conclusion?.discussion_quality_score || d.transcript_analysis?.coach?.overall_score || 88;
     return `
@@ -918,7 +895,6 @@ function renderAnalyticsView() {
           <button class="card-delete-btn" onclick="deleteDebateCard(event, '${d.id}')" title="Delete debate">🗑️</button>
           <img src="${d.coverImage || COVER_IMAGES[0]}" alt="Cover" class="debate-card-img" />
           <span class="debate-card-mode-badge" style="background:rgba(5,150,105,0.9);">${score}/100 Score</span>
-          <span class="debate-card-duration-badge">⏱️ ${d.durationMinutes || 1} Min</span>
         </div>
         <div class="debate-card-body">
           <h4 class="debate-card-title">${escapeHtml(d.topic)}</h4>
@@ -958,18 +934,12 @@ function renderInsightsView() {
   if (!grid) return;
   const debates = getStoredDebates();
 
-  if (debates.length === 0) {
-    grid.innerHTML = '<p style="color:var(--text-muted); font-style:italic; grid-column:1/-1;">No saved insights available yet. Generate a debate from the Dashboard tab!</p>';
-    return;
-  }
-
   grid.innerHTML = debates.map(d => `
     <div class="debate-card" onclick="openInsightsModal('${d.id}')">
       <div class="debate-card-img-wrap">
         <button class="card-delete-btn" onclick="deleteDebateCard(event, '${d.id}')" title="Delete debate">🗑️</button>
         <img src="${d.coverImage || COVER_IMAGES[0]}" alt="Cover" class="debate-card-img" />
         <span class="debate-card-mode-badge" style="background:rgba(217,119,6,0.9);">💡 Insights</span>
-        <span class="debate-card-duration-badge">⏱️ ${d.durationMinutes || 1} Min</span>
       </div>
       <div class="debate-card-body">
         <h4 class="debate-card-title">${escapeHtml(d.topic)}</h4>

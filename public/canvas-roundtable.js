@@ -74,25 +74,8 @@ class CanvasRoundTable {
   }
 
   stopSpeech() {
-    if (this.speechFallbackTimer) {
-      clearTimeout(this.speechFallbackTimer);
-      this.speechFallbackTimer = null;
-    }
-    if (this.currentUtterance) {
-      this.currentUtterance.onend = null;
-      this.currentUtterance.onerror = null;
-      this.currentUtterance = null;
-    }
-    if (window._activeUtterance) {
-      window._activeUtterance.onend = null;
-      window._activeUtterance.onerror = null;
-      window._activeUtterance = null;
-    }
-    if (this.synth) {
-      try { this.synth.cancel(); } catch(e){}
-    }
-    if (window.speechSynthesis) {
-      try { window.speechSynthesis.cancel(); } catch(e){}
+    if (this.synth && this.synth.speaking) {
+      this.synth.cancel();
     }
   }
 
@@ -100,9 +83,15 @@ class CanvasRoundTable {
     this.activeSpeakerId = speakerId;
     this.headlineText = headline || "";
 
-    this.stopSpeech();
+    // Clear any previous speech completion timers
+    if (this.speechFallbackTimer) {
+      clearTimeout(this.speechFallbackTimer);
+      this.speechFallbackTimer = null;
+    }
 
     if (speakerId && spokenText && this.audioEnabled && this.synth) {
+      this.stopSpeech();
+
       const persona = this.personas[speakerId];
       const utterance = new SpeechSynthesisUtterance(spokenText);
       utterance.pitch = persona ? persona.voicePitch : 1.0;
@@ -112,7 +101,8 @@ class CanvasRoundTable {
       const handleSpeechEnd = () => {
         if (callbackTriggered) return;
         callbackTriggered = true;
-        this.speechFallbackTimer = setTimeout(() => {
+        // Natural 1.2-second human breathing pause before passing the turn
+        setTimeout(() => {
           if (onSpeechEndCallback) onSpeechEndCallback();
         }, 1200);
       };
@@ -120,17 +110,10 @@ class CanvasRoundTable {
       utterance.onend = handleSpeechEnd;
       utterance.onerror = handleSpeechEnd;
 
-      // Retain global reference to prevent Chrome garbage collection
-      window._activeUtterance = utterance;
       this.currentUtterance = utterance;
-      
-      try {
-        this.synth.speak(utterance);
-      } catch (e) {
-        handleSpeechEnd();
-      }
+      this.synth.speak(utterance);
     } else {
-      // Fallback timing when speech audio is muted or unsupported
+      // Fallback timer when speech audio is muted or unsupported
       const fallbackMs = Math.max(6500, Math.min(14000, (spokenText ? spokenText.length : 100) * 75));
       this.speechFallbackTimer = setTimeout(() => {
         if (onSpeechEndCallback) onSpeechEndCallback();
@@ -162,9 +145,9 @@ class CanvasRoundTable {
     ctx.fillStyle = wallGrad;
     ctx.fillRect(0, 0, w, h * 0.45);
 
-    // 2. High Wall-Mounted Presentation TV Screen (Spacious multiline display)
-    const tvW = w * 0.54;
-    const tvH = h * 0.22;
+    // 2. High Wall-Mounted Presentation TV Screen (Positioned high up at y = 0.02 to avoid colliding with Person A & B)
+    const tvW = w * 0.46;
+    const tvH = h * 0.18;
     const tvX = (w - tvW) / 2;
     const tvY = h * 0.02;
 
@@ -174,34 +157,15 @@ class CanvasRoundTable {
     ctx.lineWidth = 3;
     ctx.strokeRect(tvX, tvY, tvW, tvH);
 
-    // TV Screen Header Tag
+    // TV Screen Text
     ctx.fillStyle = '#38BDF8';
     ctx.font = 'bold 11px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('LIVE ROUND-TABLE DEBATE SCREEN', w * 0.5, tvY + 18);
+    ctx.fillText('LIVE ROUND-TABLE DEBATE SCREEN', w * 0.5, tvY + 20);
 
-    // Multiline Full Topic Display (No truncation, zero cut-offs!)
     ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 12px sans-serif';
-    
-    const words = `"${this.topicText}"`.split(' ');
-    let line = '';
-    let startY = tvY + 36;
-    const maxLineW = tvW - 24;
-    const lineHeight = 16;
-
-    for (let n = 0; n < words.length; n++) {
-      const testLine = line + words[n] + ' ';
-      const metrics = ctx.measureText(testLine);
-      if (metrics.width > maxLineW && n > 0) {
-        ctx.fillText(line.trim(), w * 0.5, startY);
-        line = words[n] + ' ';
-        startY += lineHeight;
-      } else {
-        line = testLine;
-      }
-    }
-    ctx.fillText(line.trim(), w * 0.5, startY);
+    ctx.font = 'bold 13px sans-serif';
+    ctx.fillText(`"${this.truncate(this.topicText, 48)}"`, w * 0.5, tvY + 45);
 
     // Glass Window Lines (Behind TV)
     ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.08)';
