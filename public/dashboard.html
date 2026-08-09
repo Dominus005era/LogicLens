@@ -701,6 +701,41 @@ Example: Whether school and colleges need proper uniform or not"></textarea>
     </div>
   </div>
 
+  <!-- MINI START CONFERENCE POP-UP MODAL FOR FRESHLY GENERATED DEBATES -->
+  <div class="conclusion-modal-overlay hidden" id="start-conference-modal">
+    <div class="conclusion-modal-card" style="max-width:540px; border-top:4px solid var(--accent-emerald);">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <span style="font-size:1.5rem;">🎉</span>
+          <h3>Round-Table Conference Ready!</h3>
+        </div>
+        <button class="modal-close-btn" onclick="closeStartConferenceModal()">✕</button>
+      </div>
+
+      <div style="padding:1.25rem 0; display:flex; flex-direction:column; gap:1.1rem;">
+        <div style="background:var(--bg-dark); padding:1.1rem; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+          <span style="font-size:0.75rem; text-text-transform:uppercase; letter-spacing:0.08em; color:var(--accent-emerald); font-weight:700;">Freshly Generated Topic</span>
+          <h4 id="fresh-modal-topic" style="font-size:1.1rem; margin-top:0.25rem; color:var(--text-main);">Topic Title</h4>
+          <div style="display:flex; gap:0.75rem; align-items:center; margin-top:0.6rem;">
+            <span id="fresh-modal-mode" class="badge-tag" style="background:rgba(5,150,105,0.15); color:var(--accent-emerald);">🗣️ Deep Discussion</span>
+            <span style="font-size:0.82rem; color:var(--text-muted);">👥 4 AI Personas Ready</span>
+          </div>
+        </div>
+
+        <p style="font-size:0.86rem; color:var(--text-muted); line-height:1.5;">
+          Clicking start will open the 3D Canvas Stage and stream all persona voice speeches out loud in real-time.
+        </p>
+
+        <div style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:0.4rem;">
+          <button class="btn btn-secondary" onclick="closeStartConferenceModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="confirmStartFreshConference()" style="background:var(--accent-emerald); border-color:var(--accent-emerald);">
+            🚀 Start Conference Discussion
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="canvas-roundtable.js"></script>
   <script src="dashboard.js"></script>
 </body>

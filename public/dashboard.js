@@ -636,14 +636,41 @@ async function triggerRoundTable() {
     // Populate Transcript Analysis Window Data
     renderTopicTranscriptAnalysis(roundTableData.transcript_analysis);
 
-    // Start Live 1-to-2 Minute Turn-by-Turn Discussion Stream
-    startSequentialLiveStream(roundTableData.turns || []);
+    // Open Mini Start Conference Modal for 100% Direct Gesture Audio Unlock
+    openStartConferenceModal();
   } catch (err) {
     showError(err.message || 'An error occurred during discussion simulation.');
   } finally {
     loadingIndicator.classList.add('hidden');
     analyzeBtn.disabled = false;
   }
+}
+
+// Mini Start Conference Pop-Up Modal Logic
+function openStartConferenceModal() {
+  document.getElementById('fresh-modal-topic').textContent = roundTableData.topic;
+  document.getElementById('fresh-modal-mode').textContent = currentMode === 'calm' ? '🕊️ Calm Rewrite' : '🗣️ Deep Discussion';
+
+  const modal = document.getElementById('start-conference-modal');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeStartConferenceModal() {
+  const modal = document.getElementById('start-conference-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function confirmStartFreshConference() {
+  // Direct User Gesture: Unlocks browser AudioContext & SpeechSynthesis 100%!
+  if (window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.resume();
+  }
+
+  closeStartConferenceModal();
+
+  // Start Live Turn-by-Turn Discussion Stream with instant voice output
+  startSequentialLiveStream(roundTableData.turns || [], false);
 }
 
 function showError(msg) {
