@@ -74,8 +74,15 @@ class CanvasRoundTable {
   }
 
   stopSpeech() {
-    if (this.synth && this.synth.speaking) {
+    if (this.speechFallbackTimer) {
+      clearTimeout(this.speechFallbackTimer);
+      this.speechFallbackTimer = null;
+    }
+    if (this.synth) {
       this.synth.cancel();
+    }
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
     }
   }
 
@@ -83,15 +90,9 @@ class CanvasRoundTable {
     this.activeSpeakerId = speakerId;
     this.headlineText = headline || "";
 
-    // Clear any previous speech completion timers
-    if (this.speechFallbackTimer) {
-      clearTimeout(this.speechFallbackTimer);
-      this.speechFallbackTimer = null;
-    }
+    this.stopSpeech();
 
     if (speakerId && spokenText && this.audioEnabled && this.synth) {
-      this.stopSpeech();
-
       const persona = this.personas[speakerId];
       const utterance = new SpeechSynthesisUtterance(spokenText);
       utterance.pitch = persona ? persona.voicePitch : 1.0;
@@ -101,8 +102,7 @@ class CanvasRoundTable {
       const handleSpeechEnd = () => {
         if (callbackTriggered) return;
         callbackTriggered = true;
-        // Natural 1.2-second human breathing pause before passing the turn
-        setTimeout(() => {
+        this.speechFallbackTimer = setTimeout(() => {
           if (onSpeechEndCallback) onSpeechEndCallback();
         }, 1200);
       };
@@ -110,10 +110,17 @@ class CanvasRoundTable {
       utterance.onend = handleSpeechEnd;
       utterance.onerror = handleSpeechEnd;
 
+      // Retain global reference to prevent Chrome garbage collection
+      window._activeUtterance = utterance;
       this.currentUtterance = utterance;
-      this.synth.speak(utterance);
+      
+      try {
+        this.synth.speak(utterance);
+      } catch (e) {
+        handleSpeechEnd();
+      }
     } else {
-      // Fallback timer when speech audio is muted or unsupported
+      // Fallback timing when speech audio is muted or unsupported
       const fallbackMs = Math.max(6500, Math.min(14000, (spokenText ? spokenText.length : 100) * 75));
       this.speechFallbackTimer = setTimeout(() => {
         if (onSpeechEndCallback) onSpeechEndCallback();

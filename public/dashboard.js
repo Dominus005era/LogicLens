@@ -631,62 +631,82 @@ function showError(msg) {
   errorBanner.classList.remove('hidden');
 }
 
-// Live Turn Sequencer Engine (Organic Human Event-Driven Pacing)
+let activeTurnsList = [];
+
+// Live Turn Sequencer Engine (Deterministic Event-Driven Pacing with Reliable Pause/Resume)
 function startSequentialLiveStream(turns) {
   if (!turns || turns.length === 0) return;
+  activeTurnsList = turns;
   activeTurnIndex = 0;
+  isDiscussionPaused = false;
 
-  const runNextTurn = () => {
-    if (activeTurnIndex >= turns.length) {
-      document.getElementById('live-speaker-status').textContent = 'Discussion wrapping up... personas synthesizing common ground.';
-      
-      // Graceful 2.5-second ambient room pause after the final speaker finishes
-      setTimeout(() => {
-        if (canvasStage) {
-          canvasStage.setDebateEnded(true);
-        }
-        const liveTag = document.getElementById('live-indicator-tag');
-        if (liveTag) {
-          liveTag.style.background = 'rgba(5,150,105,0.15)';
-          liveTag.style.color = 'var(--accent-emerald)';
-          liveTag.textContent = '✅ DEBATE COMPLETED';
-        }
-        document.getElementById('live-speaker-status').textContent = 'Discussion concluded across all 4 parameters. Click "Seek Synthesis & Report" to view final executive report.';
-      }, 2500);
-      return;
-    }
+  const pauseBtn = document.getElementById('pause-resume-btn');
+  if (pauseBtn) pauseBtn.innerHTML = '<span>⏸️ Pause</span>';
 
-    const turn = turns[activeTurnIndex];
-    const speakerId = turn.speaker_id;
+  const liveTag = document.getElementById('live-indicator-tag');
+  if (liveTag) {
+    liveTag.style.background = 'rgba(220,38,38,0.15)';
+    liveTag.style.color = 'var(--accent-rose)';
+    liveTag.textContent = '🔴 LIVE DEBATE STREAMING';
+  }
 
-    if (roundTableData.personaLogs && roundTableData.personaLogs[speakerId]) {
+  runSequentialTurn();
+}
+
+function runSequentialTurn() {
+  if (isDiscussionPaused || !activeTurnsList || activeTurnsList.length === 0) return;
+
+  if (activeTurnIndex >= activeTurnsList.length) {
+    document.getElementById('live-speaker-status').textContent = 'Discussion wrapping up... personas synthesizing common ground.';
+    
+    setTimeout(() => {
+      if (isDiscussionPaused) return;
+      if (canvasStage) {
+        canvasStage.setDebateEnded(true);
+      }
+      const liveTag = document.getElementById('live-indicator-tag');
+      if (liveTag) {
+        liveTag.style.background = 'rgba(5,150,105,0.15)';
+        liveTag.style.color = 'var(--accent-emerald)';
+        liveTag.textContent = '✅ DEBATE COMPLETED';
+      }
+      document.getElementById('live-speaker-status').textContent = 'Discussion concluded across all 4 parameters. Click "Seek Synthesis & Report" to view final executive report.';
+    }, 2000);
+    return;
+  }
+
+  const turn = activeTurnsList[activeTurnIndex];
+  const speakerId = turn.speaker_id;
+
+  if (roundTableData && roundTableData.personaLogs && roundTableData.personaLogs[speakerId]) {
+    // Avoid duplicate log push on resume
+    const lastLogged = roundTableData.personaLogs[speakerId][roundTableData.personaLogs[speakerId].length - 1];
+    if (!lastLogged || lastLogged.turn_index !== turn.turn_index) {
       roundTableData.personaLogs[speakerId].push(turn);
     }
+  }
 
-    if (activeOpenDrawerPersonId === speakerId) {
-      renderLivePersonaDrawerContent(speakerId);
-    }
+  if (activeOpenDrawerPersonId === speakerId) {
+    renderLivePersonaDrawerContent(speakerId);
+  }
 
-    const transitionLabel = turn.transition_type === 'organic_interjection' ? '⚡ interjecting...' : turn.transition_type === 'direct_counter' ? '💬 responding...' : 'speaking...';
-    const statusText = `Turn ${turn.turn_index} of ${turns.length}: ${turn.speaker_name} is ${transitionLabel}`;
-    document.getElementById('live-speaker-status').textContent = statusText;
+  const transitionLabel = turn.transition_type === 'organic_interjection' ? '⚡ interjecting...' : turn.transition_type === 'direct_counter' ? '💬 responding...' : 'speaking...';
+  const statusText = `Turn ${turn.turn_index} of ${activeTurnsList.length}: ${turn.speaker_name} is ${transitionLabel}`;
+  document.getElementById('live-speaker-status').textContent = statusText;
 
-    let turnAdvanced = false;
-    const advanceTurn = () => {
-      if (turnAdvanced) return;
-      turnAdvanced = true;
-      activeTurnIndex++;
-      runNextTurn();
-    };
-
-    if (canvasStage) {
-      canvasStage.setActiveSpeaker(speakerId, turn.headline_point, turn.spoken_text, advanceTurn);
-    } else {
-      setTimeout(advanceTurn, 8000);
-    }
+  let turnAdvanced = false;
+  const advanceTurn = () => {
+    if (turnAdvanced || isDiscussionPaused) return;
+    turnAdvanced = true;
+    activeTurnIndex++;
+    runSequentialTurn();
   };
 
-  runNextTurn();
+  if (canvasStage) {
+    canvasStage.setActiveSpeaker(speakerId, turn.headline_point, turn.spoken_text, advanceTurn);
+  } else {
+    setTimeout(advanceTurn, 7500);
+  }
 }
 
 // On-Demand Transcript Analysis View Toggle
