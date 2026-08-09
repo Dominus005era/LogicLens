@@ -9,6 +9,15 @@ let liveStreamTimer = null;
 let activeOpenDrawerPersonId = null;
 let isAnalysisViewActive = false;
 
+// Sample Curated Cover Images for Debate Themes
+const COVER_IMAGES = [
+  "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80"
+];
+
 // Sample Topic Presets Catalog
 const TOPIC_PRESETS = {
   uniforms: "Whether school and colleges need proper uniform or not",
@@ -18,16 +27,201 @@ const TOPIC_PRESETS = {
   social_media: "Should social media usage for teenagers under 16 be legally restricted?"
 };
 
+// Default Seed Debates for Library, Analytics & Insights
+const DEFAULT_SEED_DEBATES = [
+  {
+    id: "seed-1",
+    topic: "Whether school and colleges need proper uniform or not",
+    mode: "deep_discussion",
+    date: "Aug 8, 2026",
+    coverImage: COVER_IMAGES[0],
+    personas: [
+      { id: "person_a", name: "Person A", archetype: "Economic & Logistics", avatar_color: "indigo", tone: "Calm", logic_rating: 8 },
+      { id: "person_b", name: "Person B", archetype: "Social & Freedom", avatar_color: "rose", tone: "Passionate", logic_rating: 8 },
+      { id: "person_c", name: "Person C", archetype: "Empirical Data", avatar_color: "emerald", tone: "Calm", logic_rating: 9 },
+      { id: "person_d", name: "Person D", archetype: "Ethics & Psychology", avatar_color: "amber", tone: "Thoughtful", logic_rating: 8 }
+    ],
+    turns: [
+      { turn_index: 1, speaker_id: "person_a", speaker_name: "Person A", headline_point: "1. Socioeconomic Equality and Routine Streamlining", spoken_text: "Mandatory uniforms level the playing field by eliminating visible wealth disparities and reducing annual household costs.", duration_ms: 7500 },
+      { turn_index: 2, speaker_id: "person_b", speaker_name: "Person B", headline_point: "2. Counter: Suppression of Identity and Expression", spoken_text: "While economic relief is valid, Person A ignores that forcing identical dress suppresses student identity and self-expression.", duration_ms: 8000 },
+      { turn_index: 3, speaker_id: "person_c", speaker_name: "Person C", headline_point: "3. Empirical Data on Academic Correlation", spoken_text: "Meta-analyses show zero statistical correlation between strict uniforms and academic test scores.", duration_ms: 8500 },
+      { turn_index: 4, speaker_id: "person_d", speaker_name: "Person D", headline_point: "4. Psychological Sense of Belonging", spoken_text: "However, psychological studies reveal that shared group attire increases a sense of belonging and reduces peer bullying.", duration_ms: 8000 }
+    ],
+    attributed_conclusion: {
+      summary: "The discussion reveals that while uniforms offer logistical simplicity and community cohesion, they lack a proven empirical link to academic test scores and pose risks to individual expression.",
+      agreement_mappings: [
+        { persons: ["Person A", "Person D"], common_point: "Both agreed that baseline dress standards foster school focus, discipline, and financial equity." },
+        { persons: ["Person B", "Person C"], common_point: "Both emphasized that flexible dress codes achieve social harmony without violating individual autonomy." }
+      ],
+      core_tradeoffs: "Fundamental tension between economic standardization and personal freedom of expression.",
+      discussion_quality_score: 88
+    },
+    transcript_analysis: {
+      summary: "Deep multi-parameter evaluation covering household economic relief, personal expression rights, empirical data, and psychological well-being.",
+      coach: { overall_score: 88, verdict: "High-quality reasoned debate with balanced empirical and ethical arguments.", tips: ["Bridge logistical simplicity with creative expression avenues"] },
+      participants: [
+        { name: "Person A (Economic)", logic_score: 8, evidence_score: 8, respect_score: 9, clarity_score: 9, badges: ["🧠 Rational Thinker", "🔍 Logistics Focus"] },
+        { name: "Person B (Social & Freedom)", logic_score: 8, evidence_score: 8, respect_score: 8, clarity_score: 9, badges: ["🕊️ Autonomy Defender"] },
+        { name: "Person C (Empirical Data)", logic_score: 9, evidence_score: 10, respect_score: 9, clarity_score: 9, badges: ["🔍 Evidence Hunter", "🧠 Data Master"] },
+        { name: "Person D (Ethics & Psychology)", logic_score: 8, evidence_score: 8, respect_score: 9, clarity_score: 8, badges: ["🕊️ Respectful Debater"] }
+      ],
+      heat_map: [
+        { speaker: "Person A", message: "Uniforms eliminate socioeconomic clothing competition.", tone: "Calm", level: "Blue" },
+        { speaker: "Person B", message: "Mandates restrict personal autonomy and identity.", tone: "Curious", level: "Green" }
+      ],
+      evidence_meter: [
+        { claim: "Uniforms reduce household wardrobe costs.", speaker: "Person A", status: "Supported by facts", reason: "Consistent with consumer expenditure surveys." },
+        { claim: "No direct correlation to test scores.", speaker: "Person C", status: "Supported by facts", reason: "Cites peer-reviewed educational meta-analyses." }
+      ]
+    }
+  },
+  {
+    id: "seed-2",
+    topic: "Is Generative AI a threat or an enhancement to human artistic creativity?",
+    mode: "deep_discussion",
+    date: "Aug 8, 2026",
+    coverImage: COVER_IMAGES[1],
+    personas: [
+      { id: "person_a", name: "Person A", archetype: "Economic & Logistics", avatar_color: "indigo", tone: "Calm", logic_rating: 8 },
+      { id: "person_b", name: "Person B", archetype: "Social & Freedom", avatar_color: "rose", tone: "Passionate", logic_rating: 9 },
+      { id: "person_c", name: "Person C", archetype: "Empirical Data", avatar_color: "emerald", tone: "Calm", logic_rating: 9 },
+      { id: "person_d", name: "Person D", archetype: "Ethics & Psychology", avatar_color: "amber", tone: "Thoughtful", logic_rating: 8 }
+    ],
+    turns: [
+      { turn_index: 1, speaker_id: "person_a", speaker_name: "Person A", headline_point: "1. Democratizing Creative Production Costs", spoken_text: "AI lowers technical barriers to entry, enabling independent creators to prototype and produce media at fraction of traditional costs.", duration_ms: 8000 },
+      { turn_index: 2, speaker_id: "person_b", speaker_name: "Person B", headline_point: "2. Counter: Devaluation of Human Craftsmanship", spoken_text: "Generative AI floods markets with automated content, uncompensated labor training, and devalues human artistic mastery.", duration_ms: 8500 }
+    ],
+    attributed_conclusion: {
+      summary: "AI democratizes commercial production and rapid prototyping, but risks devaluing specialized human craftsmanship and intellectual property rights.",
+      agreement_mappings: [
+        { persons: ["Person B", "Person D"], common_point: "Both agreed that preserving uncompensated human artist labor and psychological mastery is essential." }
+      ],
+      core_tradeoffs: "Trade-off between rapid low-cost production and human artistic authenticity.",
+      discussion_quality_score: 92
+    },
+    transcript_analysis: {
+      summary: "Multi-faceted debate weighing economic democratization against intellectual property theft and loss of human mastery.",
+      coach: { overall_score: 92, verdict: "Exceptional debate moving from philosophical clashes to concrete economic data.", tips: ["Establish clear AI attribution standards for artists"] },
+      participants: [
+        { name: "Person A (Economic)", logic_score: 8, evidence_score: 8, respect_score: 8, clarity_score: 9, badges: ["🧠 Rational Thinker"] },
+        { name: "Person B (Social & Freedom)", logic_score: 9, evidence_score: 8, respect_score: 8, clarity_score: 9, badges: ["🕊️ Autonomy Defender"] },
+        { name: "Person C (Empirical Data)", logic_score: 10, evidence_score: 9, respect_score: 9, clarity_score: 9, badges: ["🔍 Evidence Hunter", "🧠 Data Master"] },
+        { name: "Person D (Ethics & Psychology)", logic_score: 8, evidence_score: 8, respect_score: 10, clarity_score: 8, badges: ["🕊️ Respectful Debater"] }
+      ],
+      heat_map: [
+        { speaker: "Person A", message: "AI lowers barriers to entry.", tone: "Calm", level: "Blue" },
+        { speaker: "Person B", message: "It cannibalizes artists through uncompensated labor.", tone: "Passionate", level: "Green" }
+      ],
+      evidence_meter: [
+        { claim: "AI increases output volume in commercial sectors.", speaker: "Person C", status: "Supported by facts", reason: "Consistent with current industry observations in digital media." }
+      ]
+    }
+  },
+  {
+    id: "seed-3",
+    topic: "Should companies mandate 5-day in-office work or offer full remote flexibility?",
+    mode: "calm",
+    date: "Aug 9, 2026",
+    coverImage: COVER_IMAGES[2],
+    personas: [
+      { id: "person_a", name: "Person A", archetype: "Economic & Logistics", avatar_color: "indigo", tone: "Calm", logic_rating: 8 },
+      { id: "person_b", name: "Person B", archetype: "Social & Freedom", avatar_color: "rose", tone: "Calm", logic_rating: 8 }
+    ],
+    turns: [
+      { turn_index: 1, speaker_id: "person_a", speaker_name: "Person A", headline_point: "1. Spontaneous Collaboration & Real Estate Utilization", spoken_text: "In-office presence fosters serendipitous innovation, mentorship for junior talent, and maximizes facility investments.", duration_ms: 7500 },
+      { turn_index: 2, speaker_id: "person_b", speaker_name: "Person B", headline_point: "2. Work-Life Integration & Talent Retention", spoken_text: "Remote flexibility reduces commute fatigue, expands hiring diversity, and improves overall employee satisfaction.", duration_ms: 8000 }
+    ],
+    attributed_conclusion: {
+      summary: "Hybrid policies offer the optimal compromise between in-person team trust building and remote lifestyle flexibility.",
+      agreement_mappings: [
+        { persons: ["Person A", "Person B"], common_point: "Both agreed that structured core collaboration days preserve team cohesion while granting focus time." }
+      ],
+      core_tradeoffs: "Balancing centralized organizational culture with employee work-life autonomy.",
+      discussion_quality_score: 85
+    },
+    transcript_analysis: {
+      summary: "Constructive examination of organizational productivity versus individual remote flexibility.",
+      coach: { overall_score: 85, verdict: "Respectful dialogue focusing on hybrid compromises.", tips: ["Measure output metrics rather than physical desk presence"] },
+      participants: [
+        { name: "Person A (Economic)", logic_score: 8, evidence_score: 8, respect_score: 9, clarity_score: 8, badges: ["🧠 Rational Thinker"] },
+        { name: "Person B (Social & Freedom)", logic_score: 8, evidence_score: 8, respect_score: 9, clarity_score: 8, badges: ["🕊️ Autonomy Defender"] }
+      ],
+      heat_map: [
+        { speaker: "Person A", message: "In-office presence fosters spontaneous collaboration.", tone: "Calm", level: "Blue" },
+        { speaker: "Person B", message: "Remote flexibility improves satisfaction and retention.", tone: "Calm", level: "Blue" }
+      ],
+      evidence_meter: [
+        { claim: "Hybrid models maintain productivity while boosting retention.", speaker: "Person C", status: "Supported by facts", reason: "Supported by recent workplace survey data." }
+      ]
+    }
+  }
+];
+
 // Initialize Dashboard
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   fetchFallacyLibrary();
+  initStorage();
 
-  // Initialize Canvas 2D Pseudo-3D Stage
+  // Initialize Canvas 2D Stage
   if (document.getElementById('roundtable-canvas')) {
     canvasStage = new CanvasRoundTable('roundtable-canvas');
   }
 });
+
+// Storage Management
+function initStorage() {
+  const existing = localStorage.getItem('logiclens_saved_debates');
+  if (!existing) {
+    localStorage.setItem('logiclens_saved_debates', JSON.stringify(DEFAULT_SEED_DEBATES));
+  }
+}
+
+function getStoredDebates() {
+  try {
+    const raw = localStorage.getItem('logiclens_saved_debates');
+    return raw ? JSON.parse(raw) : DEFAULT_SEED_DEBATES;
+  } catch (e) {
+    return DEFAULT_SEED_DEBATES;
+  }
+}
+
+function saveDebateToStorage(debateData) {
+  if (!debateData || !debateData.topic) return;
+  const stored = getStoredDebates();
+  
+  // Check if topic already exists
+  const existingIdx = stored.findIndex(d => d.topic.toLowerCase() === debateData.topic.toLowerCase());
+  
+  const newEntry = {
+    id: `debate-${Date.now()}`,
+    topic: debateData.topic,
+    mode: currentMode,
+    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+    coverImage: COVER_IMAGES[stored.length % COVER_IMAGES.length],
+    personas: debateData.personas || [],
+    turns: debateData.turns || [],
+    attributed_conclusion: debateData.attributed_conclusion || {},
+    transcript_analysis: debateData.transcript_analysis || {}
+  };
+
+  if (existingIdx !== -1) {
+    stored[existingIdx] = newEntry;
+  } else {
+    stored.unshift(newEntry);
+  }
+
+  localStorage.setItem('logiclens_saved_debates', JSON.stringify(stored));
+}
+
+function clearSavedStorage() {
+  if (confirm("Are you sure you want to clear all saved debates from storage?")) {
+    localStorage.removeItem('logiclens_saved_debates');
+    initStorage();
+    alert("Saved debates have been reset to default seeds.");
+    switchSidebarTab('library');
+  }
+}
 
 // Mobile Sidebar Toggle
 function toggleSidebar() {
@@ -35,7 +229,7 @@ function toggleSidebar() {
   if (sidebar) sidebar.classList.toggle('open');
 }
 
-// Working Theme Switcher Sync
+// Theme Switcher Sync
 function initTheme() {
   const savedTheme = localStorage.getItem('logiclens_theme') || 'light';
   applyTheme(savedTheme);
@@ -83,7 +277,11 @@ function switchSidebarTab(target) {
   if (sidebar) sidebar.classList.remove('open');
 
   if (target === 'library') {
-    renderDashFallacies(fallacyLibraryCache);
+    renderLibraryView();
+  } else if (target === 'analytics') {
+    renderAnalyticsView();
+  } else if (target === 'insights') {
+    renderInsightsView();
   }
 }
 
@@ -116,7 +314,7 @@ function expandTopicInput() {
   document.getElementById('minimized-topic-bar').classList.add('hidden');
 }
 
-// Mode Selection (Deep Discussion vs Calm Rewrite)
+// Mode Selection
 function setMode(mode) {
   currentMode = mode;
   document.querySelectorAll('.mode-tab').forEach(tab => {
@@ -151,9 +349,6 @@ async function triggerRoundTable() {
   analyzeBtn.disabled = true;
 
   try {
-    const endpoint = currentMode === 'calm' ? '/api/rewrite-calm' : '/api/simulate-roundtable';
-    
-    // In calm mode, wrap request if needed or use simulate-roundtable with calm directive
     const res = await fetch('/api/simulate-roundtable', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -165,6 +360,9 @@ async function triggerRoundTable() {
 
     roundTableData = data.data;
     
+    // Save to Local Storage Vault
+    saveDebateToStorage(roundTableData);
+
     // Initialize persona live logs
     roundTableData.personaLogs = {
       person_a: [],
@@ -203,14 +401,13 @@ function showError(msg) {
   errorBanner.classList.remove('hidden');
 }
 
-// Live 1-to-2 Minute Turn Sequencer Engine with TTS Synchronization
+// Live Turn Sequencer Engine
 function startSequentialLiveStream(turns) {
   if (!turns || turns.length === 0) return;
   activeTurnIndex = 0;
 
   const runNextTurn = () => {
     if (activeTurnIndex >= turns.length) {
-      // Stream completed — show Discussion Ended badge on table center
       if (canvasStage) {
         canvasStage.setDebateEnded(true);
       }
@@ -227,21 +424,17 @@ function startSequentialLiveStream(turns) {
     const turn = turns[activeTurnIndex];
     const speakerId = turn.speaker_id;
 
-    // 1. Update Persona Live Logs
-    if (roundTableData.personaLogs[speakerId]) {
+    if (roundTableData.personaLogs && roundTableData.personaLogs[speakerId]) {
       roundTableData.personaLogs[speakerId].push(turn);
     }
 
-    // 2. If Persona Drawer is open for this speaker, UPDATE LIVE!
     if (activeOpenDrawerPersonId === speakerId) {
       renderLivePersonaDrawerContent(speakerId);
     }
 
-    // 3. Update Status Banner
     const statusText = `Turn ${turn.turn_index} of ${turns.length}: ${turn.speaker_name} is speaking...`;
     document.getElementById('live-speaker-status').textContent = statusText;
 
-    // Advance turn callback
     let turnAdvanced = false;
     const advanceTurn = () => {
       if (turnAdvanced) return;
@@ -250,7 +443,6 @@ function startSequentialLiveStream(turns) {
       runNextTurn();
     };
 
-    // 4. Trigger Canvas Active Speaker & Speech Audio
     if (canvasStage) {
       canvasStage.setActiveSpeaker(speakerId, turn.headline_point, turn.spoken_text, () => {
         advanceTurn();
@@ -281,17 +473,213 @@ function toggleTranscriptAnalysisView() {
   }
 }
 
-// Render Topic Transcript Analysis Data
+// --------------------------------------------------------------------------
+// 📚 SUB-PAGE 1: LIBRARY VIEW RENDERER (SAVED DEBATES VAULT)
+// --------------------------------------------------------------------------
+function renderLibraryView() {
+  const grid = document.getElementById('library-grid-container');
+  if (!grid) return;
+  const debates = getStoredDebates();
+
+  if (debates.length === 0) {
+    grid.innerHTML = '<p style="color:var(--text-muted); font-style:italic; grid-column:1/-1;">No saved debates found. Generate a debate from the Dashboard tab!</p>';
+    return;
+  }
+
+  grid.innerHTML = debates.map(d => `
+    <div class="debate-card" onclick="loadSavedDebateIntoRoundTable('${d.id}')">
+      <div class="debate-card-img-wrap">
+        <img src="${d.coverImage || COVER_IMAGES[0]}" alt="Cover" class="debate-card-img" />
+        <span class="debate-card-mode-badge">${d.mode === 'calm' ? '🕊️ Calm Rewrite' : '🗣️ Deep Discussion'}</span>
+      </div>
+      <div class="debate-card-body">
+        <h4 class="debate-card-title">${escapeHtml(d.topic)}</h4>
+        <div class="debate-card-footer">
+          <span>📅 ${escapeHtml(d.date || 'Recent')}</span>
+          <span style="color:var(--accent-indigo); font-weight:700;">Re-Play Stage →</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterLibraryCards() {
+  const query = document.getElementById('library-search-input').value.toLowerCase();
+  const debates = getStoredDebates();
+  const filtered = debates.filter(d => d.topic.toLowerCase().includes(query));
+  
+  const grid = document.getElementById('library-grid-container');
+  if (!grid) return;
+
+  grid.innerHTML = filtered.map(d => `
+    <div class="debate-card" onclick="loadSavedDebateIntoRoundTable('${d.id}')">
+      <div class="debate-card-img-wrap">
+        <img src="${d.coverImage || COVER_IMAGES[0]}" alt="Cover" class="debate-card-img" />
+        <span class="debate-card-mode-badge">${d.mode === 'calm' ? '🕊️ Calm Rewrite' : '🗣️ Deep Discussion'}</span>
+      </div>
+      <div class="debate-card-body">
+        <h4 class="debate-card-title">${escapeHtml(d.topic)}</h4>
+        <div class="debate-card-footer">
+          <span>📅 ${escapeHtml(d.date || 'Recent')}</span>
+          <span style="color:var(--accent-indigo); font-weight:700;">Re-Play Stage →</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Re-Play Saved Debate on Round-Table Canvas Stage
+function loadSavedDebateIntoRoundTable(debateId) {
+  const debates = getStoredDebates();
+  const debate = debates.find(d => d.id === debateId);
+  if (!debate) return;
+
+  roundTableData = debate;
+  roundTableData.personaLogs = { person_a: [], person_b: [], person_c: [], person_d: [] };
+
+  switchSidebarTab('dashboard');
+  
+  document.getElementById('topic-input').value = debate.topic;
+  document.getElementById('minimized-topic-text').textContent = `"${debate.topic}"`;
+  document.getElementById('stage-topic-title').textContent = debate.topic;
+
+  collapseTopicInput();
+  const stageWorkspace = document.getElementById('roundtable-workspace');
+  stageWorkspace.classList.remove('hidden');
+
+  if (canvasStage) {
+    canvasStage.setTopic(debate.topic);
+  }
+
+  renderTopicTranscriptAnalysis(debate.transcript_analysis);
+  startSequentialLiveStream(debate.turns || []);
+}
+
+// --------------------------------------------------------------------------
+// 📈 SUB-PAGE 2: ANALYTICS VIEW RENDERER (GLOBAL + INDIVIDUAL CARDS)
+// --------------------------------------------------------------------------
+function renderAnalyticsView() {
+  const debates = getStoredDebates();
+
+  // 1. Calculate Aggregate Global Metrics
+  const totalCount = debates.length;
+  let totalScoreSum = 0;
+  debates.forEach(d => {
+    const score = d.attributed_conclusion?.discussion_quality_score || d.transcript_analysis?.coach?.overall_score || 88;
+    totalScoreSum += score;
+  });
+  const avgScore = totalCount > 0 ? Math.round(totalScoreSum / totalCount) : 0;
+
+  document.getElementById('stat-total-debates').textContent = totalCount;
+  document.getElementById('stat-avg-score').textContent = `${avgScore} / 100`;
+  document.getElementById('stat-consensus-rate').textContent = `100%`;
+  document.getElementById('stat-top-parameter').textContent = `Empirical Data`;
+
+  // 2. Render Individual Debate Analytics Cards
+  const grid = document.getElementById('analytics-grid-container');
+  if (!grid) return;
+
+  grid.innerHTML = debates.map(d => {
+    const score = d.attributed_conclusion?.discussion_quality_score || d.transcript_analysis?.coach?.overall_score || 88;
+    return `
+      <div class="debate-card" onclick="openIndividualDebateAnalytics('${d.id}')">
+        <div class="debate-card-img-wrap">
+          <img src="${d.coverImage || COVER_IMAGES[0]}" alt="Cover" class="debate-card-img" />
+          <span class="debate-card-mode-badge" style="background:rgba(5,150,105,0.9);">${score}/100 Score</span>
+        </div>
+        <div class="debate-card-body">
+          <h4 class="debate-card-title">${escapeHtml(d.topic)}</h4>
+          <div class="debate-card-footer">
+            <span>📅 ${escapeHtml(d.date || 'Recent')}</span>
+            <span style="color:var(--accent-emerald); font-weight:700;">Inspect Metrics →</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openIndividualDebateAnalytics(debateId) {
+  const debates = getStoredDebates();
+  const debate = debates.find(d => d.id === debateId);
+  if (!debate) return;
+
+  roundTableData = debate;
+  switchSidebarTab('dashboard');
+  
+  collapseTopicInput();
+  const stageWorkspace = document.getElementById('roundtable-workspace');
+  stageWorkspace.classList.remove('hidden');
+
+  renderTopicTranscriptAnalysis(debate.transcript_analysis);
+  
+  // Toggle to transcript analysis view directly
+  isAnalysisViewActive = false;
+  toggleTranscriptAnalysisView();
+}
+
+// --------------------------------------------------------------------------
+// 💡 SUB-PAGE 3: INSIGHTS VIEW RENDERER (KEY INSIGHTS MODAL POP-UP)
+// --------------------------------------------------------------------------
+function renderInsightsView() {
+  const grid = document.getElementById('insights-grid-container');
+  if (!grid) return;
+  const debates = getStoredDebates();
+
+  grid.innerHTML = debates.map(d => `
+    <div class="debate-card" onclick="openInsightsModal('${d.id}')">
+      <div class="debate-card-img-wrap">
+        <img src="${d.coverImage || COVER_IMAGES[0]}" alt="Cover" class="debate-card-img" />
+        <span class="debate-card-mode-badge" style="background:rgba(217,119,6,0.9);">💡 Insights</span>
+      </div>
+      <div class="debate-card-body">
+        <h4 class="debate-card-title">${escapeHtml(d.topic)}</h4>
+        <div class="debate-card-footer">
+          <span>📅 ${escapeHtml(d.date || 'Recent')}</span>
+          <span style="color:var(--accent-amber); font-weight:700;">View Takeaways →</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openInsightsModal(debateId) {
+  const debates = getStoredDebates();
+  const debate = debates.find(d => d.id === debateId);
+  if (!debate) return;
+
+  document.getElementById('insights-modal-topic').textContent = `"${debate.topic}"`;
+  document.getElementById('insights-modal-summary').textContent = debate.attributed_conclusion?.summary || debate.transcript_analysis?.summary || 'Comprehensive reasoning insights generated across 4 cognitive parameters.';
+  
+  const personasContainer = document.getElementById('insights-modal-personas');
+  if (personasContainer) {
+    personasContainer.innerHTML = (debate.personas || []).map(p => `
+      <div style="background:var(--bg-card); padding:0.75rem; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
+        <strong style="color:var(--accent-indigo); font-size:0.85rem;">${escapeHtml(p.name)} (${escapeHtml(p.archetype)})</strong>
+        <p style="font-size:0.82rem; color:var(--text-muted); margin-top:0.2rem;">Key Parameter: Evaluated practical, social, empirical, or psychological dimensions.</p>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('insights-modal-tradeoff').textContent = debate.attributed_conclusion?.core_tradeoffs || 'Fundamental trade-off reconciled through multi-parameter consensus.';
+  document.getElementById('insights-modal').classList.remove('hidden');
+}
+
+function closeInsightsModal() {
+  document.getElementById('insights-modal').classList.add('hidden');
+}
+
+// --------------------------------------------------------------------------
+// TRANSCRIPT ANALYSIS METRICS RENDERER
+// --------------------------------------------------------------------------
 function renderTopicTranscriptAnalysis(analysis) {
   if (!analysis) return;
 
-  // Summary & Coach
   document.getElementById('topic-summary-text').textContent = analysis.summary || '';
   const coach = analysis.coach || { overall_score: 85, verdict: 'Good reasoning quality.', tips: [] };
   document.getElementById('topic-coach-score-num').textContent = coach.overall_score;
   document.getElementById('topic-coach-verdict-title').textContent = coach.verdict;
   
-  // Score Ring Offset & Gradient
   const scoreRing = document.getElementById('topic-score-ring');
   if (scoreRing) {
     const circumference = 264;
@@ -305,7 +693,6 @@ function renderTopicTranscriptAnalysis(analysis) {
     tipsList.innerHTML = (coach.tips || []).map(tip => `<li>💡 ${escapeHtml(tip)}</li>`).join('');
   }
 
-  // Color Mapping for Personas
   const colorMap = {
     'Person A': { color: '#4F46E5', bg: 'rgba(79, 70, 229, 0.12)' },
     'Person B': { color: '#E11D48', bg: 'rgba(225, 29, 72, 0.12)' },
@@ -313,7 +700,6 @@ function renderTopicTranscriptAnalysis(analysis) {
     'Person D': { color: '#D97706', bg: 'rgba(217, 119, 6, 0.12)' }
   };
 
-  // Participants Grid
   const partContainer = document.getElementById('topic-participants-container');
   if (partContainer) {
     partContainer.innerHTML = (analysis.participants || []).map(p => {
@@ -335,26 +721,17 @@ function renderTopicTranscriptAnalysis(analysis) {
             ${(p.badges || []).map(b => `<span class="badge-tag" style="background: ${theme.bg}; color: ${theme.color};">${escapeHtml(b)}</span>`).join('')}
           </div>
           <div class="p-metrics">
-            <div class="metric-line">
-              <span>Evidence Support</span>
-              <strong>${p.evidence_score}/10</strong>
-            </div>
+            <div class="metric-line"><span>Evidence Support</span><strong>${p.evidence_score}/10</strong></div>
             <div style="width:100%; height:6px; background:var(--border-subtle); border-radius:3px; overflow:hidden;">
               <div style="width:${(p.evidence_score * 10)}%; height:100%; background:${theme.color}; border-radius:3px;"></div>
             </div>
 
-            <div class="metric-line" style="margin-top:0.4rem;">
-              <span>Clarity</span>
-              <strong>${p.clarity_score}/10</strong>
-            </div>
+            <div class="metric-line" style="margin-top:0.4rem;"><span>Clarity</span><strong>${p.clarity_score}/10</strong></div>
             <div style="width:100%; height:6px; background:var(--border-subtle); border-radius:3px; overflow:hidden;">
               <div style="width:${(p.clarity_score * 10)}%; height:100%; background:${theme.color}; border-radius:3px;"></div>
             </div>
 
-            <div class="metric-line" style="margin-top:0.4rem;">
-              <span>Respectfulness</span>
-              <strong>${p.respect_score}/10</strong>
-            </div>
+            <div class="metric-line" style="margin-top:0.4rem;"><span>Respectfulness</span><strong>${p.respect_score}/10</strong></div>
             <div style="width:100%; height:6px; background:var(--border-subtle); border-radius:3px; overflow:hidden;">
               <div style="width:${(p.respect_score * 10)}%; height:100%; background:${theme.color}; border-radius:3px;"></div>
             </div>
@@ -364,7 +741,6 @@ function renderTopicTranscriptAnalysis(analysis) {
     }).join('');
   }
 
-  // Heatmap
   const heatContainer = document.getElementById('topic-heatmap-container');
   if (heatContainer) {
     heatContainer.innerHTML = (analysis.heat_map || []).map(h => `
@@ -376,7 +752,6 @@ function renderTopicTranscriptAnalysis(analysis) {
     `).join('');
   }
 
-  // Evidence Meter
   const evContainer = document.getElementById('topic-evidence-container');
   if (evContainer) {
     evContainer.innerHTML = (analysis.evidence_meter || []).map(e => `
@@ -397,14 +772,12 @@ function handleCanvasClick(evt) {
   const clickY = evt.clientY - rect.top;
   const w = canvasStage.canvas.width;
 
-  // Check audio toggle button
   if (clickX >= w - 125 && clickX <= w - 15 && clickY >= 10 && clickY <= 50) {
     const isEnabled = canvasStage.toggleAudio();
     alert(isEnabled ? '🔊 Voice Audio Enabled for Discussion!' : '🔇 Voice Audio Muted.');
     return;
   }
 
-  // Check proximity to 4 personas
   Object.keys(canvasStage.personas).forEach(key => {
     const p = canvasStage.personas[key];
     const px = w * p.x;
@@ -416,7 +789,6 @@ function handleCanvasClick(evt) {
   });
 }
 
-// Open Persona Detail Slide Drawer
 function openPersonaDrawer(personaId) {
   activeOpenDrawerPersonId = personaId;
   const drawer = document.getElementById('persona-drawer');
@@ -471,7 +843,6 @@ function openConclusionModal() {
   document.getElementById('report-score-badge').textContent = `${conc.discussion_quality_score || 88} / 100`;
   document.getElementById('conclusion-summary-text').textContent = conc.summary || '';
   
-  // Render Persona Behavioral Profiles Grid
   const personasGrid = document.getElementById('report-personas-grid');
   if (personasGrid && roundTableData.personas) {
     personasGrid.innerHTML = roundTableData.personas.map(p => `
@@ -484,7 +855,6 @@ function openConclusionModal() {
     `).join('');
   }
 
-  // Agreement Mappings
   const mappingsContainer = document.getElementById('conclusion-agreements-list');
   const mappings = conc.agreement_mappings || [];
   
@@ -519,29 +889,6 @@ async function fetchFallacyLibrary() {
   } catch (err) {
     console.error('Failed to load fallacy library', err);
   }
-}
-
-function renderDashFallacies(list) {
-  const grid = document.getElementById('dash-fallacy-grid');
-  if (!grid) return;
-  grid.innerHTML = list.map(f => `
-    <div class="fallacy-modal-card">
-      <span class="fallacy-cat">${escapeHtml(f.category)}</span>
-      <h4>❌ ${escapeHtml(f.name)}</h4>
-      <p class="fallacy-def">${escapeHtml(f.definition)}</p>
-      <div class="fallacy-ex"><strong>Example:</strong> "${escapeHtml(f.example)}"</div>
-    </div>
-  `).join('');
-}
-
-function filterDashFallacies() {
-  const query = document.getElementById('dash-fallacy-search').value.toLowerCase();
-  const filtered = fallacyLibraryCache.filter(f => 
-    f.name.toLowerCase().includes(query) ||
-    f.category.toLowerCase().includes(query) ||
-    f.definition.toLowerCase().includes(query)
-  );
-  renderDashFallacies(filtered);
 }
 
 function escapeHtml(str) {

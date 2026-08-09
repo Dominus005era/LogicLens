@@ -54,7 +54,7 @@
         </div>
         <div class="sidebar-link" data-target="library" onclick="switchSidebarTab('library')">
           <span class="sidebar-icon">📚</span>
-          <span>Fallacy Library</span>
+          <span>Library</span>
         </div>
         <div class="sidebar-link" data-target="analytics" onclick="switchSidebarTab('analytics')">
           <span class="sidebar-icon">📈</span>
@@ -90,14 +90,14 @@
 
         <!-- Topic & Argument Input Card Container -->
         <div class="workspace-card" id="topic-input-container">
-          <div class="workspace-header" style="justify-content:center; text-align:center;">
-            <div class="workspace-title-box" style="margin-bottom:1rem;">
+          <div class="workspace-header">
+            <div class="workspace-title-box">
               <h2>🗣️ Deep Discussion & Reasoning Platform</h2>
               <p>Enter any topic, prompt, or opinion to launch an in-depth 4-party round-table discussion.</p>
             </div>
 
             <!-- Two Primary Centered Mode Switcher Tabs -->
-            <div class="mode-tabs" style="margin: 0 auto;">
+            <div class="mode-tabs">
               <button class="mode-tab active" data-mode="deep_discussion" onclick="setMode('deep_discussion')">
                 <span>🗣️ Deep Discussion</span>
               </button>
@@ -271,61 +271,108 @@ Example: Whether school and colleges need proper uniform or not"></textarea>
 
       </div>
 
-      <!-- 2. LIBRARY VIEW -->
+      <!-- 2. LIBRARY SUB-PAGE (SAVED DEBATES VAULT) -->
       <div id="library-view" class="view-panel hidden">
         <div class="workspace-card">
-          <h2>📚 Fallacy Reference Library</h2>
-          <p style="margin-bottom:1.5rem; color:var(--text-muted);">Explore 20+ logical fallacies scanned by Gemma 4 AI.</p>
-
-          <input type="text" id="dash-fallacy-search" class="custom-input" placeholder="Search fallacy by name or category..." oninput="filterDashFallacies()" style="margin-bottom:1.5rem;">
-
-          <div class="modal-body" id="dash-fallacy-grid">
-            <!-- Dynamically rendered -->
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.75rem;">
+            <div>
+              <h2>📚 Debate Library & Archive Vault</h2>
+              <p style="color:var(--text-muted); margin-top:0.2rem;">All generated round-table discussions are stored here. Click any card to re-open the Canvas stage.</p>
+            </div>
+            <div style="display:flex; gap:0.5rem;">
+              <input type="text" id="library-search-input" class="custom-input" placeholder="Search saved topics..." oninput="filterLibraryCards()" style="max-width:240px; font-size:0.85rem;">
+            </div>
           </div>
+
+          <!-- 4-Column Responsive Grid -->
+          <div class="debates-grid" id="library-grid-container"></div>
         </div>
       </div>
 
-      <!-- 3. ANALYTICS VIEW PLACEHOLDER -->
+      <!-- 3. ANALYTICS SUB-PAGE (GLOBAL + INDIVIDUAL ANALYTICS) -->
       <div id="analytics-view" class="view-panel hidden">
-        <div class="workspace-card" style="text-align:center; padding:4rem 2rem;">
-          <div style="font-size:3rem; margin-bottom:1rem;">📈</div>
-          <h2>Debate Analytics Module</h2>
-          <p style="color:var(--text-muted); max-width:500px; margin:0 auto 1.5rem;">Advanced long-term argument metrics, recurring fallacy frequency tracking, and cohort debate trends will be enabled in future updates.</p>
-          <button class="btn btn-secondary" onclick="switchSidebarTab('dashboard')">← Return to Dashboard</button>
+        <div class="workspace-card">
+          <div style="margin-bottom:2rem;">
+            <h2>📈 Platform Analytics & Debate Metrics</h2>
+            <p style="color:var(--text-muted); margin-top:0.2rem;">Aggregate analytical breakdown across all discussions and individual topic metric cards.</p>
+          </div>
+
+          <!-- Top Aggregate Stats Bar -->
+          <div class="analytics-stats-grid" id="analytics-global-summary">
+            <div class="stat-card">
+              <span class="stat-icon">💬</span>
+              <span class="stat-num" id="stat-total-debates">0</span>
+              <span class="stat-label">Total Debates Generated</span>
+            </div>
+
+            <div class="stat-card">
+              <span class="stat-icon">🎯</span>
+              <span class="stat-num" id="stat-avg-score">0 / 100</span>
+              <span class="stat-label">Avg Reasoning Score</span>
+            </div>
+
+            <div class="stat-card">
+              <span class="stat-icon">🤝</span>
+              <span class="stat-num" id="stat-consensus-rate">100%</span>
+              <span class="stat-label">Consensus Synthesis Rate</span>
+            </div>
+
+            <div class="stat-card">
+              <span class="stat-icon">🧠</span>
+              <span class="stat-num" id="stat-top-parameter">Empirical Data</span>
+              <span class="stat-label">Dominant Parameter</span>
+            </div>
+          </div>
+
+          <h3 style="font-size:1.15rem; margin:2rem 0 1.25rem; color:var(--text-main);">Individual Topic Analytics (Click card to view full analysis):</h3>
+          
+          <!-- 4-Column Analytics Grid -->
+          <div class="debates-grid" id="analytics-grid-container"></div>
         </div>
       </div>
 
-      <!-- 4. INSIGHTS VIEW PLACEHOLDER -->
+      <!-- 4. INSIGHTS SUB-PAGE (KEY INSIGHTS POP-UP MODAL) -->
       <div id="insights-view" class="view-panel hidden">
-        <div class="workspace-card" style="text-align:center; padding:4rem 2rem;">
-          <div style="font-size:3rem; margin-bottom:1rem;">💡</div>
-          <h2>Debate Insights & Coaching Reports</h2>
-          <p style="color:var(--text-muted); max-width:500px; margin:0 auto 1.5rem;">AI historical argument pattern analysis and personalized communication recommendations will be enabled in future updates.</p>
-          <button class="btn btn-secondary" onclick="switchSidebarTab('dashboard')">← Return to Dashboard</button>
+        <div class="workspace-card">
+          <div style="margin-bottom:2rem;">
+            <h2>💡 Executive Debate Insights</h2>
+            <p style="color:var(--text-muted); margin-top:0.2rem;">Select any discussion card below to view its key takeaways, persona highlights, and strategic dilemma.</p>
+          </div>
+
+          <!-- 4-Column Insights Grid -->
+          <div class="debates-grid" id="insights-grid-container"></div>
         </div>
       </div>
 
-      <!-- 5. SETTINGS VIEW PLACEHOLDER -->
+      <!-- 5. SETTINGS SUB-PAGE -->
       <div id="settings-view" class="view-panel hidden">
         <div class="workspace-card">
           <h2>⚙️ Dashboard Settings</h2>
-          <p style="color:var(--text-muted); margin-bottom:2rem;">Manage your preferences and theme options.</p>
+          <p style="color:var(--text-muted); margin-bottom:2rem;">Manage your engine preferences and theme options.</p>
 
-          <div style="display:flex; flex-direction:column; gap:1.5rem; max-width:500px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-dark); padding:1rem; border-radius:var(--radius-md);">
+          <div style="display:flex; flex-direction:column; gap:1.5rem; max-width:600px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-dark); padding:1.25rem; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
               <div>
-                <strong>Active AI Model</strong>
+                <strong>Active AI Model Engine</strong>
                 <p style="font-size:0.85rem; color:var(--text-muted);">Google Gemma 4 (gemma-4-26b-a4b-it)</p>
               </div>
-              <span class="badge-tag">Connected</span>
+              <span class="badge-tag" style="background:rgba(5,150,105,0.15); color:var(--accent-emerald);">Connected</span>
             </div>
 
-            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-dark); padding:1rem; border-radius:var(--radius-md);">
+            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-dark); padding:1.25rem; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
               <div>
                 <strong>Interface Color Theme</strong>
-                <p style="font-size:0.85rem; color:var(--text-muted);">Toggle between Light and Dark mode</p>
+                <p style="font-size:0.85rem; color:var(--text-muted);">Toggle between Light (Default) and Dark theme</p>
               </div>
               <button class="theme-toggle-btn" onclick="toggleTheme()">Switch Theme</button>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-dark); padding:1.25rem; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+              <div>
+                <strong>Storage Management</strong>
+                <p style="font-size:0.85rem; color:var(--text-muted);">Clear all saved debates from local storage</p>
+              </div>
+              <button class="btn btn-secondary" onclick="clearSavedStorage()" style="color:var(--accent-rose); border-color:var(--accent-rose);">Reset Saved Debates</button>
             </div>
           </div>
         </div>
@@ -406,6 +453,36 @@ Example: Whether school and colleges need proper uniform or not"></textarea>
           <p id="conclusion-tradeoff-text" style="font-size:0.92rem; margin-top:0.3rem; color:var(--text-main);"></p>
         </div>
 
+      </div>
+    </div>
+  </div>
+
+  <!-- KEY INSIGHTS POP-UP MODAL (INSIGHTS SUB-PAGE) -->
+  <div class="conclusion-modal-overlay hidden" id="insights-modal">
+    <div class="conclusion-modal-card" style="max-width:700px;">
+      <div class="modal-header">
+        <div>
+          <h3>💡 Key Topic Insights & Takeaways</h3>
+          <p style="font-size:0.88rem; color:var(--text-muted);" id="insights-modal-topic">Topic Takeaways</p>
+        </div>
+        <button class="modal-close-btn" onclick="closeInsightsModal()">✕</button>
+      </div>
+
+      <div style="padding:1.5rem 0; display:flex; flex-direction:column; gap:1.25rem; max-height:70vh; overflow-y:auto;">
+        <div style="background:var(--bg-dark); padding:1rem; border-radius:var(--radius-md);">
+          <strong style="color:var(--accent-indigo); font-size:0.9rem;">Core Discussion Takeaway:</strong>
+          <p id="insights-modal-summary" style="font-size:0.92rem; margin-top:0.3rem; line-height:1.6;"></p>
+        </div>
+
+        <div>
+          <strong style="font-size:0.9rem;">Persona Key Arguments Raised:</strong>
+          <div id="insights-modal-personas" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:0.75rem; margin-top:0.5rem;"></div>
+        </div>
+
+        <div style="background:rgba(217, 119, 6, 0.08); border:1px solid rgba(217, 119, 6, 0.2); padding:1rem; border-radius:var(--radius-md);">
+          <strong style="color:var(--accent-amber); font-size:0.88rem;">Key Conflict & Resolution:</strong>
+          <p id="insights-modal-tradeoff" style="font-size:0.88rem; margin-top:0.2rem;"></p>
+        </div>
       </div>
     </div>
   </div>
