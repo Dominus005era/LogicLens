@@ -501,7 +501,7 @@ Example: Whether school and colleges need proper uniform or not"></textarea>
               <button class="btn btn-primary btn-large" onclick="saveSettings()">
                 ✨ Save Settings & Apply Changes
               </button>
-              <button class="btn btn-secondary" onclick="clearSavedStorage()" style="color:var(--accent-rose); border-color:var(--accent-rose);">
+              <button class="btn btn-secondary" onclick="openResetDisclaimerModal()" style="color:var(--accent-rose); border-color:var(--accent-rose);">
                 🗑️ Reset Saved Storage
               </button>
             </div>
@@ -619,6 +619,43 @@ Example: Whether school and colleges need proper uniform or not"></textarea>
         <div style="background:rgba(217, 119, 6, 0.08); border:1px solid rgba(217, 119, 6, 0.2); padding:1rem; border-radius:var(--radius-md);">
           <strong style="color:var(--accent-amber); font-size:0.88rem;">Key Conflict & Resolution:</strong>
           <p id="insights-modal-tradeoff" style="font-size:0.88rem; margin-top:0.2rem;"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MINI DISCLAIMER CONFIRMATION POP-UP MODAL FOR COMPLETE STORAGE PURGE -->
+  <div class="conclusion-modal-overlay hidden" id="reset-disclaimer-modal">
+    <div class="conclusion-modal-card" style="max-width:560px; border-top:4px solid var(--accent-rose);">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <span style="font-size:1.5rem;">⚠️</span>
+          <h3>Confirm Complete Data Purge</h3>
+        </div>
+        <button class="modal-close-btn" onclick="closeResetDisclaimerModal()">✕</button>
+      </div>
+
+      <div style="padding:1.25rem 0; display:flex; flex-direction:column; gap:1.1rem;">
+        <div style="background:rgba(220, 38, 38, 0.08); border:1px solid rgba(220, 38, 38, 0.25); padding:1rem; border-radius:var(--radius-md);">
+          <strong style="color:var(--accent-rose); font-size:0.9rem; display:block; margin-bottom:0.4rem;">DISCLAIMER WARNING:</strong>
+          <p style="font-size:0.88rem; color:var(--text-main); line-height:1.5;">
+            Purging stored data will <strong>permanently erase all entries</strong> across all 4 platform views:
+          </p>
+          <ul style="padding-left:1.25rem; color:var(--text-muted); font-size:0.84rem; margin-top:0.5rem; display:flex; flex-direction:column; gap:0.3rem;">
+            <li>📚 <strong>Library Page</strong> — All saved debate discussions</li>
+            <li>📄 <strong>Reports Vault Page</strong> — All formal executive synthesis reports</li>
+            <li>📈 <strong>Analytics Page</strong> — All aggregated & topic metric cards</li>
+            <li>💡 <strong>Insights Page</strong> — All key takeaway summaries</li>
+          </ul>
+        </div>
+
+        <p style="font-size:0.85rem; color:var(--text-muted);">This action cannot be undone. Are you sure you want to proceed?</p>
+
+        <div style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:0.5rem;">
+          <button class="btn btn-secondary" onclick="closeResetDisclaimerModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="confirmCompletePurge()" style="background:var(--accent-rose); border-color:var(--accent-rose);">
+            🔥 Yes, Purge All Data
+          </button>
         </div>
       </div>
     </div>

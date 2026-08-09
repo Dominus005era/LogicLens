@@ -307,28 +307,18 @@ function saveSettings() {
 // Storage Management
 function initStorage() {
   const existing = localStorage.getItem('logiclens_saved_debates');
-  if (!existing) {
+  // Only set default seed debates on initial brand-new visit, NOT after a purge!
+  if (existing === null) {
     localStorage.setItem('logiclens_saved_debates', JSON.stringify(DEFAULT_SEED_DEBATES));
-  } else {
-    try {
-      const parsed = JSON.parse(existing);
-      // Auto-upgrade storage if old seed data had less than 6 turns
-      const needsUpgrade = parsed.some(d => !d.turns || d.turns.length < 6);
-      if (needsUpgrade) {
-        localStorage.setItem('logiclens_saved_debates', JSON.stringify(DEFAULT_SEED_DEBATES));
-      }
-    } catch (e) {
-      localStorage.setItem('logiclens_saved_debates', JSON.stringify(DEFAULT_SEED_DEBATES));
-    }
   }
 }
 
 function getStoredDebates() {
   try {
     const raw = localStorage.getItem('logiclens_saved_debates');
-    return raw ? JSON.parse(raw) : DEFAULT_SEED_DEBATES;
+    return raw ? JSON.parse(raw) : [];
   } catch (e) {
-    return DEFAULT_SEED_DEBATES;
+    return [];
   }
 }
 
@@ -359,13 +349,34 @@ function saveDebateToStorage(debateData) {
   localStorage.setItem('logiclens_saved_debates', JSON.stringify(stored));
 }
 
-function clearSavedStorage() {
-  if (confirm("Are you sure you want to clear all saved debates from storage?")) {
-    localStorage.removeItem('logiclens_saved_debates');
-    initStorage();
-    alert("Saved debates have been reset to default seeds.");
-    switchSidebarTab('library');
-  }
+// Mini Pop-Up Disclaimer Modal & 100% Storage Purge Engine
+function openResetDisclaimerModal() {
+  const modal = document.getElementById('reset-disclaimer-modal');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeResetDisclaimerModal() {
+  const modal = document.getElementById('reset-disclaimer-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function confirmCompletePurge() {
+  // Stop active speech if currently playing
+  if (canvasStage) canvasStage.stopSpeech();
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+
+  // Completely purge all saved debate entries (empty array)
+  localStorage.setItem('logiclens_saved_debates', JSON.stringify([]));
+
+  closeResetDisclaimerModal();
+
+  // Dynamically refresh all 4 sub-page views immediately
+  renderLibraryView();
+  renderReportsView();
+  renderAnalyticsView();
+  renderInsightsView();
+
+  alert("🧹 All data across Library, Reports Vault, Analytics, and Insights has been completely purged.");
 }
 
 // Mobile Sidebar Toggle
@@ -880,12 +891,17 @@ function renderAnalyticsView() {
   const avgScore = totalCount > 0 ? Math.round(totalScoreSum / totalCount) : 0;
 
   document.getElementById('stat-total-debates').textContent = totalCount;
-  document.getElementById('stat-avg-score').textContent = `${avgScore} / 100`;
-  document.getElementById('stat-consensus-rate').textContent = `100%`;
-  document.getElementById('stat-top-parameter').textContent = `Empirical Data`;
+  document.getElementById('stat-avg-score').textContent = totalCount > 0 ? `${avgScore} / 100` : `0 / 100`;
+  document.getElementById('stat-consensus-rate').textContent = totalCount > 0 ? `100%` : `0%`;
+  document.getElementById('stat-top-parameter').textContent = totalCount > 0 ? `Empirical Data` : `None`;
 
   const grid = document.getElementById('analytics-grid-container');
   if (!grid) return;
+
+  if (debates.length === 0) {
+    grid.innerHTML = '<p style="color:var(--text-muted); font-style:italic; grid-column:1/-1;">No analytics metrics available. Generate a debate from the Dashboard tab!</p>';
+    return;
+  }
 
   grid.innerHTML = debates.map(d => {
     const score = d.attributed_conclusion?.discussion_quality_score || d.transcript_analysis?.coach?.overall_score || 88;
@@ -933,6 +949,11 @@ function renderInsightsView() {
   const grid = document.getElementById('insights-grid-container');
   if (!grid) return;
   const debates = getStoredDebates();
+
+  if (debates.length === 0) {
+    grid.innerHTML = '<p style="color:var(--text-muted); font-style:italic; grid-column:1/-1;">No key topic insights available. Generate a debate from the Dashboard tab!</p>';
+    return;
+  }
 
   grid.innerHTML = debates.map(d => `
     <div class="debate-card" onclick="openInsightsModal('${d.id}')">
