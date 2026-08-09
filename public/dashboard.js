@@ -812,6 +812,16 @@ function loadSavedDebateIntoRoundTable(debateId) {
   roundTableData = debate;
   roundTableData.personaLogs = { person_a: [], person_b: [], person_c: [], person_d: [] };
 
+  // Explicitly unpause and reset button UI for re-playing stored debate
+  isDiscussionPaused = false;
+  const btn = document.getElementById('pause-resume-btn');
+  if (btn) {
+    btn.innerHTML = '<span>⏸️ Pause Discussion</span>';
+    btn.style.borderColor = 'var(--accent-amber)';
+    btn.style.color = 'var(--text-main)';
+    btn.style.background = 'transparent';
+  }
+
   switchSidebarTab('dashboard');
   
   document.getElementById('topic-input').value = debate.topic;
@@ -824,10 +834,11 @@ function loadSavedDebateIntoRoundTable(debateId) {
 
   if (canvasStage) {
     canvasStage.setTopic(debate.topic);
+    canvasStage.updatePersonas(debate.personas || []);
   }
 
   renderTopicTranscriptAnalysis(debate.transcript_analysis);
-  startSequentialLiveStream(debate.turns || []);
+  startSequentialLiveStream(debate.turns || [], false);
 }
 
 // --------------------------------------------------------------------------
