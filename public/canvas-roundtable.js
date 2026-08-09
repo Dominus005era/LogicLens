@@ -69,6 +69,20 @@ class CanvasRoundTable {
     this.audioEnabled = !this.audioEnabled;
     if (!this.audioEnabled) {
       this.stopSpeech();
+    } else {
+      // Direct User Gesture Audio Unlock & Immediate Turn Voice Restart
+      if (this.synth) {
+        this.synth.cancel();
+        this.synth.resume();
+      }
+      if (this.currentActiveSpeakerId && this.currentSpokenText) {
+        this.setActiveSpeaker(
+          this.currentActiveSpeakerId,
+          this.headlineText,
+          this.currentSpokenText,
+          this.currentSpeechEndCallback
+        );
+      }
     }
     return this.audioEnabled;
   }
@@ -108,6 +122,11 @@ class CanvasRoundTable {
     this.isStopped = false;
     this.activeSpeakerId = speakerId;
     this.headlineText = headline || "";
+
+    // Save active turn speech parameters for audio toggle re-triggering
+    this.currentActiveSpeakerId = speakerId;
+    this.currentSpokenText = spokenText;
+    this.currentSpeechEndCallback = onSpeechEndCallback;
 
     // Clear any previous speech completion timers
     if (this.speechFallbackTimer) {
