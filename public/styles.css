@@ -331,8 +331,11 @@ h1, h2, h3, h4 { font-family: var(--font-heading); letter-spacing: -0.02em; }
 .faq-item.active .faq-icon { transform: rotate(45deg); }
 .faq-answer { padding: 0 1.5rem 1.25rem; color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
 
-.cta-banner-card { background: var(--gradient-primary); color: #FFF; border-radius: var(--radius-lg); padding: 4rem 2rem; text-align: center; box-shadow: 0 20px 40px rgba(79, 70, 229, 0.3); }
-.cta-banner-card h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+.cta-banner-card { background: var(--gradient-primary); color: #FFF; border-radius: var(--radius-lg); padding: 4.5rem 2rem; text-align: center; box-shadow: 0 20px 40px rgba(79, 70, 229, 0.3); }
+.cta-banner-card h2 { font-size: 2.5rem; margin-bottom: 1.25rem; font-weight: 800; }
+.cta-banner-card p { font-size: 1.1rem; opacity: 0.95; margin-bottom: 2.25rem; max-width: 680px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+.cta-banner-card .btn { margin-top: 0.5rem; padding: 1.05rem 2.6rem; font-size: 1.05rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; border-radius: 50px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25); transition: transform var(--transition-fast), box-shadow var(--transition-fast); }
+.cta-banner-card .btn:hover { transform: translateY(-3px); box-shadow: 0 15px 32px rgba(0, 0, 0, 0.35); }
 
 /* ==========================================================================
    DASHBOARD & ROUND-TABLE VIRTUAL CONFERENCE STAGE STYLES
