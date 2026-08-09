@@ -172,27 +172,66 @@ class CanvasRoundTable {
     ctx.fillStyle = wallGrad;
     ctx.fillRect(0, 0, w, h * 0.45);
 
-    // 2. High Wall-Mounted Presentation TV Screen (Positioned high up at y = 0.02 to avoid colliding with Person A & B)
-    const tvW = w * 0.46;
-    const tvH = h * 0.18;
+    // 2. High Wall-Mounted Presentation TV Screen (Expanded 72% Width for Full Topic Display)
+    const tvW = w * 0.72;
+    const tvH = h * 0.22;
     const tvX = (w - tvW) / 2;
-    const tvY = h * 0.02;
+    const tvY = h * 0.015;
+
+    // Outer Screen Bezel Glow
+    ctx.shadowColor = '#4F46E5';
+    ctx.shadowBlur = 12;
 
     ctx.fillStyle = isDark ? '#030712' : '#0F172A';
-    ctx.fillRect(tvX, tvY, tvW, tvH);
-    ctx.strokeStyle = '#4F46E5';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(tvX, tvY, tvW, tvH);
+    if (ctx.roundRect) {
+      ctx.beginPath();
+      ctx.roundRect(tvX, tvY, tvW, tvH, 10);
+      ctx.fill();
+      ctx.strokeStyle = '#6366F1';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    } else {
+      ctx.fillRect(tvX, tvY, tvW, tvH);
+      ctx.strokeStyle = '#6366F1';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(tvX, tvY, tvW, tvH);
+    }
+    ctx.shadowBlur = 0; // Reset shadow glow
 
-    // TV Screen Text
+    // TV Screen Top Tag Header
     ctx.fillStyle = '#38BDF8';
     ctx.font = 'bold 11px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('LIVE ROUND-TABLE DEBATE SCREEN', w * 0.5, tvY + 20);
+    ctx.fillText('LIVE ROUND-TABLE DEBATE SCREEN', w * 0.5, tvY + 18);
 
+    // Full Topic Text Renderer (Multi-Line Word Wrapping without Truncation)
     ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 13px sans-serif';
-    ctx.fillText(`"${this.truncate(this.topicText, 48)}"`, w * 0.5, tvY + 45);
+    ctx.font = 'bold 13.5px sans-serif';
+    
+    const fullTopic = this.topicText ? `"${this.topicText}"` : '"Round-Table Discussion Room"';
+    const words = fullTopic.split(' ');
+    const maxLineW = tvW - 32;
+    let line = '';
+    const lines = [];
+
+    for (let n = 0; n < words.length; n++) {
+      const testLine = line + words[n] + ' ';
+      const metrics = ctx.measureText(testLine);
+      if (metrics.width > maxLineW && n > 0) {
+        lines.push(line.trim());
+        line = words[n] + ' ';
+      } else {
+        line = testLine;
+      }
+    }
+    lines.push(line.trim());
+
+    // Center multi-line topic text vertically in screen
+    const startY = lines.length > 1 ? tvY + 36 : tvY + 44;
+    const lineHeight = 17;
+    lines.forEach((l, idx) => {
+      ctx.fillText(l, w * 0.5, startY + (idx * lineHeight));
+    });
 
     // Glass Window Lines (Behind TV)
     ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.08)';
