@@ -74,6 +74,10 @@ class CanvasRoundTable {
   }
 
   stopSpeech() {
+    if (this.speechFallbackTimer) {
+      clearTimeout(this.speechFallbackTimer);
+      this.speechFallbackTimer = null;
+    }
     if (this.synth && this.synth.speaking) {
       this.synth.cancel();
     }

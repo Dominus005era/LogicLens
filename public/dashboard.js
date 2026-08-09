@@ -414,12 +414,11 @@ function applyTheme(theme) {
   localStorage.setItem('logiclens_theme', theme);
 }
 
-// Sidebar Navigation Tabs (Stops TTS speech audio immediately on tab switch!)
+// Sidebar Navigation Tabs (Stops TTS speech audio & turn progression immediately on tab switch!)
 function switchSidebarTab(target) {
+  if (liveStreamTimer) clearTimeout(liveStreamTimer);
   if (canvasStage) canvasStage.stopSpeech();
-  if (window.speechSynthesis && window.speechSynthesis.speaking) {
-    window.speechSynthesis.cancel();
-  }
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
 
   document.querySelectorAll('.sidebar-link').forEach(link => {
     link.classList.toggle('active', link.dataset.target === target);
