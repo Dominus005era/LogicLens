@@ -155,6 +155,152 @@ const FALLACY_LIBRARY = [
   }
 ];
 
+// Helper function for robust JSON parsing & auto-repairing truncated strings
+function robustParseJson(rawOutput) {
+  if (!rawOutput || typeof rawOutput !== 'string') {
+    throw new Error('Empty or invalid output from AI model.');
+  }
+
+  let cleanStr = rawOutput.trim();
+
+  // 1. Extract markdown JSON block if present
+  if (cleanStr.includes('```json')) {
+    const parts = cleanStr.split('```json');
+    cleanStr = parts[1].split('```')[0].trim();
+  } else if (cleanStr.includes('```')) {
+    const parts = cleanStr.split('```');
+    cleanStr = parts[1].split('```')[0].trim();
+  }
+
+  // 2. Find start of JSON object or array
+  const firstBrace = cleanStr.indexOf('{');
+  const firstBracket = cleanStr.indexOf('[');
+  let startIdx = 0;
+  if (firstBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)) {
+    startIdx = firstBrace;
+  } else if (firstBracket !== -1) {
+    startIdx = firstBracket;
+  }
+  cleanStr = cleanStr.substring(startIdx);
+
+  // Try parsing directly first
+  try {
+    return JSON.parse(cleanStr);
+  } catch (e1) {
+    // Continue to repair
+  }
+
+  // 3. Clean raw control characters & unescaped newlines inside strings
+  let repaired = '';
+  let inString = false;
+  let isEscaped = false;
+
+  for (let i = 0; i < cleanStr.length; i++) {
+    const char = cleanStr[i];
+
+    if (isEscaped) {
+      isEscaped = false;
+      repaired += char;
+      continue;
+    }
+
+    if (char === '\\') {
+      isEscaped = true;
+      repaired += char;
+      continue;
+    }
+
+    if (char === '"') {
+      inString = !inString;
+      repaired += char;
+      continue;
+    }
+
+    if (inString) {
+      if (char === '\n') {
+        repaired += '\\n';
+      } else if (char === '\r') {
+        repaired += '\\r';
+      } else if (char === '\t') {
+        repaired += '\\t';
+      } else {
+        repaired += char;
+      }
+    } else {
+      repaired += char;
+    }
+  }
+
+  try {
+    return JSON.parse(repaired);
+  } catch (e2) {
+    // Continue to structural auto-repair
+  }
+
+  // 4. Structural Auto-Repair for Truncated JSON
+  let openQuotes = false;
+  let escaped = false;
+  const stack = [];
+  let fixed = '';
+
+  for (let i = 0; i < repaired.length; i++) {
+    const ch = repaired[i];
+
+    if (escaped) {
+      escaped = false;
+      fixed += ch;
+      continue;
+    }
+
+    if (ch === '\\') {
+      escaped = true;
+      fixed += ch;
+      continue;
+    }
+
+    if (ch === '"') {
+      openQuotes = !openQuotes;
+      fixed += ch;
+      continue;
+    }
+
+    if (!openQuotes) {
+      if (ch === '{' || ch === '[') {
+        stack.push(ch);
+      } else if (ch === '}' || ch === ']') {
+        if (stack.length > 0) {
+          const top = stack[stack.length - 1];
+          if ((ch === '}' && top === '{') || (ch === ']' && top === '[')) {
+            stack.pop();
+          }
+        }
+      }
+    }
+
+    fixed += ch;
+  }
+
+  if (openQuotes) {
+    fixed += '"';
+  }
+
+  fixed = fixed.replace(/,\s*$/, '');
+  fixed = fixed.replace(/,\s*([\}\]])/g, '$1');
+
+  while (stack.length > 0) {
+    const top = stack.pop();
+    if (top === '{') fixed += '}';
+    if (top === '[') fixed += ']';
+  }
+
+  try {
+    return JSON.parse(fixed);
+  } catch (e3) {
+    console.error('Final JSON repair failed:', e3.message);
+    throw new Error(`AI generated invalid response formatting: ${e3.message}`);
+  }
+}
+
 // Helper function to invoke Gemma API
 async function callGemma(promptText) {
   if (!GEMMA_API_KEY) {
@@ -175,7 +321,7 @@ async function callGemma(promptText) {
       temperature: 0.2,
       topK: 40,
       topP: 0.95,
-      maxOutputTokens: 4096
+      maxOutputTokens: 8192
     }
   };
 
@@ -206,15 +352,7 @@ async function callGemma(promptText) {
   // If no non-thought text part found, fallback to joining all text
   const rawOutput = textParts.trim() || parts.map(p => p.text || '').join('\n').trim();
 
-  // Clean JSON fence if present
-  let cleanJson = rawOutput;
-  if (cleanJson.includes('```json')) {
-    cleanJson = cleanJson.split('```json')[1].split('```')[0].trim();
-  } else if (cleanJson.includes('```')) {
-    cleanJson = cleanJson.split('```')[1].split('```')[0].trim();
-  }
-
-  return JSON.parse(cleanJson);
+  return robustParseJson(rawOutput);
 }
 
 // Endpoint: Get Fallacy Library
