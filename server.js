@@ -593,22 +593,18 @@ app.post('/api/simulate-roundtable', async (req, res) => {
     const numTurnsTarget = durationMin >= 5 ? 14 : durationMin >= 3 ? 10 : 8;
 
     const prompt = `You are LogicLens AI featuring Virtual Multi-Persona Round-Table Discussion Engine.
+Simulate a realistic multi-persona discussion among 4 distinct AI Personas sitting around a virtual round table for topic: "${topic}".
 
-Your task is to take the following topic/opinion and simulate a deep, realistic, organic multi-persona discussion among 4 distinct AI Personas sitting around a virtual round table, AND generate a complete transcript analysis:
+Personas evaluating the topic:
+- ${pA_name} (${pA_arch})
+- ${pB_name} (${pB_arch})
+- ${pC_name} (${pC_arch})
+- ${pD_name} (${pD_arch})
 
-Topic / Opinion: "${topic}"
-
-The 4 Personas evaluate this topic from 4 distinct cognitive parameters using their assigned names:
-- ${pA_name} (Archetype: ${pA_arch})
-- ${pB_name} (Archetype: ${pB_arch})
-- ${pC_name} (Archetype: ${pC_arch})
-- ${pD_name} (Archetype: ${pD_arch})
-
-CRITICAL INSTRUCTIONS FOR ORGANIC HUMAN CONVERSATION FLOW:
-1. DO NOT use a fixed sequential order. Make turns flow naturally! Use exact persona names (${pA_name}, ${pB_name}, ${pC_name}, ${pD_name}).
-2. MOST TURNS (85%) MUST BE FULL POLITE LISTENING ("listen_and_respond"): allow each persona to speak their full thought cleanly.
-3. Keep interruptions RARE: max 1 interjection ("organic_interjection") across the ENTIRE debate (5-10% probability), and 1-2 direct counters ("direct_counter").
-4. Generate between ${numTurnsTarget} to ${numTurnsTarget + 4} dynamic dialogue turns total.
+CRITICAL INSTRUCTIONS FOR FAST HIGH-QUALITY GENERATION:
+1. Generate exactly ${numTurnsTarget} organic dialogue turns.
+2. 85% of turns MUST be polite statement/listening ("listen_and_respond"). Max 1 interjection ("organic_interjection") and 1 counter ("direct_counter").
+3. Use exact persona names (${pA_name}, ${pB_name}, ${pC_name}, ${pD_name}).
 
 Return ONLY a valid, strict JSON object with EXACTLY this structure:
 
@@ -636,60 +632,30 @@ Return ONLY a valid, strict JSON object with EXACTLY this structure:
       "speaker_id": "person_b",
       "speaker_name": "${pB_name.replace(/"/g, '\\"')}",
       "headline_point": "2. Direct Counter: Restricting Self-Expression & Autonomy",
-      "spoken_text": "While economic relief is valid, ${pA_name} ignores that forcing identical dress suppresses student identity and self-expression.",
+      "spoken_text": "While economic relief is valid, ${pA_name} ignores that forcing identical dress suppresses student identity.",
       "transition_type": "direct_counter",
       "target_response_to": "person_a",
-      "duration_ms": 8000
-    },
-    {
-      "turn_index": 3,
-      "speaker_id": "person_a",
-      "speaker_name": "Person A",
-      "headline_point": "3. Rebuttal: Focus Over Fashion Trends",
-      "spoken_text": "Self-expression happens through achievements and arts, not daily brand flexing in classrooms.",
-      "target_response_to": "person_b",
-      "duration_ms": 7000
-    },
-    {
-      "turn_index": 4,
-      "speaker_id": "person_c",
-      "speaker_name": "Person C",
-      "headline_point": "4. Interjecting Empirical Data on Academic Correlation",
-      "spoken_text": "Let's look at numbers. Meta-analyses show zero statistical correlation between strict uniforms and academic test scores.",
-      "target_response_to": "person_a",
-      "duration_ms": 8500
-    },
-    {
-      "turn_index": 5,
-      "speaker_id": "person_d",
-      "speaker_name": "Person D",
-      "headline_point": "5. Psychological Framing: Sense of Belonging",
-      "spoken_text": "However, psychological studies reveal that shared group attire increases a sense of belonging and reduces peer bullying.",
-      "target_response_to": "person_c",
       "duration_ms": 8000
     }
   ],
   "transcript_analysis": {
-    "summary": "Deep multi-parameter examination of the topic covering economic feasibility, individual rights, statistical research, and psychological well-being.",
+    "summary": "Deep examination of topic covering economic feasibility, individual rights, research, and psychology.",
     "coach": {
       "overall_score": 86,
-      "verdict": "High-quality reasoned debate with strong empirical backing and passionate philosophical counterpoints.",
-      "tips": [
-        "Reconcile economic standardization with student identity needs",
-        "Utilize randomized controlled trials for policy decisions"
-      ]
+      "verdict": "High-quality reasoned debate with strong empirical backing.",
+      "tips": ["Balance economic standardization with individual identity needs"]
     },
     "participants": [
       {
-        "name": "Person A (Economic)",
+        "name": "${pA_name.replace(/"/g, '\\"')}",
         "logic_score": 8, "evidence_score": 7, "respect_score": 8, "clarity_score": 9, "consistency_score": 8, "persuasiveness_score": 8,
         "fallacies": [],
         "strengths": ["Focused on household economic relief and logistics"],
         "weaknesses": ["Overlooked identity expression concerns"],
-        "badges": ["🧠 Rational Thinker", "🔍 Logistics Focus"]
+        "badges": ["🧠 Rational Thinker"]
       },
       {
-        "name": "Person B (Social & Freedom)",
+        "name": "${pB_name.replace(/"/g, '\\"')}",
         "logic_score": 8, "evidence_score": 8, "respect_score": 8, "clarity_score": 9, "consistency_score": 8, "persuasiveness_score": 8,
         "fallacies": [],
         "strengths": ["Strong defense of personal autonomy and equity"],
@@ -697,51 +663,43 @@ Return ONLY a valid, strict JSON object with EXACTLY this structure:
         "badges": ["🕊️ Autonomy Defender"]
       },
       {
-        "name": "Person C (Empirical Data)",
+        "name": "${pC_name.replace(/"/g, '\\"')}",
         "logic_score": 9, "evidence_score": 10, "respect_score": 9, "clarity_score": 9, "consistency_score": 9, "persuasiveness_score": 9,
         "fallacies": [],
         "strengths": ["Cited empirical meta-analyses and statistical data"],
-        "weaknesses": ["Focused strictly on quantitative metrics"],
-        "badges": ["🔍 Evidence Hunter", "🧠 Data Master"]
+        "weaknesses": ["Quantitative focus"],
+        "badges": ["🔍 Evidence Hunter"]
       },
       {
-        "name": "Person D (Ethics & Psychology)",
+        "name": "${pD_name.replace(/"/g, '\\"')}",
         "logic_score": 8, "evidence_score": 8, "respect_score": 9, "clarity_score": 8, "consistency_score": 8, "persuasiveness_score": 8,
         "fallacies": [],
-        "strengths": ["Framed psychological belonging and bullying reduction"],
+        "strengths": ["Framed psychological belonging"],
         "weaknesses": ["Qualitative focus"],
         "badges": ["🕊️ Respectful Debater"]
       }
     ],
     "heat_map": [
-      { "speaker": "Person A", "message": "Uniforms eliminate socioeconomic clothing competition.", "tone": "Calm", "level": "Blue" },
-      { "speaker": "Person B", "message": "Mandates restrict personal autonomy and identity.", "tone": "Curious", "level": "Green" },
-      { "speaker": "Person C", "message": "Meta-analyses show zero academic test score correlation.", "tone": "Calm", "level": "Blue" },
-      { "speaker": "Person D", "message": "Shared attire increases belonging and reduces bullying.", "tone": "Calm", "level": "Blue" }
+      { "speaker": "${pA_name.replace(/"/g, '\\"')}", "message": "Uniforms eliminate socioeconomic clothing competition.", "tone": "Calm", "level": "Blue" }
     ],
     "evidence_meter": [
-      { "claim": "Uniforms reduce household wardrobe costs.", "speaker": "Person A", "status": "Supported by facts", "reason": "Consistent with consumer expenditure surveys." },
-      { "claim": "No direct correlation to academic test scores.", "speaker": "Person C", "status": "Supported by facts", "reason": "Cites peer-reviewed educational meta-analyses." }
+      { "claim": "Uniforms reduce household wardrobe costs.", "speaker": "${pA_name.replace(/"/g, '\\"')}", "status": "Supported by facts", "reason": "Consistent with survey data." }
     ],
-    "strongest_argument": { "speaker": "Person C", "quote": "Meta-analyses show zero statistical correlation between strict uniforms and test scores.", "reason": "Direct empirical evidence addressing policy claims." },
-    "weakest_argument": { "speaker": "Person A", "quote": "Self-expression happens through achievements, not daily brand flexing.", "reason": "Dismissive of personal aesthetic autonomy." },
+    "strongest_argument": { "speaker": "${pC_name.replace(/"/g, '\\"')}", "quote": "Empirical data shows key statistical correlation.", "reason": "Direct research evidence." },
+    "weakest_argument": { "speaker": "${pA_name.replace(/"/g, '\\"')}", "quote": "Self-expression happens through achievements.", "reason": "Dismissive of personal autonomy." },
     "constructive_suggestions": [
-      { "speaker": "Person A", "original": "Self-expression happens through achievements, not brand flexing.", "suggested": "How can we balance economic equity with opportunities for personal expression?" }
+      { "speaker": "${pA_name.replace(/"/g, '\\"')}", "original": "Self-expression happens through achievements.", "suggested": "How can we balance economic equity with identity?" }
     ]
   },
   "attributed_conclusion": {
-    "summary": "Synthesized 3-4 sentence balanced overview combining all 4 perspectives into an objective resolution.",
+    "summary": "Synthesized overview combining economic, individual, research, and psychological perspectives.",
     "agreement_mappings": [
       {
-        "persons": ["Person A", "Person D"],
-        "common_point": "Both Person A and Person D agreed that baseline dress standards foster school focus, discipline, and financial equity for families."
-      },
-      {
-        "persons": ["Person B", "Person C"],
-        "common_point": "Both Person B and Person C emphasized that flexible dress codes achieve social harmony without violating individual autonomy or lacking empirical support."
+        "persons": ["${pA_name.replace(/"/g, '\\"')}", "${pD_name.replace(/"/g, '\\"')}"],
+        "common_point": "Both agreed that baseline dress standards foster school focus and financial equity."
       }
     ],
-    "core_tradeoffs": "Summary of the fundamental trade-off between economic standardization and personal expression.",
+    "core_tradeoffs": "Summary of fundamental trade-offs between economic standardization and personal expression.",
     "discussion_quality_score": 88
   }
 }
