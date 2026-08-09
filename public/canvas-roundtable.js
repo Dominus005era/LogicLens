@@ -78,11 +78,21 @@ class CanvasRoundTable {
       clearTimeout(this.speechFallbackTimer);
       this.speechFallbackTimer = null;
     }
+    if (this.currentUtterance) {
+      this.currentUtterance.onend = null;
+      this.currentUtterance.onerror = null;
+      this.currentUtterance = null;
+    }
+    if (window._activeUtterance) {
+      window._activeUtterance.onend = null;
+      window._activeUtterance.onerror = null;
+      window._activeUtterance = null;
+    }
     if (this.synth) {
-      this.synth.cancel();
+      try { this.synth.cancel(); } catch(e){}
     }
     if (window.speechSynthesis) {
-      window.speechSynthesis.cancel();
+      try { window.speechSynthesis.cancel(); } catch(e){}
     }
   }
 

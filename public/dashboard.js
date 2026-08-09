@@ -632,10 +632,17 @@ function showError(msg) {
 }
 
 let activeTurnsList = [];
+let activeStreamSessionId = 0;
 
-// Live Turn Sequencer Engine (Deterministic Event-Driven Pacing with Reliable Pause/Resume)
+// Live Turn Sequencer Engine (Deterministic Session Guard & Sequential Flow)
 function startSequentialLiveStream(turns) {
   if (!turns || turns.length === 0) return;
+  
+  // Invalidate any previous stream loop immediately
+  activeStreamSessionId++;
+  if (canvasStage) canvasStage.stopSpeech();
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+
   activeTurnsList = turns;
   activeTurnIndex = 0;
   isDiscussionPaused = false;
@@ -654,13 +661,17 @@ function startSequentialLiveStream(turns) {
 }
 
 function runSequentialTurn() {
-  if (isDiscussionPaused || !activeTurnsList || activeTurnsList.length === 0) return;
+  const currentSessionId = activeStreamSessionId;
+
+  if (isDiscussionPaused || currentSessionId !== activeStreamSessionId || !activeTurnsList || activeTurnsList.length === 0) {
+    return;
+  }
 
   if (activeTurnIndex >= activeTurnsList.length) {
     document.getElementById('live-speaker-status').textContent = 'Discussion wrapping up... personas synthesizing common ground.';
     
     setTimeout(() => {
-      if (isDiscussionPaused) return;
+      if (isDiscussionPaused || currentSessionId !== activeStreamSessionId) return;
       if (canvasStage) {
         canvasStage.setDebateEnded(true);
       }
@@ -696,7 +707,7 @@ function runSequentialTurn() {
 
   let turnAdvanced = false;
   const advanceTurn = () => {
-    if (turnAdvanced || isDiscussionPaused) return;
+    if (turnAdvanced || isDiscussionPaused || currentSessionId !== activeStreamSessionId) return;
     turnAdvanced = true;
     activeTurnIndex++;
     runSequentialTurn();
@@ -790,10 +801,16 @@ function loadSavedDebateIntoRoundTable(debateId) {
   const debate = debates.find(d => d.id === debateId);
   if (!debate) return;
 
+  // Invalidate any previous running session immediately
+  activeStreamSessionId++;
+  if (canvasStage) canvasStage.stopSpeech();
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+
   roundTableData = debate;
   roundTableData.personaLogs = { person_a: [], person_b: [], person_c: [], person_d: [] };
 
   switchSidebarTab('dashboard');
+  isDiscussionPaused = false;
   
   document.getElementById('topic-input').value = debate.topic;
   document.getElementById('minimized-topic-text').textContent = `"${debate.topic}"`;
