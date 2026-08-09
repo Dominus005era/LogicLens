@@ -578,23 +578,28 @@ function showError(msg) {
   errorBanner.classList.remove('hidden');
 }
 
-// Live Turn Sequencer Engine
+// Live Turn Sequencer Engine (Organic Human Event-Driven Pacing)
 function startSequentialLiveStream(turns) {
   if (!turns || turns.length === 0) return;
   activeTurnIndex = 0;
 
   const runNextTurn = () => {
     if (activeTurnIndex >= turns.length) {
-      if (canvasStage) {
-        canvasStage.setDebateEnded(true);
-      }
-      const liveTag = document.getElementById('live-indicator-tag');
-      if (liveTag) {
-        liveTag.style.background = 'rgba(5,150,105,0.15)';
-        liveTag.style.color = 'var(--accent-emerald)';
-        liveTag.textContent = '✅ DEBATE COMPLETED';
-      }
-      document.getElementById('live-speaker-status').textContent = 'Discussion concluded across all 4 parameters. Click "Seek Synthesis & Report" to view final executive report.';
+      document.getElementById('live-speaker-status').textContent = 'Discussion wrapping up... personas synthesizing common ground.';
+      
+      // Graceful 2.5-second ambient room pause after the final speaker finishes
+      setTimeout(() => {
+        if (canvasStage) {
+          canvasStage.setDebateEnded(true);
+        }
+        const liveTag = document.getElementById('live-indicator-tag');
+        if (liveTag) {
+          liveTag.style.background = 'rgba(5,150,105,0.15)';
+          liveTag.style.color = 'var(--accent-emerald)';
+          liveTag.textContent = '✅ DEBATE COMPLETED';
+        }
+        document.getElementById('live-speaker-status').textContent = 'Discussion concluded across all 4 parameters. Click "Seek Synthesis & Report" to view final executive report.';
+      }, 2500);
       return;
     }
 
@@ -609,7 +614,8 @@ function startSequentialLiveStream(turns) {
       renderLivePersonaDrawerContent(speakerId);
     }
 
-    const statusText = `Turn ${turn.turn_index} of ${turns.length}: ${turn.speaker_name} is speaking...`;
+    const transitionLabel = turn.transition_type === 'organic_interjection' ? '⚡ interjecting...' : turn.transition_type === 'direct_counter' ? '💬 countering...' : 'speaking...';
+    const statusText = `Turn ${turn.turn_index} of ${turns.length}: ${turn.speaker_name} is ${transitionLabel}`;
     document.getElementById('live-speaker-status').textContent = statusText;
 
     let turnAdvanced = false;
@@ -621,13 +627,10 @@ function startSequentialLiveStream(turns) {
     };
 
     if (canvasStage) {
-      canvasStage.setActiveSpeaker(speakerId, turn.headline_point, turn.spoken_text, () => {
-        advanceTurn();
-      });
+      canvasStage.setActiveSpeaker(speakerId, turn.headline_point, turn.spoken_text, advanceTurn);
+    } else {
+      setTimeout(advanceTurn, 8000);
     }
-
-    const duration = turn.duration_ms || 8000;
-    liveStreamTimer = setTimeout(advanceTurn, duration + 1000);
   };
 
   runNextTurn();

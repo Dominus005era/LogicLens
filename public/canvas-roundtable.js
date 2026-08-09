@@ -83,6 +83,12 @@ class CanvasRoundTable {
     this.activeSpeakerId = speakerId;
     this.headlineText = headline || "";
 
+    // Clear any previous speech completion timers
+    if (this.speechFallbackTimer) {
+      clearTimeout(this.speechFallbackTimer);
+      this.speechFallbackTimer = null;
+    }
+
     if (speakerId && spokenText && this.audioEnabled && this.synth) {
       this.stopSpeech();
 
@@ -91,16 +97,27 @@ class CanvasRoundTable {
       utterance.pitch = persona ? persona.voicePitch : 1.0;
       utterance.rate = persona ? persona.voiceRate : 0.95;
 
-      utterance.onend = () => {
-        if (onSpeechEndCallback) onSpeechEndCallback();
+      let callbackTriggered = false;
+      const handleSpeechEnd = () => {
+        if (callbackTriggered) return;
+        callbackTriggered = true;
+        // Natural 1.2-second human breathing pause before passing the turn
+        setTimeout(() => {
+          if (onSpeechEndCallback) onSpeechEndCallback();
+        }, 1200);
       };
 
-      utterance.onerror = () => {
-        if (onSpeechEndCallback) onSpeechEndCallback();
-      };
+      utterance.onend = handleSpeechEnd;
+      utterance.onerror = handleSpeechEnd;
 
       this.currentUtterance = utterance;
       this.synth.speak(utterance);
+    } else {
+      // Fallback timer when speech audio is muted or unsupported
+      const fallbackMs = Math.max(6500, Math.min(14000, (spokenText ? spokenText.length : 100) * 75));
+      this.speechFallbackTimer = setTimeout(() => {
+        if (onSpeechEndCallback) onSpeechEndCallback();
+      }, fallbackMs);
     }
   }
 

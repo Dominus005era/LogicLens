@@ -604,9 +604,10 @@ The 4 Personas evaluate this topic from 4 distinct cognitive parameters using th
 - ${pC_name} (Archetype: ${pC_arch})
 - ${pD_name} (Archetype: ${pD_arch})
 
-CRITICAL INSTRUCTIONS FOR ORGANIC CONVERSATION FLOW:
+CRITICAL INSTRUCTIONS FOR ORGANIC HUMAN CONVERSATION FLOW:
 1. DO NOT use a fixed sequential order. Make turns flow naturally! Use exact persona names (${pA_name}, ${pB_name}, ${pC_name}, ${pD_name}).
-2. Generate between ${numTurnsTarget} to ${numTurnsTarget + 4} dynamic dialogue turns total.
+2. Mix 4 communication patterns: "listen_and_respond" (60%), "direct_counter" (25%), "organic_interjection" (15%), and "final_synthesis" for closing.
+3. Generate between ${numTurnsTarget} to ${numTurnsTarget + 4} dynamic dialogue turns total.
 
 Return ONLY a valid, strict JSON object with EXACTLY this structure:
 
@@ -622,18 +623,20 @@ Return ONLY a valid, strict JSON object with EXACTLY this structure:
     {
       "turn_index": 1,
       "speaker_id": "person_a",
-      "speaker_name": "Person A",
+      "speaker_name": "${pA_name.replace(/"/g, '\\"')}",
       "headline_point": "1. Uniforms Eliminate Socioeconomic Clothing Competitiveness",
       "spoken_text": "Mandatory uniforms level the playing field by eliminating visible wealth disparities and reducing annual household costs.",
+      "transition_type": "listen_and_respond",
       "target_response_to": null,
       "duration_ms": 7500
     },
     {
       "turn_index": 2,
       "speaker_id": "person_b",
-      "speaker_name": "Person B",
+      "speaker_name": "${pB_name.replace(/"/g, '\\"')}",
       "headline_point": "2. Direct Counter: Restricting Self-Expression & Autonomy",
-      "spoken_text": "While economic relief is valid, Person A ignores that forcing identical dress suppresses student identity and self-expression.",
+      "spoken_text": "While economic relief is valid, ${pA_name} ignores that forcing identical dress suppresses student identity and self-expression.",
+      "transition_type": "direct_counter",
       "target_response_to": "person_a",
       "duration_ms": 8000
     },
