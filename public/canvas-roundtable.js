@@ -68,9 +68,25 @@ class CanvasRoundTable {
   toggleAudio() {
     this.audioEnabled = !this.audioEnabled;
     if (!this.audioEnabled) {
-      this.stopSpeech();
+      // Mute audio output only - DO NOT stop turn progression!
+      if (this.synth && this.synth.speaking) {
+        this.synth.cancel();
+      }
+      // Trigger reading fallback timer for current turn if speech was playing
+      if (this.currentSpokenText && !this.speechFallbackTimer) {
+        const fallbackMs = Math.max(5500, Math.min(10000, this.currentSpokenText.length * 65));
+        this.speechFallbackTimer = setTimeout(() => {
+          if (!this.isStopped && this.currentSpeechEndCallback) {
+            this.currentSpeechEndCallback();
+          }
+        }, fallbackMs);
+      }
     } else {
-      // Direct User Gesture Audio Unlock & Immediate Turn Voice Restart
+      // Direct User Gesture Audio Unlock & Immediate Turn Voice Resume
+      if (this.speechFallbackTimer) {
+        clearTimeout(this.speechFallbackTimer);
+        this.speechFallbackTimer = null;
+      }
       if (this.synth) {
         this.synth.cancel();
         this.synth.resume();
@@ -135,7 +151,9 @@ class CanvasRoundTable {
     }
 
     if (speakerId && spokenText && this.audioEnabled && this.synth) {
-      this.stopSpeech();
+      if (this.synth.speaking) {
+        this.synth.cancel();
+      }
       this.isStopped = false;
 
       const persona = this.personas[speakerId];
@@ -159,8 +177,11 @@ class CanvasRoundTable {
       this.currentUtterance = utterance;
       this.synth.speak(utterance);
     } else {
-      // Fallback timer when speech audio is muted or unsupported
-      const fallbackMs = Math.max(6500, Math.min(14000, (spokenText ? spokenText.length : 100) * 75));
+      // Audio Muted (Voice OFF) or Unsupported: Silent Reading Fallback Timer (Turns continue advancing to conclusion!)
+      if (this.synth && this.synth.speaking) {
+        this.synth.cancel();
+      }
+      const fallbackMs = Math.max(5500, Math.min(10000, (spokenText ? spokenText.length : 100) * 65));
       this.speechFallbackTimer = setTimeout(() => {
         if (!this.isStopped && onSpeechEndCallback) onSpeechEndCallback();
       }, fallbackMs);
