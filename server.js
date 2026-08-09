@@ -606,8 +606,9 @@ The 4 Personas evaluate this topic from 4 distinct cognitive parameters using th
 
 CRITICAL INSTRUCTIONS FOR ORGANIC HUMAN CONVERSATION FLOW:
 1. DO NOT use a fixed sequential order. Make turns flow naturally! Use exact persona names (${pA_name}, ${pB_name}, ${pC_name}, ${pD_name}).
-2. Mix 4 communication patterns: "listen_and_respond" (60%), "direct_counter" (25%), "organic_interjection" (15%), and "final_synthesis" for closing.
-3. Generate between ${numTurnsTarget} to ${numTurnsTarget + 4} dynamic dialogue turns total.
+2. MOST TURNS (85%) MUST BE FULL POLITE LISTENING ("listen_and_respond"): allow each persona to speak their full thought cleanly.
+3. Keep interruptions RARE: max 1 interjection ("organic_interjection") across the ENTIRE debate (5-10% probability), and 1-2 direct counters ("direct_counter").
+4. Generate between ${numTurnsTarget} to ${numTurnsTarget + 4} dynamic dialogue turns total.
 
 Return ONLY a valid, strict JSON object with EXACTLY this structure:
 

@@ -614,7 +614,7 @@ function startSequentialLiveStream(turns) {
       renderLivePersonaDrawerContent(speakerId);
     }
 
-    const transitionLabel = turn.transition_type === 'organic_interjection' ? '⚡ interjecting...' : turn.transition_type === 'direct_counter' ? '💬 countering...' : 'speaking...';
+    const transitionLabel = turn.transition_type === 'organic_interjection' ? '⚡ interjecting...' : turn.transition_type === 'direct_counter' ? '💬 responding...' : 'speaking...';
     const statusText = `Turn ${turn.turn_index} of ${turns.length}: ${turn.speaker_name} is ${transitionLabel}`;
     document.getElementById('live-speaker-status').textContent = statusText;
 
