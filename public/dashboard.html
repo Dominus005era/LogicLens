@@ -56,6 +56,10 @@
           <span class="sidebar-icon">📚</span>
           <span>Library</span>
         </div>
+        <div class="sidebar-link" data-target="reports" onclick="switchSidebarTab('reports')">
+          <span class="sidebar-icon">📄</span>
+          <span>Reports Vault</span>
+        </div>
         <div class="sidebar-link" data-target="analytics" onclick="switchSidebarTab('analytics')">
           <span class="sidebar-icon">📈</span>
           <span>Analytics</span>
@@ -289,7 +293,22 @@ Example: Whether school and colleges need proper uniform or not"></textarea>
         </div>
       </div>
 
-      <!-- 3. ANALYTICS SUB-PAGE (GLOBAL + INDIVIDUAL ANALYTICS) -->
+      <!-- 3. REPORTS VAULT SUB-PAGE (SEPARATE DEDICATED REPORTS VAULT) -->
+      <div id="reports-view" class="view-panel hidden">
+        <div class="workspace-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.75rem;">
+            <div>
+              <h2>📄 Formal Executive Reports Vault</h2>
+              <p style="color:var(--text-muted); margin-top:0.2rem;">Stored formal executive synthesis reports. Click any report card to view or export as a clean PDF.</p>
+            </div>
+          </div>
+
+          <!-- 4-Column Reports Grid -->
+          <div class="debates-grid" id="reports-grid-container"></div>
+        </div>
+      </div>
+
+      <!-- 4. ANALYTICS SUB-PAGE (GLOBAL + INDIVIDUAL ANALYTICS) -->
       <div id="analytics-view" class="view-panel hidden">
         <div class="workspace-card">
           <div style="margin-bottom:2rem;">
@@ -331,7 +350,7 @@ Example: Whether school and colleges need proper uniform or not"></textarea>
         </div>
       </div>
 
-      <!-- 4. INSIGHTS SUB-PAGE (KEY INSIGHTS POP-UP MODAL) -->
+      <!-- 5. INSIGHTS SUB-PAGE (KEY INSIGHTS POP-UP MODAL) -->
       <div id="insights-view" class="view-panel hidden">
         <div class="workspace-card">
           <div style="margin-bottom:2rem;">
@@ -344,7 +363,7 @@ Example: Whether school and colleges need proper uniform or not"></textarea>
         </div>
       </div>
 
-      <!-- 5. SETTINGS SUB-PAGE -->
+      <!-- 6. SETTINGS SUB-PAGE -->
       <div id="settings-view" class="view-panel hidden">
         <div class="workspace-card">
           <h2>⚙️ Dashboard Settings</h2>
@@ -404,18 +423,23 @@ Example: Whether school and colleges need proper uniform or not"></textarea>
     </div>
   </div>
 
-  <!-- FORMAL EXECUTIVE CONCLUSION SYNTHESIS REPORT MODAL -->
+  <!-- FORMAL EXECUTIVE CONCLUSION SYNTHESIS REPORT MODAL WITH PDF EXPORT -->
   <div class="conclusion-modal-overlay hidden" id="conclusion-modal">
-    <div class="conclusion-modal-card" style="max-width:850px;">
+    <div class="conclusion-modal-card" style="max-width:850px;" id="printable-report-card">
       <div class="modal-header">
         <div>
           <h3>📑 Deep Reasoning Synthesis & Executive Report</h3>
           <p style="font-size:0.88rem; color:var(--text-muted);">Formal objective consensus mapping participant behaviors and trade-offs.</p>
         </div>
-        <button class="modal-close-btn" onclick="closeConclusionModal()">✕</button>
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <button class="btn btn-secondary" onclick="exportReportToPDF()" style="border-color:var(--accent-indigo); font-size:0.85rem; padding:0.4rem 0.85rem;" title="Export report to PDF">
+            <span>📥 Export as PDF</span>
+          </button>
+          <button class="modal-close-btn" onclick="closeConclusionModal()">✕</button>
+        </div>
       </div>
 
-      <div style="padding:1.5rem 0; display:flex; flex-direction:column; gap:1.5rem; max-height:75vh; overflow-y:auto;">
+      <div style="padding:1.5rem 0; display:flex; flex-direction:column; gap:1.5rem; max-height:75vh; overflow-y:auto;" id="printable-report-content">
         
         <!-- Report Title & Score Badge -->
         <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-dark); padding:1.25rem; border-radius:var(--radius-md); border-left:4px solid var(--accent-indigo);">

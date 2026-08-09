@@ -190,7 +190,6 @@ function saveDebateToStorage(debateData) {
   if (!debateData || !debateData.topic) return;
   const stored = getStoredDebates();
   
-  // Check if topic already exists
   const existingIdx = stored.findIndex(d => d.topic.toLowerCase() === debateData.topic.toLowerCase());
   
   const newEntry = {
@@ -260,7 +259,6 @@ function applyTheme(theme) {
 
 // Sidebar Navigation Tabs (Stops TTS speech audio immediately on tab switch!)
 function switchSidebarTab(target) {
-  // Stop active speech audio immediately on page/tab navigation
   if (canvasStage) canvasStage.stopSpeech();
   if (window.speechSynthesis && window.speechSynthesis.speaking) {
     window.speechSynthesis.cancel();
@@ -284,6 +282,8 @@ function switchSidebarTab(target) {
 
   if (target === 'library') {
     renderLibraryView();
+  } else if (target === 'reports') {
+    renderReportsView();
   } else if (target === 'analytics') {
     renderAnalyticsView();
   } else if (target === 'insights') {
@@ -291,12 +291,11 @@ function switchSidebarTab(target) {
   }
 }
 
-// Delete Debate Card Helper (Deletes from storage & updates UI)
+// Delete Debate Card Helper
 function deleteDebateCard(evt, debateId) {
   if (evt) evt.stopPropagation();
   if (!confirm("Are you sure you want to delete this saved debate?")) return;
 
-  // Stop active speech if currently playing
   if (canvasStage) canvasStage.stopSpeech();
   if (window.speechSynthesis) window.speechSynthesis.cancel();
 
@@ -304,8 +303,8 @@ function deleteDebateCard(evt, debateId) {
   stored = stored.filter(d => d.id !== debateId);
   localStorage.setItem('logiclens_saved_debates', JSON.stringify(stored));
 
-  // Re-render current active view
   renderLibraryView();
+  renderReportsView();
   renderAnalyticsView();
   renderInsightsView();
 }
@@ -555,7 +554,6 @@ function filterLibraryCards() {
   `).join('');
 }
 
-// Re-Play Saved Debate on Round-Table Canvas Stage
 function loadSavedDebateIntoRoundTable(debateId) {
   const debates = getStoredDebates();
   const debate = debates.find(d => d.id === debateId);
@@ -583,12 +581,140 @@ function loadSavedDebateIntoRoundTable(debateId) {
 }
 
 // --------------------------------------------------------------------------
-// 📈 SUB-PAGE 2: ANALYTICS VIEW RENDERER (GLOBAL + INDIVIDUAL CARDS)
+// 📄 SUB-PAGE 2: REPORTS VAULT VIEW RENDERER (SEPARATE REPORTS VAULT PAGE)
+// --------------------------------------------------------------------------
+function renderReportsView() {
+  const grid = document.getElementById('reports-grid-container');
+  if (!grid) return;
+  const debates = getStoredDebates();
+
+  if (debates.length === 0) {
+    grid.innerHTML = '<p style="color:var(--text-muted); font-style:italic; grid-column:1/-1;">No reports found. Generate a debate to store executive reports!</p>';
+    return;
+  }
+
+  grid.innerHTML = debates.map(d => {
+    const score = d.attributed_conclusion?.discussion_quality_score || d.transcript_analysis?.coach?.overall_score || 88;
+    return `
+      <div class="debate-card" onclick="openReportModalForDebate('${d.id}')">
+        <div class="debate-card-img-wrap">
+          <button class="card-delete-btn" onclick="deleteDebateCard(event, '${d.id}')" title="Delete report">🗑️</button>
+          <img src="${d.coverImage || COVER_IMAGES[0]}" alt="Cover" class="debate-card-img" />
+          <span class="debate-card-mode-badge" style="background:rgba(79,70,229,0.9);">📄 ${score}/100 Score</span>
+        </div>
+        <div class="debate-card-body">
+          <h4 class="debate-card-title">${escapeHtml(d.topic)}</h4>
+          <div class="debate-card-footer">
+            <span>📅 ${escapeHtml(d.date || 'Recent')}</span>
+            <span style="color:var(--accent-indigo); font-weight:700;">Open Report →</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openReportModalForDebate(debateId) {
+  const debates = getStoredDebates();
+  const debate = debates.find(d => d.id === debateId);
+  if (!debate) return;
+
+  roundTableData = debate;
+  openConclusionModal();
+}
+
+// --------------------------------------------------------------------------
+// 📥 UNIVERSAL PDF EXPORT ENGINE (CLEAN PRINTING WITHOUT TEXT CLIPPING)
+// --------------------------------------------------------------------------
+function exportReportToPDF() {
+  if (!roundTableData || !roundTableData.attributed_conclusion) {
+    alert('No report data available to export.');
+    return;
+  }
+
+  const conc = roundTableData.attributed_conclusion;
+  const topic = roundTableData.topic;
+  const score = conc.discussion_quality_score || 88;
+  const date = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+  const personasHtml = (roundTableData.personas || []).map(p => `
+    <div style="background:#F8FAFC; border:1px solid #E2E8F0; padding:12px; border-radius:8px; margin-bottom:10px;">
+      <strong style="color:#1E293B; font-size:14px;">${escapeHtml(p.name)} (${escapeHtml(p.archetype)})</strong>
+      <div style="font-size:13px; color:#475569; margin-top:4px;">Behavior Tone: <strong>${escapeHtml(p.tone || 'Calm')}</strong> | Logic Rating: <strong>${p.logic_rating || 8}/10</strong></div>
+    </div>
+  `).join('');
+
+  const alignmentsHtml = (conc.agreement_mappings || []).map(m => `
+    <div style="background:#F0FDF4; border:1px solid #BBF7D0; padding:12px; border-radius:8px; margin-bottom:10px;">
+      <strong style="color:#166534; font-size:13px;">🤝 Alignment (${(m.persons || []).join(' & ')}):</strong>
+      <p style="font-size:13px; color:#1E293B; margin-top:4px;">${escapeHtml(m.common_point)}</p>
+    </div>
+  `).join('');
+
+  const printWindow = window.open('', '_blank', 'width=900,height=1000');
+  if (!printWindow) {
+    alert('Please allow pop-ups to download/print the PDF report.');
+    return;
+  }
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>LogicLens AI Executive Report - ${escapeHtml(topic)}</title>
+      <style>
+        body { font-family: 'Plus Jakarta Sans', Arial, sans-serif; padding: 40px; color: #0F172A; line-height: 1.6; }
+        .header-box { border-bottom: 3px solid #4F46E5; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .title { font-size: 22px; font-weight: 800; color: #1E293B; margin-top: 4px; }
+        .score-badge { font-size: 24px; font-weight: 800; color: #059669; background: #ECFDF5; padding: 8px 16px; border-radius: 8px; border: 1px solid #A7F3D0; }
+        .section-header { font-size: 15px; font-weight: 700; color: #4F46E5; text-transform: uppercase; letter-spacing: 0.05em; margin: 25px 0 10px; }
+        .summary-box { font-size: 14px; background: #F8FAFC; padding: 16px; border-radius: 8px; border: 1px solid #E2E8F0; }
+        .tradeoff-box { background: #FFFBEB; border: 1px solid #FDE68A; padding: 16px; border-radius: 8px; font-size: 14px; }
+        @media print {
+          body { padding: 20px; }
+          button { display: none; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header-box">
+        <div>
+          <div style="font-size:12px; color:#64748B; font-weight:700; text-transform:uppercase;">LogicLens AI Executive Reasoning Report • ${date}</div>
+          <div class="title">"${escapeHtml(topic)}"</div>
+        </div>
+        <div class="score-badge">${score} / 100</div>
+      </div>
+
+      <div class="section-header">1. Synthesized Consensus Verdict</div>
+      <div class="summary-box">${escapeHtml(conc.summary || '')}</div>
+
+      <div class="section-header">2. Participant Behavioral Profiles & Cognitive Logic Ratings</div>
+      ${personasHtml}
+
+      <div class="section-header">3. Attributed Common Ground Alignments</div>
+      ${alignmentsHtml}
+
+      <div class="section-header">4. Fundamental Dilemma & Strategic Trade-Off</div>
+      <div class="tradeoff-box">${escapeHtml(conc.core_tradeoffs || '')}</div>
+
+      <script>
+        window.onload = function() {
+          window.print();
+        };
+      </script>
+    </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+}
+
+// --------------------------------------------------------------------------
+// 📈 SUB-PAGE 3: ANALYTICS VIEW RENDERER (GLOBAL + INDIVIDUAL CARDS)
 // --------------------------------------------------------------------------
 function renderAnalyticsView() {
   const debates = getStoredDebates();
 
-  // 1. Calculate Aggregate Global Metrics
   const totalCount = debates.length;
   let totalScoreSum = 0;
   debates.forEach(d => {
@@ -602,7 +728,6 @@ function renderAnalyticsView() {
   document.getElementById('stat-consensus-rate').textContent = `100%`;
   document.getElementById('stat-top-parameter').textContent = `Empirical Data`;
 
-  // 2. Render Individual Debate Analytics Cards
   const grid = document.getElementById('analytics-grid-container');
   if (!grid) return;
 
@@ -641,13 +766,12 @@ function openIndividualDebateAnalytics(debateId) {
 
   renderTopicTranscriptAnalysis(debate.transcript_analysis);
   
-  // Toggle to transcript analysis view directly
   isAnalysisViewActive = false;
   toggleTranscriptAnalysisView();
 }
 
 // --------------------------------------------------------------------------
-// 💡 SUB-PAGE 3: INSIGHTS VIEW RENDERER (KEY INSIGHTS MODAL POP-UP)
+// 💡 SUB-PAGE 4: INSIGHTS VIEW RENDERER (KEY INSIGHTS MODAL POP-UP)
 // --------------------------------------------------------------------------
 function renderInsightsView() {
   const grid = document.getElementById('insights-grid-container');
@@ -698,9 +822,7 @@ function closeInsightsModal() {
   document.getElementById('insights-modal').classList.add('hidden');
 }
 
-// --------------------------------------------------------------------------
 // TRANSCRIPT ANALYSIS METRICS RENDERER
-// --------------------------------------------------------------------------
 function renderTopicTranscriptAnalysis(analysis) {
   if (!analysis) return;
 
