@@ -748,8 +748,46 @@ function toggleTranscriptAnalysisView() {
 }
 
 // --------------------------------------------------------------------------
-// 📚 SUB-PAGE 1: LIBRARY VIEW RENDERER (SAVED DEBATES VAULT)
+// 📚 SUB-PAGE 1: LIBRARY VIEW RENDERER & RE-PLAY CONFIRMATION MODAL
 // --------------------------------------------------------------------------
+let pendingReplayDebateId = null;
+
+function openReplayModalForDebate(debateId) {
+  const debates = getStoredDebates();
+  const debate = debates.find(d => d.id === debateId);
+  if (!debate) return;
+
+  pendingReplayDebateId = debateId;
+
+  document.getElementById('replay-modal-topic').textContent = debate.topic;
+  document.getElementById('replay-modal-date').textContent = `📅 ${debate.date || 'Recent'}`;
+  document.getElementById('replay-modal-mode').textContent = debate.mode === 'calm' ? '🕊️ Calm Rewrite' : '🗣️ Deep Discussion';
+
+  const modal = document.getElementById('replay-confirm-modal');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeReplayModal() {
+  const modal = document.getElementById('replay-confirm-modal');
+  if (modal) modal.classList.add('hidden');
+  pendingReplayDebateId = null;
+}
+
+function confirmStartReplay() {
+  // Direct User Gesture: Unlocks browser AudioContext & SpeechSynthesis 100%!
+  if (window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.resume();
+  }
+
+  const debateIdToLoad = pendingReplayDebateId;
+  closeReplayModal();
+
+  if (debateIdToLoad) {
+    loadSavedDebateIntoRoundTable(debateIdToLoad);
+  }
+}
+
 function renderLibraryView() {
   const grid = document.getElementById('library-grid-container');
   if (!grid) return;
@@ -761,7 +799,7 @@ function renderLibraryView() {
   }
 
   grid.innerHTML = debates.map(d => `
-    <div class="debate-card" onclick="loadSavedDebateIntoRoundTable('${d.id}')">
+    <div class="debate-card" onclick="openReplayModalForDebate('${d.id}')">
       <div class="debate-card-img-wrap">
         <button class="card-delete-btn" onclick="deleteDebateCard(event, '${d.id}')" title="Delete debate">🗑️</button>
         <img src="${d.coverImage || COVER_IMAGES[0]}" alt="Cover" class="debate-card-img" />
@@ -787,7 +825,7 @@ function filterLibraryCards() {
   if (!grid) return;
 
   grid.innerHTML = filtered.map(d => `
-    <div class="debate-card" onclick="loadSavedDebateIntoRoundTable('${d.id}')">
+    <div class="debate-card" onclick="openReplayModalForDebate('${d.id}')">
       <div class="debate-card-img-wrap">
         <button class="card-delete-btn" onclick="deleteDebateCard(event, '${d.id}')" title="Delete debate">🗑️</button>
         <img src="${d.coverImage || COVER_IMAGES[0]}" alt="Cover" class="debate-card-img" />

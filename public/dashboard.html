@@ -666,6 +666,41 @@ Example: Whether school and colleges need proper uniform or not"></textarea>
     </div>
   </div>
 
+  <!-- MINI RE-PLAY CONFIRMATION POP-UP MODAL FOR LIBRARY CARDS ONLY -->
+  <div class="conclusion-modal-overlay hidden" id="replay-confirm-modal">
+    <div class="conclusion-modal-card" style="max-width:540px; border-top:4px solid var(--accent-indigo);">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <span style="font-size:1.5rem;">▶️</span>
+          <h3>Re-Play Round-Table Discussion</h3>
+        </div>
+        <button class="modal-close-btn" onclick="closeReplayModal()">✕</button>
+      </div>
+
+      <div style="padding:1.25rem 0; display:flex; flex-direction:column; gap:1.1rem;">
+        <div style="background:var(--bg-dark); padding:1.1rem; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+          <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--accent-indigo); font-weight:700;">Selected Debate Topic</span>
+          <h4 id="replay-modal-topic" style="font-size:1.1rem; margin-top:0.25rem; color:var(--text-main);">Topic Title</h4>
+          <div style="display:flex; gap:0.75rem; align-items:center; margin-top:0.6rem;">
+            <span id="replay-modal-mode" class="badge-tag" style="background:rgba(79,70,229,0.15); color:var(--accent-indigo);">🗣️ Deep Discussion</span>
+            <span id="replay-modal-date" style="font-size:0.82rem; color:var(--text-muted);">📅 Aug 8, 2026</span>
+          </div>
+        </div>
+
+        <p style="font-size:0.86rem; color:var(--text-muted); line-height:1.5;">
+          Clicking start will transition to the 3D Canvas Stage on Dashboard and stream all persona voice speeches out loud in real-time.
+        </p>
+
+        <div style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:0.4rem;">
+          <button class="btn btn-secondary" onclick="closeReplayModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="confirmStartReplay()" style="background:var(--accent-indigo); border-color:var(--accent-indigo);">
+            ▶️ Start Re-Play Discussion
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="canvas-roundtable.js"></script>
   <script src="dashboard.js"></script>
 </body>
