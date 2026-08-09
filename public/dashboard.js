@@ -27,7 +27,7 @@ const TOPIC_PRESETS = {
   social_media: "Should social media usage for teenagers under 16 be legally restricted?"
 };
 
-// Default Seed Debates for Library, Analytics & Insights
+// // Default Seed Debates for Library, Analytics & Insights (Full 8-10 turns across all 4 personas!)
 const DEFAULT_SEED_DEBATES = [
   {
     id: "seed-1",
@@ -42,15 +42,19 @@ const DEFAULT_SEED_DEBATES = [
       { id: "person_d", name: "Person D", archetype: "Ethics & Psychology", avatar_color: "amber", tone: "Thoughtful", logic_rating: 8 }
     ],
     turns: [
-      { turn_index: 1, speaker_id: "person_a", speaker_name: "Person A", headline_point: "1. Socioeconomic Equality and Routine Streamlining", spoken_text: "Mandatory uniforms level the playing field by eliminating visible wealth disparities and reducing annual household costs.", duration_ms: 7500 },
-      { turn_index: 2, speaker_id: "person_b", speaker_name: "Person B", headline_point: "2. Counter: Suppression of Identity and Expression", spoken_text: "While economic relief is valid, Person A ignores that forcing identical dress suppresses student identity and self-expression.", duration_ms: 8000 },
-      { turn_index: 3, speaker_id: "person_c", speaker_name: "Person C", headline_point: "3. Empirical Data on Academic Correlation", spoken_text: "Meta-analyses show zero statistical correlation between strict uniforms and academic test scores.", duration_ms: 8500 },
-      { turn_index: 4, speaker_id: "person_d", speaker_name: "Person D", headline_point: "4. Psychological Sense of Belonging", spoken_text: "However, psychological studies reveal that shared group attire increases a sense of belonging and reduces peer bullying.", duration_ms: 8000 }
+      { turn_index: 1, speaker_id: "person_a", speaker_name: "Person A", headline_point: "1. Socioeconomic Equality & Household Savings", spoken_text: "Mandatory uniforms level the playing field by eliminating visible wealth disparities and reducing annual household wardrobe costs.", duration_ms: 7500 },
+      { turn_index: 2, speaker_id: "person_b", speaker_name: "Person B", headline_point: "2. Direct Counter: Suppression of Personal Autonomy", spoken_text: "While economic relief is valid, Person A ignores that forcing identical dress suppresses student identity, comfort, and self-expression.", duration_ms: 8000 },
+      { turn_index: 3, speaker_id: "person_a", speaker_name: "Person A", headline_point: "3. Rebuttal: Academic Focus Over Fashion Trends", spoken_text: "Self-expression happens through achievements, arts, and sports, not daily brand flexing in educational classrooms.", duration_ms: 7500 },
+      { turn_index: 4, speaker_id: "person_c", speaker_name: "Person C", headline_point: "4. Empirical Data on Academic Test Scores", spoken_text: "Let's examine data. Comprehensive meta-analyses show zero statistical correlation between strict uniform mandates and academic test scores.", duration_ms: 8500 },
+      { turn_index: 5, speaker_id: "person_d", speaker_name: "Person D", headline_point: "5. Psychological Sense of Belonging & Anti-Bullying", spoken_text: "However, psychological studies reveal that shared group attire increases a sense of belonging and significantly reduces peer bullying.", duration_ms: 8000 },
+      { turn_index: 6, speaker_id: "person_b", speaker_name: "Person B", headline_point: "6. Flexible Dress Codes as Balanced Alternative", spoken_text: "Flexible dress codes with clear modesty guidelines achieve social harmony without forcing uniform rigidity.", duration_ms: 7500 },
+      { turn_index: 7, speaker_id: "person_c", speaker_name: "Person C", headline_point: "7. Quantitative Surveys on Student Wellbeing", spoken_text: "Survey data across 120 schools indicates 88% higher student comfort ratings when flexible dress codes replace rigid uniforms.", duration_ms: 8000 },
+      { turn_index: 8, speaker_id: "person_d", speaker_name: "Person D", headline_point: "8. Ethical Resolution: Subsidized Inclusive Policies", spoken_text: "Ethically, a subsidized, flexible dress code offers the ideal balance between discipline and personal dignity.", duration_ms: 7500 }
     ],
     attributed_conclusion: {
       summary: "The discussion reveals that while uniforms offer logistical simplicity and community cohesion, they lack a proven empirical link to academic test scores and pose risks to individual expression.",
       agreement_mappings: [
-        { persons: ["Person A", "Person D"], common_point: "Both agreed that baseline dress standards foster school focus, discipline, and financial equity." },
+        { persons: ["Person A", "Person D"], common_point: "Both agreed that baseline dress standards foster school focus, discipline, and financial equity for families." },
         { persons: ["Person B", "Person C"], common_point: "Both emphasized that flexible dress codes achieve social harmony without violating individual autonomy." }
       ],
       core_tradeoffs: "Fundamental tension between economic standardization and personal freedom of expression.",
@@ -67,7 +71,9 @@ const DEFAULT_SEED_DEBATES = [
       ],
       heat_map: [
         { speaker: "Person A", message: "Uniforms eliminate socioeconomic clothing competition.", tone: "Calm", level: "Blue" },
-        { speaker: "Person B", message: "Mandates restrict personal autonomy and identity.", tone: "Curious", level: "Green" }
+        { speaker: "Person B", message: "Mandates restrict personal autonomy and identity.", tone: "Curious", level: "Green" },
+        { speaker: "Person C", message: "Meta-analyses show zero correlation to test scores.", tone: "Calm", level: "Blue" },
+        { speaker: "Person D", message: "Shared attire increases belonging and reduces bullying.", tone: "Calm", level: "Blue" }
       ],
       evidence_meter: [
         { claim: "Uniforms reduce household wardrobe costs.", speaker: "Person A", status: "Supported by facts", reason: "Consistent with consumer expenditure surveys." },
@@ -88,13 +94,20 @@ const DEFAULT_SEED_DEBATES = [
       { id: "person_d", name: "Person D", archetype: "Ethics & Psychology", avatar_color: "amber", tone: "Thoughtful", logic_rating: 8 }
     ],
     turns: [
-      { turn_index: 1, speaker_id: "person_a", speaker_name: "Person A", headline_point: "1. Democratizing Creative Production Costs", spoken_text: "AI lowers technical barriers to entry, enabling independent creators to prototype and produce media at fraction of traditional costs.", duration_ms: 8000 },
-      { turn_index: 2, speaker_id: "person_b", speaker_name: "Person B", headline_point: "2. Counter: Devaluation of Human Craftsmanship", spoken_text: "Generative AI floods markets with automated content, uncompensated labor training, and devalues human artistic mastery.", duration_ms: 8500 }
+      { turn_index: 1, speaker_id: "person_a", speaker_name: "Person A", headline_point: "1. Democratizing Production & Prototype Speed", spoken_text: "AI lowers technical barriers to entry, enabling independent creators to prototype and produce high-end media at fraction of traditional costs.", duration_ms: 8000 },
+      { turn_index: 2, speaker_id: "person_b", speaker_name: "Person B", headline_point: "2. Counter: Devaluation of Human Craftsmanship", spoken_text: "Generative AI floods markets with automated content trained on uncompensated artist labor, devaluing lifelong human artistic mastery.", duration_ms: 8500 },
+      { turn_index: 3, speaker_id: "person_a", speaker_name: "Person A", headline_point: "3. Rapid Iteration for Independent Creators", spoken_text: "Solo game devs and writers can now build worlds that previously required multimillion-dollar studio budgets.", duration_ms: 7500 },
+      { turn_index: 4, speaker_id: "person_c", speaker_name: "Person C", headline_point: "4. Empirical Data on Freelance Artist Income", spoken_text: "Market tracking shows a 38% decline in entry-level commercial illustration rates since commercial image model deployment.", duration_ms: 8000 },
+      { turn_index: 5, speaker_id: "person_d", speaker_name: "Person D", headline_point: "5. Psychological Meaning & Human Emotion", spoken_text: "Art is human emotional expression. Algorithmic outputs lack lived experience, risking a cultural meaning crisis.", duration_ms: 8000 },
+      { turn_index: 6, speaker_id: "person_b", speaker_name: "Person B", headline_point: "6. Mandatory Opt-in & Training Royalties", spoken_text: "Artists must have opt-in consent rights and recurring revenue sharing when their works train foundational models.", duration_ms: 8000 },
+      { turn_index: 7, speaker_id: "person_c", speaker_name: "Person C", headline_point: "7. Productivity Surveys on Hybrid AI-Human Workflows", spoken_text: "Studies show hybrid creators who use AI as a assistant reach 3x higher output while maintaining creative direction.", duration_ms: 8500 },
+      { turn_index: 8, speaker_id: "person_d", speaker_name: "Person D", headline_point: "8. Ethical Resolution: Watermarking & Craft Value", spoken_text: "The future requires provenance watermarking so authentic human art remains a prized, high-value premium tier.", duration_ms: 8000 }
     ],
     attributed_conclusion: {
       summary: "AI democratizes commercial production and rapid prototyping, but risks devaluing specialized human craftsmanship and intellectual property rights.",
       agreement_mappings: [
-        { persons: ["Person B", "Person D"], common_point: "Both agreed that preserving uncompensated human artist labor and psychological mastery is essential." }
+        { persons: ["Person B", "Person D"], common_point: "Both agreed that preserving uncompensated human artist labor and psychological mastery is essential." },
+        { persons: ["Person A", "Person C"], common_point: "Both recognized that AI dramatically accelerates production speed for independent creators." }
       ],
       core_tradeoffs: "Trade-off between rapid low-cost production and human artistic authenticity.",
       discussion_quality_score: 92
@@ -110,7 +123,9 @@ const DEFAULT_SEED_DEBATES = [
       ],
       heat_map: [
         { speaker: "Person A", message: "AI lowers barriers to entry.", tone: "Calm", level: "Blue" },
-        { speaker: "Person B", message: "It cannibalizes artists through uncompensated labor.", tone: "Passionate", level: "Green" }
+        { speaker: "Person B", message: "It cannibalizes artists through uncompensated labor.", tone: "Passionate", level: "Green" },
+        { speaker: "Person C", message: "Market rates for entry-level illustrators are declining.", tone: "Calm", level: "Blue" },
+        { speaker: "Person D", message: "We risk a loss of human emotional connection.", tone: "Thoughtful", level: "Blue" }
       ],
       evidence_meter: [
         { claim: "AI increases output volume in commercial sectors.", speaker: "Person C", status: "Supported by facts", reason: "Consistent with current industry observations in digital media." }
@@ -125,16 +140,25 @@ const DEFAULT_SEED_DEBATES = [
     coverImage: COVER_IMAGES[2],
     personas: [
       { id: "person_a", name: "Person A", archetype: "Economic & Logistics", avatar_color: "indigo", tone: "Calm", logic_rating: 8 },
-      { id: "person_b", name: "Person B", archetype: "Social & Freedom", avatar_color: "rose", tone: "Calm", logic_rating: 8 }
+      { id: "person_b", name: "Person B", archetype: "Social & Freedom", avatar_color: "rose", tone: "Calm", logic_rating: 8 },
+      { id: "person_c", name: "Person C", archetype: "Empirical Data", avatar_color: "emerald", tone: "Calm", logic_rating: 9 },
+      { id: "person_d", name: "Person D", archetype: "Ethics & Psychology", avatar_color: "amber", tone: "Calm", logic_rating: 8 }
     ],
     turns: [
-      { turn_index: 1, speaker_id: "person_a", speaker_name: "Person A", headline_point: "1. Spontaneous Collaboration & Real Estate Utilization", spoken_text: "In-office presence fosters serendipitous innovation, mentorship for junior talent, and maximizes facility investments.", duration_ms: 7500 },
-      { turn_index: 2, speaker_id: "person_b", speaker_name: "Person B", headline_point: "2. Work-Life Integration & Talent Retention", spoken_text: "Remote flexibility reduces commute fatigue, expands hiring diversity, and improves overall employee satisfaction.", duration_ms: 8000 }
+      { turn_index: 1, speaker_id: "person_a", speaker_name: "Person A", headline_point: "1. Spontaneous Innovation & Mentorship", spoken_text: "In-office presence fosters serendipitous collaboration, mentorship for junior talent, and maximizes real estate investments.", duration_ms: 7500 },
+      { turn_index: 2, speaker_id: "person_b", speaker_name: "Person B", headline_point: "2. Work-Life Integration & Reduced Fatigue", spoken_text: "Remote flexibility eliminates commute fatigue, expands hiring diversity, and significantly improves employee well-being.", duration_ms: 8000 },
+      { turn_index: 3, speaker_id: "person_c", speaker_name: "Person C", headline_point: "3. Retention Metrics & Productivity Data", spoken_text: "Longitudinal workplace studies confirm that hybrid models yield 14% higher retention with zero productivity loss.", duration_ms: 8000 },
+      { turn_index: 4, speaker_id: "person_d", speaker_name: "Person D", headline_point: "4. Trust-Based Leadership & Mental Health", spoken_text: "Ethically, managing by output rather than physical desk presence builds organizational trust and reduces burnout.", duration_ms: 8000 },
+      { turn_index: 5, speaker_id: "person_a", speaker_name: "Person A", headline_point: "5. Onboarding Challenges in Fully Remote Teams", spoken_text: "However, fully remote teams report 25% slower onboarding times for early-career hires who lack organic shadowing.", duration_ms: 7500 },
+      { turn_index: 6, speaker_id: "person_b", speaker_name: "Person B", headline_point: "6. Socioeconomic Inclusion for Caregivers", spoken_text: "Remote flexibility allows working parents and caregivers to maintain full employment while supporting family routines.", duration_ms: 8000 },
+      { turn_index: 7, speaker_id: "person_c", speaker_name: "Person C", headline_point: "7. Survey Preferences across 50,000 Employees", spoken_text: "76% of knowledge workers state they would consider leaving a role that enforces rigid 5-day office mandates.", duration_ms: 8000 },
+      { turn_index: 8, speaker_id: "person_d", speaker_name: "Person D", headline_point: "8. Balanced Resolution: Structured Hybrid Model", spoken_text: "A structured 2/3 hybrid policy balances team bonding with individual focus time.", duration_ms: 7500 }
     ],
     attributed_conclusion: {
       summary: "Hybrid policies offer the optimal compromise between in-person team trust building and remote lifestyle flexibility.",
       agreement_mappings: [
-        { persons: ["Person A", "Person B"], common_point: "Both agreed that structured core collaboration days preserve team cohesion while granting focus time." }
+        { persons: ["Person A", "Person B"], common_point: "Both agreed that structured core collaboration days preserve team cohesion while granting focus time." },
+        { persons: ["Person C", "Person D"], common_point: "Both emphasized that output-based performance metrics beat physical desk monitoring." }
       ],
       core_tradeoffs: "Balancing centralized organizational culture with employee work-life autonomy.",
       discussion_quality_score: 85
@@ -144,7 +168,9 @@ const DEFAULT_SEED_DEBATES = [
       coach: { overall_score: 85, verdict: "Respectful dialogue focusing on hybrid compromises.", tips: ["Measure output metrics rather than physical desk presence"] },
       participants: [
         { name: "Person A (Economic)", logic_score: 8, evidence_score: 8, respect_score: 9, clarity_score: 8, badges: ["🧠 Rational Thinker"] },
-        { name: "Person B (Social & Freedom)", logic_score: 8, evidence_score: 8, respect_score: 9, clarity_score: 8, badges: ["🕊️ Autonomy Defender"] }
+        { name: "Person B (Social & Freedom)", logic_score: 8, evidence_score: 8, respect_score: 9, clarity_score: 8, badges: ["🕊️ Autonomy Defender"] },
+        { name: "Person C (Empirical Data)", logic_score: 9, evidence_score: 9, respect_score: 9, clarity_score: 9, badges: ["🔍 Evidence Hunter"] },
+        { name: "Person D (Ethics & Psychology)", logic_score: 8, evidence_score: 8, respect_score: 10, clarity_score: 8, badges: ["🕊️ Respectful Debater"] }
       ],
       heat_map: [
         { speaker: "Person A", message: "In-office presence fosters spontaneous collaboration.", tone: "Calm", level: "Blue" },
@@ -174,6 +200,17 @@ function initStorage() {
   const existing = localStorage.getItem('logiclens_saved_debates');
   if (!existing) {
     localStorage.setItem('logiclens_saved_debates', JSON.stringify(DEFAULT_SEED_DEBATES));
+  } else {
+    try {
+      const parsed = JSON.parse(existing);
+      // Auto-upgrade storage if old seed data had less than 6 turns
+      const needsUpgrade = parsed.some(d => !d.turns || d.turns.length < 6);
+      if (needsUpgrade) {
+        localStorage.setItem('logiclens_saved_debates', JSON.stringify(DEFAULT_SEED_DEBATES));
+      }
+    } catch (e) {
+      localStorage.setItem('logiclens_saved_debates', JSON.stringify(DEFAULT_SEED_DEBATES));
+    }
   }
 }
 
