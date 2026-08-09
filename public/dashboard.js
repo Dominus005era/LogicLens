@@ -338,10 +338,12 @@ function saveDebateToStorage(debateData) {
   
   const existingIdx = stored.findIndex(d => d.topic.toLowerCase() === debateData.topic.toLowerCase());
   
+  const settings = getSavedSettings();
   const newEntry = {
     id: `debate-${Date.now()}`,
     topic: debateData.topic,
     mode: currentMode,
+    durationMinutes: debateData.durationMinutes || settings.discussionDurationMinutes || 1,
     date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
     coverImage: COVER_IMAGES[stored.length % COVER_IMAGES.length],
     personas: debateData.personas || [],
@@ -403,11 +405,12 @@ function applyTheme(theme) {
   localStorage.setItem('logiclens_theme', theme);
 }
 
-// Sidebar Navigation Tabs (Stops TTS speech audio immediately on tab switch!)
+let isDiscussionPaused = false;
+
+// Sidebar Navigation Tabs (Pauses live discussion & TTS speech audio immediately on tab switch!)
 function switchSidebarTab(target) {
-  if (canvasStage) canvasStage.stopSpeech();
-  if (window.speechSynthesis && window.speechSynthesis.speaking) {
-    window.speechSynthesis.cancel();
+  if (target !== 'dashboard') {
+    pauseDiscussion();
   }
 
   document.querySelectorAll('.sidebar-link').forEach(link => {
@@ -435,6 +438,56 @@ function switchSidebarTab(target) {
   } else if (target === 'insights') {
     renderInsightsView();
   }
+}
+
+// Discussion Pause / Resume Control Engine
+function toggleDiscussionPause() {
+  if (isDiscussionPaused) {
+    resumeDiscussion();
+  } else {
+    pauseDiscussion();
+  }
+}
+
+function pauseDiscussion() {
+  isDiscussionPaused = true;
+  if (canvasStage) canvasStage.stopSpeech();
+  if (window.speechSynthesis && window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+  }
+
+  const pauseBtn = document.getElementById('pause-resume-btn');
+  if (pauseBtn) pauseBtn.innerHTML = '<span>▶️ Resume</span>';
+
+  const liveTag = document.getElementById('live-indicator-tag');
+  if (liveTag) {
+    liveTag.style.background = 'rgba(217,119,6,0.15)';
+    liveTag.style.color = 'var(--accent-amber)';
+    liveTag.textContent = '⏸️ PAUSED';
+  }
+
+  const statusEl = document.getElementById('live-speaker-status');
+  if (statusEl && activeTurnIndex < (roundTableData?.turns?.length || 0)) {
+    statusEl.textContent = `Discussion paused at Turn ${activeTurnIndex + 1}. Click ▶️ Resume to continue playback.`;
+  }
+}
+
+function resumeDiscussion() {
+  if (!roundTableData || !roundTableData.turns) return;
+  isDiscussionPaused = false;
+
+  const pauseBtn = document.getElementById('pause-resume-btn');
+  if (pauseBtn) pauseBtn.innerHTML = '<span>⏸️ Pause</span>';
+
+  const liveTag = document.getElementById('live-indicator-tag');
+  if (liveTag) {
+    liveTag.style.background = 'rgba(220,38,38,0.15)';
+    liveTag.style.color = 'var(--accent-rose)';
+    liveTag.textContent = '🔴 LIVE DEBATE STREAMING';
+  }
+
+  // Resume turn-by-turn playback from current active turn index
+  runSequentialTurn();
 }
 
 // Delete Debate Card Helper
@@ -672,6 +725,7 @@ function renderLibraryView() {
         <button class="card-delete-btn" onclick="deleteDebateCard(event, '${d.id}')" title="Delete debate">🗑️</button>
         <img src="${d.coverImage || COVER_IMAGES[0]}" alt="Cover" class="debate-card-img" />
         <span class="debate-card-mode-badge">${d.mode === 'calm' ? '🕊️ Calm Rewrite' : '🗣️ Deep Discussion'}</span>
+        <span class="debate-card-duration-badge">⏱️ ${d.durationMinutes || 1} Min</span>
       </div>
       <div class="debate-card-body">
         <h4 class="debate-card-title">${escapeHtml(d.topic)}</h4>
@@ -698,6 +752,7 @@ function filterLibraryCards() {
         <button class="card-delete-btn" onclick="deleteDebateCard(event, '${d.id}')" title="Delete debate">🗑️</button>
         <img src="${d.coverImage || COVER_IMAGES[0]}" alt="Cover" class="debate-card-img" />
         <span class="debate-card-mode-badge">${d.mode === 'calm' ? '🕊️ Calm Rewrite' : '🗣️ Deep Discussion'}</span>
+        <span class="debate-card-duration-badge">⏱️ ${d.durationMinutes || 1} Min</span>
       </div>
       <div class="debate-card-body">
         <h4 class="debate-card-title">${escapeHtml(d.topic)}</h4>
@@ -730,6 +785,7 @@ function loadSavedDebateIntoRoundTable(debateId) {
 
   if (canvasStage) {
     canvasStage.setTopic(debate.topic);
+    canvasStage.updatePersonas(debate.personas);
   }
 
   renderTopicTranscriptAnalysis(debate.transcript_analysis);
@@ -757,6 +813,7 @@ function renderReportsView() {
           <button class="card-delete-btn" onclick="deleteDebateCard(event, '${d.id}')" title="Delete report">🗑️</button>
           <img src="${d.coverImage || COVER_IMAGES[0]}" alt="Cover" class="debate-card-img" />
           <span class="debate-card-mode-badge" style="background:rgba(79,70,229,0.9);">📄 ${score}/100 Score</span>
+          <span class="debate-card-duration-badge">⏱️ ${d.durationMinutes || 1} Min</span>
         </div>
         <div class="debate-card-body">
           <h4 class="debate-card-title">${escapeHtml(d.topic)}</h4>
@@ -895,6 +952,7 @@ function renderAnalyticsView() {
           <button class="card-delete-btn" onclick="deleteDebateCard(event, '${d.id}')" title="Delete debate">🗑️</button>
           <img src="${d.coverImage || COVER_IMAGES[0]}" alt="Cover" class="debate-card-img" />
           <span class="debate-card-mode-badge" style="background:rgba(5,150,105,0.9);">${score}/100 Score</span>
+          <span class="debate-card-duration-badge">⏱️ ${d.durationMinutes || 1} Min</span>
         </div>
         <div class="debate-card-body">
           <h4 class="debate-card-title">${escapeHtml(d.topic)}</h4>
@@ -940,6 +998,7 @@ function renderInsightsView() {
         <button class="card-delete-btn" onclick="deleteDebateCard(event, '${d.id}')" title="Delete debate">🗑️</button>
         <img src="${d.coverImage || COVER_IMAGES[0]}" alt="Cover" class="debate-card-img" />
         <span class="debate-card-mode-badge" style="background:rgba(217,119,6,0.9);">💡 Insights</span>
+        <span class="debate-card-duration-badge">⏱️ ${d.durationMinutes || 1} Min</span>
       </div>
       <div class="debate-card-body">
         <h4 class="debate-card-title">${escapeHtml(d.topic)}</h4>

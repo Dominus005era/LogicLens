@@ -145,9 +145,9 @@ class CanvasRoundTable {
     ctx.fillStyle = wallGrad;
     ctx.fillRect(0, 0, w, h * 0.45);
 
-    // 2. High Wall-Mounted Presentation TV Screen (Positioned high up at y = 0.02 to avoid colliding with Person A & B)
-    const tvW = w * 0.46;
-    const tvH = h * 0.18;
+    // 2. High Wall-Mounted Presentation TV Screen (Spacious multiline display)
+    const tvW = w * 0.54;
+    const tvH = h * 0.22;
     const tvX = (w - tvW) / 2;
     const tvY = h * 0.02;
 
@@ -157,15 +157,34 @@ class CanvasRoundTable {
     ctx.lineWidth = 3;
     ctx.strokeRect(tvX, tvY, tvW, tvH);
 
-    // TV Screen Text
+    // TV Screen Header Tag
     ctx.fillStyle = '#38BDF8';
     ctx.font = 'bold 11px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('LIVE ROUND-TABLE DEBATE SCREEN', w * 0.5, tvY + 20);
+    ctx.fillText('LIVE ROUND-TABLE DEBATE SCREEN', w * 0.5, tvY + 18);
 
+    // Multiline Full Topic Display (No truncation, zero cut-offs!)
     ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 13px sans-serif';
-    ctx.fillText(`"${this.truncate(this.topicText, 48)}"`, w * 0.5, tvY + 45);
+    ctx.font = 'bold 12px sans-serif';
+    
+    const words = `"${this.topicText}"`.split(' ');
+    let line = '';
+    let startY = tvY + 36;
+    const maxLineW = tvW - 24;
+    const lineHeight = 16;
+
+    for (let n = 0; n < words.length; n++) {
+      const testLine = line + words[n] + ' ';
+      const metrics = ctx.measureText(testLine);
+      if (metrics.width > maxLineW && n > 0) {
+        ctx.fillText(line.trim(), w * 0.5, startY);
+        line = words[n] + ' ';
+        startY += lineHeight;
+      } else {
+        line = testLine;
+      }
+    }
+    ctx.fillText(line.trim(), w * 0.5, startY);
 
     // Glass Window Lines (Behind TV)
     ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.08)';

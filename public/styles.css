@@ -1044,6 +1044,20 @@ h1, h2, h3, h4 { font-family: var(--font-heading); letter-spacing: -0.02em; }
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
+.debate-card-duration-badge {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  background: rgba(217, 119, 6, 0.9);
+  backdrop-filter: blur(8px);
+  color: #FFF;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
 .card-delete-btn {
   position: absolute;
   top: 0.75rem;

@@ -176,8 +176,9 @@ Example: Whether school and colleges need proper uniform or not"></textarea>
 
             <!-- Live Discussion Feed & Action Hub -->
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; background:var(--bg-dark); padding:1rem 1.5rem; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
-              <div style="display:flex; align-items:center; gap:0.75rem;">
+              <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
                 <span class="badge-tag" id="live-indicator-tag" style="background:rgba(220,38,38,0.15); color:var(--accent-rose);">🔴 LIVE DEBATE STREAMING</span>
+                <button class="btn btn-secondary" id="pause-resume-btn" onclick="toggleDiscussionPause()" style="padding:0.35rem 0.75rem; font-size:0.85rem; border-color:var(--accent-amber);">⏸️ Pause</button>
                 <span id="live-speaker-status" style="font-size:0.9rem; font-weight:600; color:var(--text-main);">Person A is introducing their core thesis...</span>
               </div>
 
