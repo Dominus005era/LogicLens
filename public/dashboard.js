@@ -414,9 +414,18 @@ function applyTheme(theme) {
   localStorage.setItem('logiclens_theme', theme);
 }
 
+let currentActiveTab = 'dashboard';
+let currentStreamSessionId = 0;
+
 // Sidebar Navigation Tabs (Stops TTS speech audio & turn progression immediately on tab switch!)
 function switchSidebarTab(target) {
-  if (liveStreamTimer) clearTimeout(liveStreamTimer);
+  currentActiveTab = target;
+  currentStreamSessionId++; // Invalidate any running background stream session!
+
+  if (liveStreamTimer) {
+    clearTimeout(liveStreamTimer);
+    liveStreamTimer = null;
+  }
   if (canvasStage) canvasStage.stopSpeech();
   if (window.speechSynthesis) window.speechSynthesis.cancel();
 
@@ -592,13 +601,20 @@ function showError(msg) {
 function startSequentialLiveStream(turns) {
   if (!turns || turns.length === 0) return;
   activeTurnIndex = 0;
+  const sessionInstanceId = ++currentStreamSessionId;
 
   const runNextTurn = () => {
+    // Abort turn execution if user switched tabs or session was invalidated!
+    if (sessionInstanceId !== currentStreamSessionId || currentActiveTab !== 'dashboard') {
+      return;
+    }
+
     if (activeTurnIndex >= turns.length) {
       document.getElementById('live-speaker-status').textContent = 'Discussion wrapping up... personas synthesizing common ground.';
       
       // Graceful 2.5-second ambient room pause after the final speaker finishes
       setTimeout(() => {
+        if (sessionInstanceId !== currentStreamSessionId || currentActiveTab !== 'dashboard') return;
         if (canvasStage) {
           canvasStage.setDebateEnded(true);
         }
@@ -630,6 +646,7 @@ function startSequentialLiveStream(turns) {
 
     let turnAdvanced = false;
     const advanceTurn = () => {
+      if (sessionInstanceId !== currentStreamSessionId || currentActiveTab !== 'dashboard') return;
       if (turnAdvanced) return;
       turnAdvanced = true;
       activeTurnIndex++;
@@ -639,7 +656,7 @@ function startSequentialLiveStream(turns) {
     if (canvasStage) {
       canvasStage.setActiveSpeaker(speakerId, turn.headline_point, turn.spoken_text, advanceTurn);
     } else {
-      setTimeout(advanceTurn, 8000);
+      liveStreamTimer = setTimeout(advanceTurn, 8000);
     }
   };
 
