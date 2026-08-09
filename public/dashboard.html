@@ -365,34 +365,147 @@ Example: Whether school and colleges need proper uniform or not"></textarea>
 
       <!-- 6. SETTINGS SUB-PAGE -->
       <div id="settings-view" class="view-panel hidden">
-        <div class="workspace-card">
-          <h2>⚙️ Dashboard Settings</h2>
-          <p style="color:var(--text-muted); margin-bottom:2rem;">Manage your engine preferences and theme options.</p>
+        <div class="workspace-card" style="max-width:850px;">
+          <h2>⚙️ Platform & Round-Table Settings</h2>
+          <p style="color:var(--text-muted); margin-bottom:2rem;">Customize persona names, personalities, discussion duration, and interface themes.</p>
 
-          <div style="display:flex; flex-direction:column; gap:1.5rem; max-width:600px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-dark); padding:1.25rem; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
-              <div>
-                <strong>Active AI Model Engine</strong>
-                <p style="font-size:0.85rem; color:var(--text-muted);">Google Gemma 4 (gemma-4-26b-a4b-it)</p>
+          <div style="display:flex; flex-direction:column; gap:2rem;">
+            
+            <!-- 1. Theme Configuration Card -->
+            <div style="background:var(--bg-dark); padding:1.5rem; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+              <h3 style="font-size:1.1rem; margin-bottom:0.5rem; color:var(--text-main);">🎨 Color Theme Selection</h3>
+              <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:1rem;">Switch between Light (Default) and Dark interface modes.</p>
+              
+              <div style="display:flex; gap:1rem;">
+                <button class="btn btn-secondary" onclick="applyTheme('light')" style="border-color:var(--accent-indigo);">
+                  ☀️ Light Mode (Default)
+                </button>
+                <button class="btn btn-secondary" onclick="applyTheme('dark')" style="border-color:var(--accent-indigo);">
+                  🌙 Dark Mode
+                </button>
               </div>
-              <span class="badge-tag" style="background:rgba(5,150,105,0.15); color:var(--accent-emerald);">Connected</span>
             </div>
 
-            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-dark); padding:1.25rem; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
-              <div>
-                <strong>Interface Color Theme</strong>
-                <p style="font-size:0.85rem; color:var(--text-muted);">Toggle between Light (Default) and Dark theme</p>
+            <!-- 2. Round-Table Custom Persona Names & Personality Archetypes -->
+            <div style="background:var(--bg-dark); padding:1.5rem; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+              <h3 style="font-size:1.1rem; margin-bottom:0.3rem; color:var(--text-main);">👥 Customize Personas (Names & Unique Personalities)</h3>
+              <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:1.25rem;">Rename Person A, B, C, D to your friends or custom titles, and assign unique personality archetypes.</p>
+
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1.25rem;">
+                
+                <!-- Persona A -->
+                <div style="background:var(--bg-card); padding:1rem; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); border-left:4px solid #4F46E5;">
+                  <strong style="color:#4F46E5; font-size:0.9rem;">Person A Customization</strong>
+                  <div style="margin-top:0.6rem;">
+                    <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:0.2rem;">Custom Name:</label>
+                    <input type="text" id="setting-name-a" class="custom-input" placeholder="e.g. Rohit or Person A" value="Person A">
+                  </div>
+                  <div style="margin-top:0.6rem;">
+                    <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:0.2rem;">Personality Archetype:</label>
+                    <select id="setting-arch-a" class="custom-input" onchange="updateArchetypeDropdowns()">
+                      <option value="Economic & Logistics Parameter">💼 Economic & Logistics</option>
+                      <option value="Social & Individual Freedom Parameter">🕊️ Social & Individual Freedom</option>
+                      <option value="Empirical Data & Scientific Parameter">🔍 Empirical Data & Science</option>
+                      <option value="Ethical & Psychological Parameter">🧠 Ethics & Psychology</option>
+                      <option value="Legal & Regulatory Parameter">⚖️ Legal & Regulatory</option>
+                      <option value="Historical & Political Parameter">🏛️ Historical & Political</option>
+                      <option value="Artistic & Cultural Parameter">🎨 Artistic & Cultural</option>
+                      <option value="Technological Innovation Parameter">💡 Technological Innovation</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Persona B -->
+                <div style="background:var(--bg-card); padding:1rem; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); border-left:4px solid #E11D48;">
+                  <strong style="color:#E11D48; font-size:0.9rem;">Person B Customization</strong>
+                  <div style="margin-top:0.6rem;">
+                    <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:0.2rem;">Custom Name:</label>
+                    <input type="text" id="setting-name-b" class="custom-input" placeholder="e.g. Rahul or Person B" value="Person B">
+                  </div>
+                  <div style="margin-top:0.6rem;">
+                    <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:0.2rem;">Personality Archetype:</label>
+                    <select id="setting-arch-b" class="custom-input" onchange="updateArchetypeDropdowns()">
+                      <option value="Economic & Logistics Parameter">💼 Economic & Logistics</option>
+                      <option value="Social & Individual Freedom Parameter" selected>🕊️ Social & Individual Freedom</option>
+                      <option value="Empirical Data & Scientific Parameter">🔍 Empirical Data & Science</option>
+                      <option value="Ethical & Psychological Parameter">🧠 Ethics & Psychology</option>
+                      <option value="Legal & Regulatory Parameter">⚖️ Legal & Regulatory</option>
+                      <option value="Historical & Political Parameter">🏛️ Historical & Political</option>
+                      <option value="Artistic & Cultural Parameter">🎨 Artistic & Cultural</option>
+                      <option value="Technological Innovation Parameter">💡 Technological Innovation</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Persona C -->
+                <div style="background:var(--bg-card); padding:1rem; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); border-left:4px solid #059669;">
+                  <strong style="color:#059669; font-size:0.9rem;">Person C Customization</strong>
+                  <div style="margin-top:0.6rem;">
+                    <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:0.2rem;">Custom Name:</label>
+                    <input type="text" id="setting-name-c" class="custom-input" placeholder="e.g. Raju or Person C" value="Person C">
+                  </div>
+                  <div style="margin-top:0.6rem;">
+                    <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:0.2rem;">Personality Archetype:</label>
+                    <select id="setting-arch-c" class="custom-input" onchange="updateArchetypeDropdowns()">
+                      <option value="Economic & Logistics Parameter">💼 Economic & Logistics</option>
+                      <option value="Social & Individual Freedom Parameter">🕊️ Social & Individual Freedom</option>
+                      <option value="Empirical Data & Scientific Parameter" selected>🔍 Empirical Data & Science</option>
+                      <option value="Ethical & Psychological Parameter">🧠 Ethics & Psychology</option>
+                      <option value="Legal & Regulatory Parameter">⚖️ Legal & Regulatory</option>
+                      <option value="Historical & Political Parameter">🏛️ Historical & Political</option>
+                      <option value="Artistic & Cultural Parameter">🎨 Artistic & Cultural</option>
+                      <option value="Technological Innovation Parameter">💡 Technological Innovation</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Persona D -->
+                <div style="background:var(--bg-card); padding:1rem; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); border-left:4px solid #D97706;">
+                  <strong style="color:#D97706; font-size:0.9rem;">Person D Customization</strong>
+                  <div style="margin-top:0.6rem;">
+                    <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:0.2rem;">Custom Name:</label>
+                    <input type="text" id="setting-name-d" class="custom-input" placeholder="e.g. Ananya or Person D" value="Person D">
+                  </div>
+                  <div style="margin-top:0.6rem;">
+                    <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:0.2rem;">Personality Archetype:</label>
+                    <select id="setting-arch-d" class="custom-input" onchange="updateArchetypeDropdowns()">
+                      <option value="Economic & Logistics Parameter">💼 Economic & Logistics</option>
+                      <option value="Social & Individual Freedom Parameter">🕊️ Social & Individual Freedom</option>
+                      <option value="Empirical Data & Scientific Parameter">🔍 Empirical Data & Science</option>
+                      <option value="Ethical & Psychological Parameter" selected>🧠 Ethics & Psychology</option>
+                      <option value="Legal & Regulatory Parameter">⚖️ Legal & Regulatory</option>
+                      <option value="Historical & Political Parameter">🏛️ Historical & Political</option>
+                      <option value="Artistic & Cultural Parameter">🎨 Artistic & Cultural</option>
+                      <option value="Technological Innovation Parameter">💡 Technological Innovation</option>
+                    </select>
+                  </div>
+                </div>
+
               </div>
-              <button class="theme-toggle-btn" onclick="toggleTheme()">Switch Theme</button>
             </div>
 
-            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-dark); padding:1.25rem; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
-              <div>
-                <strong>Storage Management</strong>
-                <p style="font-size:0.85rem; color:var(--text-muted);">Clear all saved debates from local storage</p>
-              </div>
-              <button class="btn btn-secondary" onclick="clearSavedStorage()" style="color:var(--accent-rose); border-color:var(--accent-rose);">Reset Saved Debates</button>
+            <!-- 3. Round-Table Discussion Duration Setting -->
+            <div style="background:var(--bg-dark); padding:1.5rem; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+              <h3 style="font-size:1.1rem; margin-bottom:0.3rem; color:var(--text-main);">⏱️ Round-Table Discussion Duration</h3>
+              <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:1rem;">Control the total discussion duration and turn pacing during live meetings.</p>
+
+              <select id="setting-duration-select" class="custom-input" style="max-width:320px;">
+                <option value="1" selected>⏱️ 1 Minute (Default - Fast Pace)</option>
+                <option value="3">⏱️ 3 Minutes (In-Depth Debate)</option>
+                <option value="5">⏱️ 5 Minutes (Comprehensive Multi-Turn)</option>
+              </select>
             </div>
+
+            <!-- 4. Save & Reset Action Bar -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; background:var(--bg-dark); padding:1.25rem; border-radius:var(--radius-md); border:1px solid var(--border-glow);">
+              <button class="btn btn-primary btn-large" onclick="saveSettings()">
+                ✨ Save Settings & Apply Changes
+              </button>
+              <button class="btn btn-secondary" onclick="clearSavedStorage()" style="color:var(--accent-rose); border-color:var(--accent-rose);">
+                🗑️ Reset Saved Storage
+              </button>
+            </div>
+
           </div>
         </div>
       </div>

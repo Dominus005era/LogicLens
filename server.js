@@ -572,36 +572,51 @@ Return JSON strictly formatted:
 // Endpoint: Round-Table Multi-Persona Discussion Simulation & Full Transcript Analysis
 app.post('/api/simulate-roundtable', async (req, res) => {
   try {
-    const { topic } = req.body;
+    const { topic, customPersonas, discussionDurationMinutes } = req.body;
     if (!topic || topic.trim().length < 5) {
       return res.status(400).json({ error: 'Please enter a valid topic or opinion for the round-table discussion.' });
     }
 
+    const pA_name = (customPersonas && customPersonas.person_a && customPersonas.person_a.name) ? customPersonas.person_a.name : "Person A";
+    const pA_arch = (customPersonas && customPersonas.person_a && customPersonas.person_a.archetype) ? customPersonas.person_a.archetype : "Economic & Logistics Parameter";
+
+    const pB_name = (customPersonas && customPersonas.person_b && customPersonas.person_b.name) ? customPersonas.person_b.name : "Person B";
+    const pB_arch = (customPersonas && customPersonas.person_b && customPersonas.person_b.archetype) ? customPersonas.person_b.archetype : "Social & Freedom of Expression Parameter";
+
+    const pC_name = (customPersonas && customPersonas.person_c && customPersonas.person_c.name) ? customPersonas.person_c.name : "Person C";
+    const pC_arch = (customPersonas && customPersonas.person_c && customPersonas.person_c.archetype) ? customPersonas.person_c.archetype : "Empirical Data & Scientific Parameter";
+
+    const pD_name = (customPersonas && customPersonas.person_d && customPersonas.person_d.name) ? customPersonas.person_d.name : "Person D";
+    const pD_arch = (customPersonas && customPersonas.person_d && customPersonas.person_d.archetype) ? customPersonas.person_d.archetype : "Ethical & Psychological Parameter";
+
+    const durationMin = parseInt(discussionDurationMinutes) || 1;
+    const numTurnsTarget = durationMin >= 5 ? 14 : durationMin >= 3 ? 10 : 8;
+
     const prompt = `You are LogicLens AI featuring Virtual Multi-Persona Round-Table Discussion Engine.
 
-Your task is to take the following topic/opinion and simulate a deep, realistic, organic 1-to-2 minute multi-persona discussion among 4 distinct AI Personas sitting around a virtual round table, AND generate a complete transcript analysis:
+Your task is to take the following topic/opinion and simulate a deep, realistic, organic multi-persona discussion among 4 distinct AI Personas sitting around a virtual round table, AND generate a complete transcript analysis:
 
 Topic / Opinion: "${topic}"
 
-The 4 Personas evaluate this topic from 4 distinct cognitive parameters:
-- Person A (Archetype: Economic & Logistics Parameter) — Practical execution, household budgets, logistics.
-- Person B (Archetype: Social & Freedom of Expression Parameter) — Autonomy, self-expression, rights, equity.
-- Person C (Archetype: Empirical Data & Scientific Parameter) — Peer-reviewed studies, statistics, quantitative data.
-- Person D (Archetype: Ethical & Psychological Parameter) — Mental health, community ethics, discipline, psychology.
+The 4 Personas evaluate this topic from 4 distinct cognitive parameters using their assigned names:
+- ${pA_name} (Archetype: ${pA_arch})
+- ${pB_name} (Archetype: ${pB_arch})
+- ${pC_name} (Archetype: ${pC_arch})
+- ${pD_name} (Archetype: ${pD_arch})
 
 CRITICAL INSTRUCTIONS FOR ORGANIC CONVERSATION FLOW:
-1. DO NOT use a fixed sequential order (A->B->C->D). Make turns flow naturally! Person B should directly counter Person A, Person A can defend themselves, Person D can interrupt with an ethical concern, Person C can interject with data to settle a dispute between A and B!
-2. Generate between 8 to 12 dynamic dialogue turns total.
+1. DO NOT use a fixed sequential order. Make turns flow naturally! Use exact persona names (${pA_name}, ${pB_name}, ${pC_name}, ${pD_name}).
+2. Generate between ${numTurnsTarget} to ${numTurnsTarget + 4} dynamic dialogue turns total.
 
 Return ONLY a valid, strict JSON object with EXACTLY this structure:
 
 {
   "topic": "${topic.replace(/"/g, '\\"')}",
   "personas": [
-    { "id": "person_a", "name": "Person A", "archetype": "Economic & Logistics", "avatar_color": "indigo", "tone": "Calm", "logic_rating": 8 },
-    { "id": "person_b", "name": "Person B", "archetype": "Social & Freedom", "avatar_color": "rose", "tone": "Passionate", "logic_rating": 8 },
-    { "id": "person_c", "name": "Person C", "archetype": "Empirical Data", "avatar_color": "emerald", "tone": "Calm", "logic_rating": 9 },
-    { "id": "person_d", "name": "Person D", "archetype": "Ethics & Psychology", "avatar_color": "amber", "tone": "Thoughtful", "logic_rating": 8 }
+    { "id": "person_a", "name": "${pA_name.replace(/"/g, '\\"')}", "archetype": "${pA_arch.replace(/"/g, '\\"')}", "avatar_color": "indigo", "tone": "Calm", "logic_rating": 8 },
+    { "id": "person_b", "name": "${pB_name.replace(/"/g, '\\"')}", "archetype": "${pB_arch.replace(/"/g, '\\"')}", "avatar_color": "rose", "tone": "Passionate", "logic_rating": 8 },
+    { "id": "person_c", "name": "${pC_name.replace(/"/g, '\\"')}", "archetype": "${pC_arch.replace(/"/g, '\\"')}", "avatar_color": "emerald", "tone": "Calm", "logic_rating": 9 },
+    { "id": "person_d", "name": "${pD_name.replace(/"/g, '\\"')}", "archetype": "${pD_arch.replace(/"/g, '\\"')}", "avatar_color": "amber", "tone": "Thoughtful", "logic_rating": 8 }
   ],
   "turns": [
     {

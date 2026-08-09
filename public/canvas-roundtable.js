@@ -47,6 +47,15 @@ class CanvasRoundTable {
     this.isDebateEnded = false;
   }
 
+  updatePersonas(personaList) {
+    if (!personaList || !Array.isArray(personaList)) return;
+    personaList.forEach(p => {
+      if (this.personas[p.id]) {
+        this.personas[p.id].name = p.name || this.personas[p.id].name;
+      }
+    });
+  }
+
   setDebateEnded(ended) {
     this.isDebateEnded = ended;
     if (ended) {

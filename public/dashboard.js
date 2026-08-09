@@ -188,12 +188,121 @@ document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   fetchFallacyLibrary();
   initStorage();
+  initSettings();
 
   // Initialize Canvas 2D Stage
   if (document.getElementById('roundtable-canvas')) {
     canvasStage = new CanvasRoundTable('roundtable-canvas');
   }
 });
+
+// Settings Management (Custom Persona Names, Personalities & Duration)
+const DEFAULT_SETTINGS = {
+  personas: {
+    person_a: { name: "Person A", archetype: "Economic & Logistics Parameter" },
+    person_b: { name: "Person B", archetype: "Social & Individual Freedom Parameter" },
+    person_c: { name: "Person C", archetype: "Empirical Data & Scientific Parameter" },
+    person_d: { name: "Person D", archetype: "Ethical & Psychological Parameter" }
+  },
+  discussionDurationMinutes: 1
+};
+
+function getSavedSettings() {
+  try {
+    const raw = localStorage.getItem('logiclens_settings');
+    return raw ? JSON.parse(raw) : DEFAULT_SETTINGS;
+  } catch (e) {
+    return DEFAULT_SETTINGS;
+  }
+}
+
+function initSettings() {
+  const settings = getSavedSettings();
+  
+  const pA = settings.personas?.person_a || DEFAULT_SETTINGS.personas.person_a;
+  const pB = settings.personas?.person_b || DEFAULT_SETTINGS.personas.person_b;
+  const pC = settings.personas?.person_c || DEFAULT_SETTINGS.personas.person_c;
+  const pD = settings.personas?.person_d || DEFAULT_SETTINGS.personas.person_d;
+
+  const nameA = document.getElementById('setting-name-a');
+  const nameB = document.getElementById('setting-name-b');
+  const nameC = document.getElementById('setting-name-c');
+  const nameD = document.getElementById('setting-name-d');
+
+  if (nameA) nameA.value = pA.name || "Person A";
+  if (nameB) nameB.value = pB.name || "Person B";
+  if (nameC) nameC.value = pC.name || "Person C";
+  if (nameD) nameD.value = pD.name || "Person D";
+
+  const archA = document.getElementById('setting-arch-a');
+  const archB = document.getElementById('setting-arch-b');
+  const archC = document.getElementById('setting-arch-c');
+  const archD = document.getElementById('setting-arch-d');
+
+  if (archA) archA.value = pA.archetype || "Economic & Logistics Parameter";
+  if (archB) archB.value = pB.archetype || "Social & Individual Freedom Parameter";
+  if (archC) archC.value = pC.archetype || "Empirical Data & Scientific Parameter";
+  if (archD) archD.value = pD.archetype || "Ethical & Psychological Parameter";
+
+  const durationSelect = document.getElementById('setting-duration-select');
+  if (durationSelect) durationSelect.value = settings.discussionDurationMinutes || 1;
+
+  updateArchetypeDropdowns();
+}
+
+// Mutual Exclusion Rule: Ensures no two personas share the exact same personality archetype!
+function updateArchetypeDropdowns() {
+  const dropdowns = [
+    document.getElementById('setting-arch-a'),
+    document.getElementById('setting-arch-b'),
+    document.getElementById('setting-arch-c'),
+    document.getElementById('setting-arch-d')
+  ];
+
+  if (dropdowns.some(d => !d)) return;
+
+  const selectedValues = dropdowns.map(d => d.value);
+
+  dropdowns.forEach((currentDropdown, currentIndex) => {
+    const otherSelected = selectedValues.filter((_, idx) => idx !== currentIndex);
+    Array.from(currentDropdown.options).forEach(option => {
+      if (otherSelected.includes(option.value)) {
+        option.disabled = true;
+        option.textContent = `${option.textContent.replace(' (In Use)', '')} (In Use)`;
+      } else {
+        option.disabled = false;
+        option.textContent = option.textContent.replace(' (In Use)', '');
+      }
+    });
+  });
+}
+
+function saveSettings() {
+  const nameA = document.getElementById('setting-name-a')?.value.trim() || "Person A";
+  const nameB = document.getElementById('setting-name-b')?.value.trim() || "Person B";
+  const nameC = document.getElementById('setting-name-c')?.value.trim() || "Person C";
+  const nameD = document.getElementById('setting-name-d')?.value.trim() || "Person D";
+
+  const archA = document.getElementById('setting-arch-a')?.value || "Economic & Logistics Parameter";
+  const archB = document.getElementById('setting-arch-b')?.value || "Social & Individual Freedom Parameter";
+  const archC = document.getElementById('setting-arch-c')?.value || "Empirical Data & Scientific Parameter";
+  const archD = document.getElementById('setting-arch-d')?.value || "Ethical & Psychological Parameter";
+
+  const duration = parseInt(document.getElementById('setting-duration-select')?.value) || 1;
+
+  const newSettings = {
+    personas: {
+      person_a: { name: nameA, archetype: archA },
+      person_b: { name: nameB, archetype: archB },
+      person_c: { name: nameC, archetype: archC },
+      person_d: { name: nameD, archetype: archD }
+    },
+    discussionDurationMinutes: duration
+  };
+
+  localStorage.setItem('logiclens_settings', JSON.stringify(newSettings));
+  alert(`✅ Settings Saved Successfully!\n\nPersonas set to:\n• ${nameA} (${archA.split(' ')[0]})\n• ${nameB} (${archB.split(' ')[0]})\n• ${nameC} (${archC.split(' ')[0]})\n• ${nameD} (${archD.split(' ')[0]})\n\nDiscussion Duration: ${duration} Minute(s).`);
+}
 
 // Storage Management
 function initStorage() {
@@ -410,10 +519,16 @@ async function triggerRoundTable() {
   analyzeBtn.disabled = true;
 
   try {
+    const settings = getSavedSettings();
     const res = await fetch('/api/simulate-roundtable', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ topic, mode: currentMode })
+      body: JSON.stringify({
+        topic,
+        mode: currentMode,
+        customPersonas: settings.personas,
+        discussionDurationMinutes: settings.discussionDurationMinutes
+      })
     });
 
     const data = await res.json();
@@ -434,6 +549,7 @@ async function triggerRoundTable() {
 
     if (canvasStage) {
       canvasStage.setTopic(roundTableData.topic);
+      canvasStage.updatePersonas(roundTableData.personas);
     }
 
     document.getElementById('minimized-topic-text').textContent = `"${roundTableData.topic}"`;
