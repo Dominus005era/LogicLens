@@ -1044,6 +1044,32 @@ h1, h2, h3, h4 { font-family: var(--font-heading); letter-spacing: -0.02em; }
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
+.card-delete-btn {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  background: rgba(220, 38, 38, 0.85);
+  backdrop-filter: blur(8px);
+  color: #FFF;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform var(--transition-fast), background-color var(--transition-fast);
+}
+
+.card-delete-btn:hover {
+  transform: scale(1.15);
+  background: rgba(239, 68, 68, 1);
+}
+
 .debate-card-body {
   padding: 1.1rem;
   display: flex;

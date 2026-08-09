@@ -258,8 +258,14 @@ function applyTheme(theme) {
   localStorage.setItem('logiclens_theme', theme);
 }
 
-// Sidebar Navigation Tabs
+// Sidebar Navigation Tabs (Stops TTS speech audio immediately on tab switch!)
 function switchSidebarTab(target) {
+  // Stop active speech audio immediately on page/tab navigation
+  if (canvasStage) canvasStage.stopSpeech();
+  if (window.speechSynthesis && window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+  }
+
   document.querySelectorAll('.sidebar-link').forEach(link => {
     link.classList.toggle('active', link.dataset.target === target);
   });
@@ -283,6 +289,25 @@ function switchSidebarTab(target) {
   } else if (target === 'insights') {
     renderInsightsView();
   }
+}
+
+// Delete Debate Card Helper (Deletes from storage & updates UI)
+function deleteDebateCard(evt, debateId) {
+  if (evt) evt.stopPropagation();
+  if (!confirm("Are you sure you want to delete this saved debate?")) return;
+
+  // Stop active speech if currently playing
+  if (canvasStage) canvasStage.stopSpeech();
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+
+  let stored = getStoredDebates();
+  stored = stored.filter(d => d.id !== debateId);
+  localStorage.setItem('logiclens_saved_debates', JSON.stringify(stored));
+
+  // Re-render current active view
+  renderLibraryView();
+  renderAnalyticsView();
+  renderInsightsView();
 }
 
 // Load Topic Preset
@@ -489,6 +514,7 @@ function renderLibraryView() {
   grid.innerHTML = debates.map(d => `
     <div class="debate-card" onclick="loadSavedDebateIntoRoundTable('${d.id}')">
       <div class="debate-card-img-wrap">
+        <button class="card-delete-btn" onclick="deleteDebateCard(event, '${d.id}')" title="Delete debate">🗑️</button>
         <img src="${d.coverImage || COVER_IMAGES[0]}" alt="Cover" class="debate-card-img" />
         <span class="debate-card-mode-badge">${d.mode === 'calm' ? '🕊️ Calm Rewrite' : '🗣️ Deep Discussion'}</span>
       </div>
@@ -514,6 +540,7 @@ function filterLibraryCards() {
   grid.innerHTML = filtered.map(d => `
     <div class="debate-card" onclick="loadSavedDebateIntoRoundTable('${d.id}')">
       <div class="debate-card-img-wrap">
+        <button class="card-delete-btn" onclick="deleteDebateCard(event, '${d.id}')" title="Delete debate">🗑️</button>
         <img src="${d.coverImage || COVER_IMAGES[0]}" alt="Cover" class="debate-card-img" />
         <span class="debate-card-mode-badge">${d.mode === 'calm' ? '🕊️ Calm Rewrite' : '🗣️ Deep Discussion'}</span>
       </div>
@@ -584,6 +611,7 @@ function renderAnalyticsView() {
     return `
       <div class="debate-card" onclick="openIndividualDebateAnalytics('${d.id}')">
         <div class="debate-card-img-wrap">
+          <button class="card-delete-btn" onclick="deleteDebateCard(event, '${d.id}')" title="Delete debate">🗑️</button>
           <img src="${d.coverImage || COVER_IMAGES[0]}" alt="Cover" class="debate-card-img" />
           <span class="debate-card-mode-badge" style="background:rgba(5,150,105,0.9);">${score}/100 Score</span>
         </div>
@@ -629,6 +657,7 @@ function renderInsightsView() {
   grid.innerHTML = debates.map(d => `
     <div class="debate-card" onclick="openInsightsModal('${d.id}')">
       <div class="debate-card-img-wrap">
+        <button class="card-delete-btn" onclick="deleteDebateCard(event, '${d.id}')" title="Delete debate">🗑️</button>
         <img src="${d.coverImage || COVER_IMAGES[0]}" alt="Cover" class="debate-card-img" />
         <span class="debate-card-mode-badge" style="background:rgba(217,119,6,0.9);">💡 Insights</span>
       </div>
